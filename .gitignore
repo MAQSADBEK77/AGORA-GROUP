@@ -15,5 +15,12 @@ dist/
 backend/uploads/
 backend/model/*.pth
 
+# Database
+*.db
+*.sqlite3
+
 # Docker
 *.log
+
+# Claude
+.claude/
