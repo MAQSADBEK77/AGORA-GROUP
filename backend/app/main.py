@@ -10,6 +10,25 @@ import os
 
 Base.metadata.create_all(bind=engine)
 
+
+def run_migrations():
+    """Mavjud bazaga yangi ustunlar qo'shadi (schema o'zgarsa)."""
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        migrations = [
+            "ALTER TABLE predictions ADD COLUMN cancer_prob REAL",
+            "ALTER TABLE predictions ADD COLUMN analysis_mode TEXT DEFAULT 'heuristic'",
+        ]
+        for sql in migrations:
+            try:
+                conn.execute(text(sql))
+                conn.commit()
+            except Exception:
+                pass  # Ustun allaqachon mavjud
+
+
+run_migrations()
+
 app = FastAPI(title="MammoAI API", version="1.0.0",
               description="Mammografiya AI Tizimi - Ko'krak saratonini aniqlash")
 
