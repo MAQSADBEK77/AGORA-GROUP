@@ -170,7 +170,9 @@ def submit_review(image_id: int,
 @router.get("/dashboard/stats", response_model=schemas.DashboardStats)
 def dashboard_stats(db: Session = Depends(get_db),
                     current_user: models.User = Depends(get_current_user)):
-    total_patients = db.query(models.Patient).count()
+    total_patients = db.execute(text(
+        "SELECT COUNT(DISTINCT patient_id) FROM mammography_images WHERE patient_id IS NOT NULL"
+    )).scalar() or 0
     total_images   = db.query(models.MammographyImage).count()
     pending_count  = db.query(models.MammographyImage).filter(
         models.MammographyImage.status == models.ImageStatus.pending).count()
