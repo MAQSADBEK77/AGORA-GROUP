@@ -7,75 +7,66 @@ from ..ai.validator import is_mammography_image
 import os, shutil, uuid
 
 router = APIRouter(prefix="/api", tags=["Upload"])
-
-UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
-ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".dcm"}
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
-
-
-def validate_file(file: UploadFile):
-    ext = os.path.splitext(file.filename)[1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail=f"Format qo'llab-quvvatlanmaydi. JPG, PNG, DICOM yuklang.")
+UPLOAD_DIR    = os.getenv("UPLOAD_DIR", "./uploads")
+ALLOWED_EXTS  = {".jpg", ".jpeg", ".png", ".dcm"}
 
 
 @router.post("/patients", response_model=schemas.PatientOut)
-def create_patient(patient: schemas.PatientCreate, db: Session = Depends(get_db),
+def create_patient(patient: schemas.PatientCreate,
+                   db: Session = Depends(get_db),
                    current_user: models.User = Depends(get_current_user)):
-    db_patient = models.Patient(**patient.dict())
-    db.add(db_patient)
+    db_p = models.Patient(**patient.dict())
+    db.add(db_p)
     db.commit()
-    db.refresh(db_patient)
-
-    log = models.Log(user_id=current_user.id, action="create_patient",
-                     details=f"Bemor yaratildi: {patient.full_name}")
-    db.add(log)
+    db.refresh(db_p)
+    db.add(models.Log(user_id=current_user.id, action="create_patient",
+                      details=f"{patient.full_name}"))
     db.commit()
-    return db_patient
+    return db_p
 
 
 @router.get("/patients", response_model=list[schemas.PatientOut])
-def list_patients(search: str = "", db: Session = Depends(get_db),
+def list_patients(search: str = "",
+                  db: Session = Depends(get_db),
                   current_user: models.User = Depends(get_current_user)):
-    query = db.query(models.Patient)
+    q = db.query(models.Patient)
     if search:
-        query = query.filter(models.Patient.full_name.ilike(f"%{search}%"))
-    return query.order_by(models.Patient.created_at.desc()).all()
+        q = q.filter(models.Patient.full_name.ilike(f"%{search}%"))
+    return q.order_by(models.Patient.created_at.desc()).all()
 
 
 @router.get("/patients/{patient_id}", response_model=schemas.PatientOut)
 def get_patient(patient_id: int, db: Session = Depends(get_db),
                 current_user: models.User = Depends(get_current_user)):
-    patient = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
-    if not patient:
+    p = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
+    if not p:
         raise HTTPException(status_code=404, detail="Bemor topilmadi")
-    return patient
+    return p
 
 
 @router.post("/upload", response_model=schemas.ImageOut)
-async def upload_image(
-    patient_id: int = Form(...),
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
-):
-    validate_file(file)
+async def upload_image(patient_id: int = Form(...),
+                       file: UploadFile = File(...),
+                       db: Session = Depends(get_db),
+                       current_user: models.User = Depends(get_current_user)):
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_EXTS:
+        raise HTTPException(status_code=400, detail="Faqat JPG, PNG, DICOM formatlar")
 
     patient = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Bemor topilmadi")
 
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    ext = os.path.splitext(file.filename)[1].lower()
-    unique_name = f"{uuid.uuid4().hex}{ext}"
-    file_path = os.path.join(UPLOAD_DIR, unique_name)
+    fname     = f"{uuid.uuid4().hex}{ext}"
+    file_path = os.path.join(UPLOAD_DIR, fname)
 
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    # Mammografiya rasmi ekanligini tekshirish
-    is_valid, reason = is_mammography_image(file_path)
-    if not is_valid:
+    # Mammografiya validatsiyasi
+    valid, reason = is_mammography_image(file_path)
+    if not valid:
         os.remove(file_path)
         raise HTTPException(status_code=422, detail=f"Noto'g'ri rasm: {reason}")
 
@@ -85,14 +76,14 @@ async def upload_image(
         filename=file.filename,
         file_path=file_path,
         file_format=ext.lstrip(".").upper(),
+        status=models.ImageStatus.pending,
     )
     db.add(image)
     db.commit()
     db.refresh(image)
 
-    log = models.Log(user_id=current_user.id, action="upload_image",
-                     details=f"Rasm yuklandi: {file.filename}, bemor_id={patient_id}")
-    db.add(log)
+    db.add(models.Log(user_id=current_user.id, action="upload",
+                      details=f"image_id={image.id}, patient_id={patient_id}"))
     db.commit()
     return image
 
@@ -100,10 +91,11 @@ async def upload_image(
 @router.get("/images/{image_id}", response_model=schemas.ImageOut)
 def get_image(image_id: int, db: Session = Depends(get_db),
               current_user: models.User = Depends(get_current_user)):
-    image = db.query(models.MammographyImage).filter(models.MammographyImage.id == image_id).first()
-    if not image:
+    img = db.query(models.MammographyImage).filter(
+        models.MammographyImage.id == image_id).first()
+    if not img:
         raise HTTPException(status_code=404, detail="Rasm topilmadi")
-    return image
+    return img
 
 
 @router.get("/patients/{patient_id}/images", response_model=list[schemas.ImageOut])

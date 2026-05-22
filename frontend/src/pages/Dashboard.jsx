@@ -1,106 +1,125 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Users, ImageIcon, Activity, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react'
+import { Users, ImageIcon, Clock, CheckCircle, AlertTriangle, AlertCircle, XCircle } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import api from '../api/axios'
 
-const StatCard = ({ label, value, icon: Icon, color }) => (
-  <div className="card flex items-center gap-4">
+const StatCard = ({ label, value, icon: Icon, color, onClick }) => (
+  <div onClick={onClick}
+    className={`card flex items-center gap-4 ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}>
     <div className={`p-3 rounded-xl ${color}`}>
       <Icon size={22} className="text-white" />
     </div>
     <div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-2xl font-bold text-gray-900">{value ?? 0}</p>
       <p className="text-sm text-gray-500">{label}</p>
     </div>
   </div>
 )
 
-const PIE_COLORS = ['#22c55e', '#ef4444']
+const PIE_COLORS = ['#22c55e', '#f59e0b', '#ef4444', '#991b1b']
+
+const LABEL_BADGE = {
+  Normal:        'badge-normal',
+  Benign:        'badge-benign',
+  Malignant:     'badge-malignant',
+  'Very Malignant': 'bg-red-900 text-white text-xs font-medium px-2 py-1 rounded-full',
+}
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
-  const [predictions, setPredictions] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [pending, setPending] = useState([])
   const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
   useEffect(() => {
-    Promise.all([
-      api.get('/dashboard/stats'),
-      api.get('/predictions?limit=5'),
-    ]).then(([s, p]) => {
-      setStats(s.data)
-      setPredictions(p.data)
-    }).finally(() => setLoading(false))
+    api.get('/dashboard/stats').then(r => setStats(r.data)).catch(() => {})
+    if (['radiolog','admin'].includes(user.role)) {
+      api.get('/pending').then(r => setPending(r.data)).catch(() => {})
+    }
   }, [])
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-48">
-      <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent" />
-    </div>
-  )
-
   const pieData = [
-    { name: 'Normal', value: stats?.normal_count || 0 },
-    { name: 'Cancer', value: stats?.cancer_count || 0 },
-  ]
-
-  const labelBadge = (label) => {
-    if (label === 'Normal')    return <span className="badge-normal">Normal</span>
-    if (label === 'Benign')    return <span className="badge-benign">Benign</span>
-    if (label === 'Malignant') return <span className="badge-malignant">Malignant</span>
-  }
+    { name: 'Normal',        value: stats?.normal_count        || 0 },
+    { name: 'Benign',        value: stats?.benign_count        || 0 },
+    { name: 'Malignant',     value: stats?.malignant_count     || 0 },
+    { name: 'Very Malignant',value: stats?.very_malignant_count|| 0 },
+  ].filter(d => d.value > 0)
 
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        <StatCard label="Bemorlar" value={stats?.total_patients}   icon={Users}        color="bg-blue-500" />
-        <StatCard label="Rasmlar"  value={stats?.total_images}     icon={ImageIcon}    color="bg-indigo-500" />
-        <StatCard label="Analizlar" value={stats?.total_predictions} icon={Activity}   color="bg-purple-500" />
-        <StatCard label="Normal"   value={stats?.normal_count}     icon={CheckCircle}  color="bg-green-500" />
-        <StatCard label="Cancer"   value={stats?.cancer_count}     icon={AlertTriangle} color="bg-red-500" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Bemorlar"    value={stats?.total_patients}  icon={Users}        color="bg-blue-500" />
+        <StatCard label="Jami rasmlar" value={stats?.total_images}    icon={ImageIcon}    color="bg-indigo-500" />
+        <StatCard label="Kutmoqda"    value={stats?.pending_count}   icon={Clock}        color="bg-yellow-500"
+          onClick={['radiolog','admin'].includes(user.role) ? () => navigate('/review') : null} />
+        <StatCard label="Tekshirilgan" value={stats?.reviewed_count}  icon={CheckCircle}  color="bg-green-500" />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Normal"        value={stats?.normal_count}        icon={CheckCircle}  color="bg-green-400" />
+        <StatCard label="Benign"        value={stats?.benign_count}        icon={AlertTriangle} color="bg-yellow-400" />
+        <StatCard label="Malignant"     value={stats?.malignant_count}     icon={AlertCircle}  color="bg-red-500" />
+        <StatCard label="Very Malignant" value={stats?.very_malignant_count} icon={XCircle}     color="bg-red-900" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
-          <h3 className="font-semibold text-gray-800 mb-4">Natijalar taqsimoti</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
-                {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="card">
-          <h3 className="font-semibold text-gray-800 mb-4">So'nggi analizlar</h3>
-          <div className="space-y-3">
-            {predictions.length === 0 && (
-              <p className="text-sm text-gray-400 text-center py-6">Hali analiz yo'q</p>
-            )}
-            {predictions.map(p => (
-              <div key={p.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                onClick={() => navigate(`/predictions/${p.id}`)}>
-                <div className="flex items-center gap-2">
-                  <AlertCircle size={16} className="text-gray-400" />
-                  <span className="text-sm text-gray-700">Analiz #{p.id}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  {labelBadge(p.label)}
-                  <span className="text-xs text-gray-400">
-                    {Math.round(p.confidence * 100)}%
-                  </span>
-                </div>
-              </div>
-            ))}
+        {pieData.length > 0 && (
+          <div className="card">
+            <h3 className="font-semibold text-gray-800 mb-4">Diagnozlar taqsimoti</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
+                  {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
-        </div>
+        )}
+
+        {['radiolog','admin'].includes(user.role) && (
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-800">Kutayotgan rasmlar</h3>
+              {pending.length > 0 && (
+                <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full font-medium">
+                  {pending.length} ta
+                </span>
+              )}
+            </div>
+            {pending.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-8">Barcha rasmlar tekshirilgan</p>
+            ) : (
+              <div className="space-y-2">
+                {pending.slice(0, 5).map(img => (
+                  <div key={img.id}
+                    className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg cursor-pointer hover:bg-yellow-100"
+                    onClick={() => navigate(`/review/${img.id}`)}>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{img.filename}</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(img.uploaded_at).toLocaleDateString('uz-UZ')}
+                      </p>
+                    </div>
+                    <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">
+                      Kutmoqda
+                    </span>
+                  </div>
+                ))}
+                {pending.length > 5 && (
+                  <button onClick={() => navigate('/review')}
+                    className="w-full text-sm text-blue-600 hover:underline text-center py-2">
+                    Yana {pending.length - 5} ta ko'rish →
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

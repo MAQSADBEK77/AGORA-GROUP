@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
-from .models import UserRole, PredictionLabel
+from .models import UserRole, ImageStatus, ReviewLabel
 
 
 class UserCreate(BaseModel):
@@ -53,15 +53,29 @@ class PatientOut(BaseModel):
         from_attributes = True
 
 
-class PredictionOut(BaseModel):
+class DoctorReviewCreate(BaseModel):
+    label: ReviewLabel
+    description: Optional[str] = None
+
+
+class DoctorReviewOut(BaseModel):
     id: int
     image_id: int
-    label: PredictionLabel
+    label: ReviewLabel
+    description: Optional[str]
+    reviewed_at: datetime
+    doctor: Optional[UserOut]
+
+    class Config:
+        from_attributes = True
+
+
+class AIPredictionOut(BaseModel):
+    id: int
+    image_id: int
+    label: ReviewLabel
     confidence: float
-    normal_prob: Optional[float]
-    cancer_prob: Optional[float]
-    heatmap_path: Optional[str]
-    analysis_mode: Optional[str] = "heuristic"
+    similar_cases: Optional[str]
     created_at: datetime
 
     class Config:
@@ -73,8 +87,10 @@ class ImageOut(BaseModel):
     patient_id: int
     filename: str
     file_format: Optional[str]
+    status: ImageStatus
     uploaded_at: datetime
-    prediction: Optional[PredictionOut]
+    review: Optional[DoctorReviewOut]
+    ai_prediction: Optional[AIPredictionOut]
 
     class Config:
         from_attributes = True
@@ -83,6 +99,9 @@ class ImageOut(BaseModel):
 class DashboardStats(BaseModel):
     total_patients: int
     total_images: int
-    total_predictions: int
+    pending_count: int
+    reviewed_count: int
     normal_count: int
-    cancer_count: int
+    benign_count: int
+    malignant_count: int
+    very_malignant_count: int

@@ -6,38 +6,46 @@ from .database import Base
 
 
 class UserRole(str, enum.Enum):
-    admin = "admin"
+    admin    = "admin"
     hamshira = "hamshira"
     radiolog = "radiolog"
 
 
-class PredictionLabel(str, enum.Enum):
-    normal = "Normal"
-    cancer = "Cancer"
+class ImageStatus(str, enum.Enum):
+    pending  = "pending"   # Hamshira yukladi, radiolog ko'rmagan
+    reviewed = "reviewed"  # Radiolog belgiladi
+
+
+class ReviewLabel(str, enum.Enum):
+    normal        = "Normal"
+    benign        = "Benign"
+    malignant     = "Malignant"
+    very_malignant = "Very Malignant"
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String(150), nullable=False)
-    email = Column(String(150), unique=True, index=True, nullable=False)
+    id              = Column(Integer, primary_key=True, index=True)
+    full_name       = Column(String(150), nullable=False)
+    email           = Column(String(150), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    role = Column(Enum(UserRole), default=UserRole.hamshira, nullable=False)
-    is_active = Column(Integer, default=1)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    role            = Column(Enum(UserRole), default=UserRole.hamshira, nullable=False)
+    is_active       = Column(Integer, default=1)
+    created_at      = Column(DateTime(timezone=True), server_default=func.now())
 
-    images = relationship("MammographyImage", back_populates="uploaded_by_user")
+    images  = relationship("MammographyImage", back_populates="uploaded_by_user")
+    reviews = relationship("DoctorReview", back_populates="doctor")
 
 
 class Patient(Base):
     __tablename__ = "patients"
 
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String(150), nullable=False)
+    id         = Column(Integer, primary_key=True, index=True)
+    full_name  = Column(String(150), nullable=False)
     birth_year = Column(Integer)
-    phone = Column(String(20))
-    notes = Column(Text)
+    phone      = Column(String(20))
+    notes      = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     images = relationship("MammographyImage", back_populates="patient")
@@ -46,40 +54,55 @@ class Patient(Base):
 class MammographyImage(Base):
     __tablename__ = "mammography_images"
 
-    id = Column(Integer, primary_key=True, index=True)
-    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+    id          = Column(Integer, primary_key=True, index=True)
+    patient_id  = Column(Integer, ForeignKey("patients.id"), nullable=False)
     uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
-    filename = Column(String(255), nullable=False)
-    file_path = Column(String(500), nullable=False)
+    filename    = Column(String(255), nullable=False)
+    file_path   = Column(String(500), nullable=False)
     file_format = Column(String(20))
+    status      = Column(Enum(ImageStatus), default=ImageStatus.pending, nullable=False)
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    patient = relationship("Patient", back_populates="images")
-    uploaded_by_user = relationship("User", back_populates="images")
-    prediction = relationship("Prediction", back_populates="image", uselist=False)
+    patient            = relationship("Patient", back_populates="images")
+    uploaded_by_user   = relationship("User", back_populates="images")
+    review             = relationship("DoctorReview", back_populates="image", uselist=False)
+    ai_prediction      = relationship("AIPrediction", back_populates="image", uselist=False)
 
 
-class Prediction(Base):
-    __tablename__ = "predictions"
+class DoctorReview(Base):
+    """Radiolog tomonidan qo'lda belgilangan diagnoz — AI uchun trening ma'lumot."""
+    __tablename__ = "doctor_reviews"
 
-    id = Column(Integer, primary_key=True, index=True)
-    image_id = Column(Integer, ForeignKey("mammography_images.id"), nullable=False)
-    label = Column(Enum(PredictionLabel), nullable=False)
-    confidence = Column(Float, nullable=False)
-    normal_prob = Column(Float)
-    cancer_prob = Column(Float)
-    heatmap_path = Column(String(500))
-    analysis_mode = Column(String(20), default="heuristic")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    id          = Column(Integer, primary_key=True, index=True)
+    image_id    = Column(Integer, ForeignKey("mammography_images.id"), nullable=False, unique=True)
+    doctor_id   = Column(Integer, ForeignKey("users.id"), nullable=False)
+    label       = Column(Enum(ReviewLabel), nullable=False)
+    description = Column(Text)
+    reviewed_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    image = relationship("MammographyImage", back_populates="prediction")
+    image  = relationship("MammographyImage", back_populates="review")
+    doctor = relationship("User", back_populates="reviews")
+
+
+class AIPrediction(Base):
+    """AI tomonidan qilingan taxmin (labeled rasmlar bilan solishtirish asosida)."""
+    __tablename__ = "ai_predictions"
+
+    id            = Column(Integer, primary_key=True, index=True)
+    image_id      = Column(Integer, ForeignKey("mammography_images.id"), nullable=False, unique=True)
+    label         = Column(Enum(ReviewLabel), nullable=False)
+    confidence    = Column(Float, nullable=False)
+    similar_cases = Column(Text)   # JSON: eng o'xshash labellar
+    created_at    = Column(DateTime(timezone=True), server_default=func.now())
+
+    image = relationship("MammographyImage", back_populates="ai_prediction")
 
 
 class Log(Base):
     __tablename__ = "logs"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    action = Column(String(200))
-    details = Column(Text)
+    id         = Column(Integer, primary_key=True, index=True)
+    user_id    = Column(Integer, ForeignKey("users.id"))
+    action     = Column(String(200))
+    details    = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Upload, History, ShieldCheck, Activity } from 'lucide-react'
+import { LayoutDashboard, Upload, ClipboardList, History, ShieldCheck, Activity } from 'lucide-react'
 
 const links = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/upload',    icon: Upload,          label: 'Rasm Yuklash' },
-  { to: '/history',   icon: History,         label: 'Bemor Tarixi' },
-  { to: '/admin',     icon: ShieldCheck,     label: 'Admin Panel', adminOnly: true },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard',         roles: ['admin','hamshira','radiolog'] },
+  { to: '/upload',    icon: Upload,          label: 'Rasm Yuklash',      roles: ['admin','hamshira'] },
+  { to: '/review',    icon: ClipboardList,   label: 'Ko\'rib Chiqish',   roles: ['admin','radiolog'] },
+  { to: '/history',   icon: History,         label: 'Bemor Tarixi',      roles: ['admin','hamshira','radiolog'] },
+  { to: '/admin',     icon: ShieldCheck,     label: 'Admin Panel',       roles: ['admin'] },
 ]
 
 export default function Sidebar() {
@@ -18,26 +19,20 @@ export default function Sidebar() {
           <Activity className="text-blue-600" size={24} />
           <div>
             <h1 className="text-lg font-bold text-gray-900">MammoAI</h1>
-            <p className="text-xs text-gray-500">Ko'krak saratoni aniqlash</p>
+            <p className="text-xs text-gray-500">Ko'krak saraton tizimi</p>
           </div>
         </div>
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
         {links
-          .filter(l => !l.adminOnly || user.role === 'admin')
+          .filter(l => l.roles.includes(user.role))
           .map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
+            <NavLink key={to} to={to}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`
-              }
-            >
+                  isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                }`}>
               <Icon size={18} />
               {label}
             </NavLink>
@@ -45,7 +40,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-100 text-xs text-gray-400 text-center">
-        © 2024 MammoAI
+        © 2024 MammoAI v2
       </div>
     </aside>
   )
