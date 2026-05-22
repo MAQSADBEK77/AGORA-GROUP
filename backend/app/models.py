@@ -4,6 +4,10 @@ from sqlalchemy.sql import func
 import enum
 from .database import Base
 
+# DB da qiymatlar (value) bilan saqlanishi uchun
+def _by_value(obj):
+    return [e.value for e in obj]
+
 
 class UserRole(str, enum.Enum):
     admin    = "admin"
@@ -30,7 +34,7 @@ class User(Base):
     full_name       = Column(String(150), nullable=False)
     email           = Column(String(150), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    role            = Column(Enum(UserRole), default=UserRole.hamshira, nullable=False)
+    role            = Column(Enum(UserRole, values_callable=_by_value), default=UserRole.hamshira, nullable=False)
     is_active       = Column(Integer, default=1)
     created_at      = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -60,7 +64,7 @@ class MammographyImage(Base):
     filename    = Column(String(255), nullable=False)
     file_path   = Column(String(500), nullable=False)
     file_format = Column(String(20))
-    status      = Column(Enum(ImageStatus), default=ImageStatus.pending, nullable=False)
+    status      = Column(Enum(ImageStatus, values_callable=_by_value), default=ImageStatus.pending, nullable=False)
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
 
     patient            = relationship("Patient", back_populates="images")
@@ -76,7 +80,7 @@ class DoctorReview(Base):
     id          = Column(Integer, primary_key=True, index=True)
     image_id    = Column(Integer, ForeignKey("mammography_images.id"), nullable=False, unique=True)
     doctor_id   = Column(Integer, ForeignKey("users.id"), nullable=False)
-    label       = Column(Enum(ReviewLabel), nullable=False)
+    label       = Column(Enum(ReviewLabel, values_callable=_by_value), nullable=False)
     description = Column(Text)
     reviewed_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -90,7 +94,7 @@ class AIPrediction(Base):
 
     id            = Column(Integer, primary_key=True, index=True)
     image_id      = Column(Integer, ForeignKey("mammography_images.id"), nullable=False, unique=True)
-    label         = Column(Enum(ReviewLabel), nullable=False)
+    label         = Column(Enum(ReviewLabel, values_callable=_by_value), nullable=False)
     confidence    = Column(Float, nullable=False)
     similar_cases = Column(Text)   # JSON: eng o'xshash labellar
     created_at    = Column(DateTime(timezone=True), server_default=func.now())
