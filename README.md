@@ -1,263 +1,113 @@
-# Mammografiya AI Tizimi
+# MammoAI — Mammografiya AI Tizimi
 
-## Ko‘krak Saratonini Erta Aniqlash Loyihasi
-
----
-
-# Loyiha haqida
-
-MammoAI — bu mammografiya rasmlarini sun’iy intellekt yordamida analiz qilib, ko‘krak saratoni ehtimolini erta aniqlash uchun yaratilgan tibbiy AI tizim.
-
-Tizim klinika va shifoxonalarda foydalanish uchun mo‘ljallangan bo‘lib, mammografiya rasmlari hamshira yoki shifokor tomonidan tizimga yuklanadi.
-
-AI model:
-- rasmni analiz qiladi
-- saraton ehtimolini hisoblaydi
-- suspicious hududlarni aniqlaydi
-- natijani shifokorga chiqaradi
+Ko'krak saraton kasalligini erta aniqlash uchun yaratilgan tibbiy AI tizim.
+Hamshira rasm yuklaydi → radiolog tekshiradi → AI o'z-o'zini o'qitib boradi.
 
 ---
 
-# Loyihaning maqsadi
+## Ishga tushirish
 
-- Ko‘krak saratonini erta aniqlash
-- Diagnostika vaqtini kamaytirish
-- Shifokorlarga yordam berish
-- AI orqali analiz sifatini oshirish
+> **Talab:** Python 3.10+, Node.js 18+
 
----
-
-# Tizim foydalanuvchilari
-
-Tizimdan:
-- Hamshira
-- Radiolog
-- Shifokor
-- Administrator
-
-foydalanadi.
-
-Oddiy foydalanuvchilar tizimga kira olmaydi.
-
----
-
-# Tizim ishlash jarayoni
+**1. Backend** — yangi terminal oching:
 
 ```
-
-Hamshira mammografiya rasmini yuklaydi
-                ↓
-Tizim rasmni preprocessing qiladi
-                ↓
-AI model analiz qiladi
-                ↓
-Prediction generatsiya qilinadi
-                ↓
-Heatmap hosil qilinadi
-                ↓
-Natija shifokorga ko‘rsatiladi
-
+start_backend.bat
 ```
 
----
+**2. Frontend** — boshqa terminal oching:
 
-# Texnologiyalar
+```
+start_frontend.bat
+```
 
-## Frontend
-- React
-- Tailwind CSS
-- Axios
-
-## Backend
-- Python
-- FastAPI
-
-## AI
-- PyTorch
-- Torchvision
-
-## Image Processing
-- OpenCV
-- NumPy
-- PIL
-
-## Database
-- PostgreSQL
-
-## Deployment
-- Docker
-- Nginx
-- VPS / Cloud Server
+**3. Brauzerda oching:** [http://localhost:3000](http://localhost:3000)
 
 ---
 
-# Tizim modullari
+## Test akkauntlari
 
-## 1. Authentication Moduli
-
-Vazifasi:
-- Login
-- JWT Authentication
-- Role management
-
-Rollar:
-- Admin
-- Hamshira
-- Radiolog
+| Rol | Email | Parol |
+|-----|-------|-------|
+| **Admin** | admin@mammoai.uz | admin123 |
+| **Radiolog** | maqsadbekweb@gmail.com | admin123 |
+| **Hamshira** | shohjaxon@gmail.com | admin123 |
 
 ---
 
-## 2. Mammografiya Upload Moduli
+## Test qilish tartibi
 
-Vazifasi:
-Hamshira mammografiya rasmini yuklaydi.
+### 1. Hamshira sifatida kiring
+- Dashboard'da o'ng tomonda **"Rasm yuklash"** widget mavjud
+- Bemor qidiring yoki yangi bemor yarating
+- Mammografiya rasmini yuklang (JPG/PNG)
 
-Qo‘llab-quvvatlanadigan formatlar:
-- JPG
-- PNG
-- DICOM
+### 2. Radiolog sifatida kiring
+- Navbar'da **qo'ng'iroq belgisi** — yangi rasm kelganda bildirishnoma chiqadi
+- **"Ko'rib chiqish"** bo'limiga o'ting
+- Rasmni oching → **"AI dan so'rang"** tugmasini bosing
+- AI taxminini ko'ring, keyin o'z diagnozingizni qo'ying:
+  `Normal / Benign / Malignant / Very Malignant`
 
----
-
-## 3. AI Analiz Moduli
-
-Jarayon:
-1. Image preprocessing
-2. AI prediction
-3. Probability calculation
-4. Heatmap generation
-
-Natijalar:
-- Normal
-- Benign
-- Malignant
+### 3. Admin sifatida kiring
+- **Foydalanuvchilar** qo'shish, tahrirlash, o'chirish
+- **"Yuklangan bemorlar rasmlarini tozalash"** — test rasmlarini o'chirish
 
 ---
 
-## 4. Image Processing Moduli
+## Tizim qanday ishlaydi
 
-Jarayonlar:
-- Resize
-- Grayscale conversion
-- Noise reduction
-- Normalization
+```
+Hamshira rasm yuklaydi
+        ↓
+Radiolog rasmni ko'rib diagnoz qo'yadi
+        ↓
+AI bu rasmni o'rganib oladi (self-learning)
+        ↓
+Keyingi yangi rasmda AI shu tajribadan foydalanadi
+```
 
----
-
-## 5. Heatmap Visualization
-
-Texnologiya:
-- Grad-CAM
-
-Imkoniyatlari:
-- Qizil suspicious area
-- Explainable AI
+**AI texnologiyasi:** KNN + ResNet embedding. Radiolog qancha ko'p label qo'ysa, AI shuncha aniqroq ishlaydi. DB da 990 ta labeled MIAS mammografiya rasmi bor.
 
 ---
 
-## 6. Database Moduli
+## Sahifalar
 
-Saqlanadigan ma’lumotlar:
-- Bemor ma’lumotlari
-- c
-- Prediction natijalari
-- Analiz tarixi
-
-Jadvallar:
-- users
-- patients
-- mammography_images
-- predictions
-- logs
+| Sahifa | URL | Kim uchun |
+|--------|-----|-----------|
+| Login | `/login` | Hammaga |
+| Dashboard | `/dashboard` | Hammaga |
+| Ko'rib chiqish | `/review` | Radiolog, Admin |
+| Rasm detali | `/review/:id` | Radiolog, Admin |
+| Admin panel | `/admin` | Admin |
 
 ---
 
-## 7. Dashboard
+## Texnologiyalar
 
-Imkoniyatlari:
-- Predictionlarni ko‘rish
-- Heatmap ko‘rish
-- Statistikalar
-- Search va filter
-
----
-
-# AI Model haqida
-
-Model turi:
-- CNN (Convolutional Neural Network)
-
-Ishlatilishi mumkin bo‘lgan modellar:
-- ResNet50
-- EfficientNet
-- DenseNet121
-
-Datasetlar:
-- CBIS-DDSM
-- MIAS Dataset
+| | |
+|-|-|
+| **Frontend** | React, Tailwind CSS, Recharts |
+| **Backend** | Python, FastAPI, SQLAlchemy |
+| **AI** | KNN, ResNet18 embedding, NumPy |
+| **DB** | SQLite |
+| **Auth** | JWT, bcrypt |
 
 ---
 
-# API Endpointlar
+## API
 
-## Authentication
+Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-```bash
+Asosiy endpointlar:
+```
 POST /api/auth/login
-GET  /api/auth/me
-```
-
-## Upload
-
-```bash
-POST /api/upload
-```
-
-## Prediction
-
-```bash
-POST /api/predict
-GET  /api/predictions/:id
+GET  /api/pending          # Kutayotgan rasmlar
+GET  /api/ai-predict/{id}  # AI taxmin
+POST /api/review/{id}      # Radiolog diagnozi
+GET  /api/dashboard/stats  # Statistika
 ```
 
 ---
 
-# Frontend sahifalari
-
-- Login
-- Dashboard
-- Upload Page
-- Prediction Result
-- Patient History
-- Admin Panel
-
----
-
-# Xavfsizlik
-
-- JWT Authentication
-- Protected API
-- Password hashing
-- File validation
-- Rate limiting
-
----
-
-# Kelajakdagi rivojlantirish
-
-- BI-RADS classification
-- Mobile App
-- Hospital integration
-- Cloud AI
-- AI report generation
-
----
-
-# Muhim eslatma
-
-Ushbu tizim:
-- AI yordamchi tizimi hisoblanadi
-- Mustaqil diagnoz qo‘ymaydi
-- Yakuniy qaror shifokor tomonidan qabul qilinadi
-
-Tizim faqat diagnostikani qo‘llab-quvvatlash uchun ishlatiladi.
+> **Eslatma:** Bu tizim shifokorga yordamchi vosita bo'lib, yakuniy qaror doim shifokor tomonidan qabul qilinadi.
