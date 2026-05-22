@@ -231,23 +231,26 @@ def clear_uploaded_images(db: Session = Depends(get_db),
 
     upload_dir = os.getenv("UPLOAD_DIR", "./uploads")
 
-    # Dataset rasmlari (mdb* nomli) dan tashqari barchasini topish
-    images = (db.query(models.MammographyImage)
-              .filter(models.MammographyImage.file_path.like("%uploads%"))
-              .filter(~models.MammographyImage.filename.like("mdb%"))
-              .all())
+    # Dataset (mdb*) dan tashqari rasm IDlari va fayl yo'llarini olish
+    rows = db.execute(text("""
+        SELECT id, file_path, filename FROM mammography_images
+        WHERE file_path LIKE '%uploads%'
+          AND filename NOT LIKE 'mdb%'
+    """)).fetchall()
 
+    if not rows:
+        return {"success": True, "deleted_images": 0, "deleted_files": 0, "errors": []}
+
+    image_ids = [r[0] for r in rows]
     deleted_files = 0
-    deleted_db    = 0
     errors        = []
 
-    for img in images:
-        # Faylni o'chirish
-        path = img.file_path or ""
+    # Fayllarni diskdan o'chirish
+    for img_id, file_path, _ in rows:
+        path = file_path or ""
         if not os.path.exists(path):
             fname = os.path.basename(path.replace("\\", "/"))
             path  = os.path.join(upload_dir, fname)
-
         if os.path.exists(path):
             try:
                 os.remove(path)
@@ -255,28 +258,28 @@ def clear_uploaded_images(db: Session = Depends(get_db),
             except Exception as e:
                 errors.append(str(e))
 
-        # Embedding faylini o'chirish
-        emb_path = os.path.join(upload_dir, "embeddings", f"{img.id}.npy")
+        emb_path = os.path.join(upload_dir, "embeddings", f"{img_id}.npy")
         if os.path.exists(emb_path):
             try:
                 os.remove(emb_path)
             except Exception:
                 pass
 
-        # DB dan o'chirish (cascade: review, ai_prediction ham o'chadi)
-        db.delete(img)
-        deleted_db += 1
-
+    # Raw SQL bilan ketma-ket o'chirish (NOT NULL constraint muammosidan qochish)
+    placeholders = ",".join(str(i) for i in image_ids)
+    db.execute(text(f"DELETE FROM ai_predictions WHERE image_id IN ({placeholders})"))
+    db.execute(text(f"DELETE FROM doctor_reviews  WHERE image_id IN ({placeholders})"))
+    db.execute(text(f"DELETE FROM mammography_images WHERE id IN ({placeholders})"))
     db.commit()
 
     log = models.Log(user_id=current_user.id, action="clear_uploads",
-                     details=f"deleted {deleted_db} images, {deleted_files} files")
+                     details=f"deleted {len(image_ids)} images, {deleted_files} files")
     db.add(log)
     db.commit()
 
     return {
         "success": True,
-        "deleted_images": deleted_db,
+        "deleted_images": len(image_ids),
         "deleted_files": deleted_files,
         "errors": errors[:5] if errors else [],
     }
