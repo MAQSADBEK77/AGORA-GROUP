@@ -38,6 +38,7 @@ def run_prediction(image_id: int, db: Session = Depends(get_db),
         benign_prob=result["probabilities"][1],
         malignant_prob=result["probabilities"][2],
         heatmap_path=result.get("heatmap_path"),
+        analysis_mode=result.get("mode", "heuristic"),
     )
     db.add(prediction)
     db.commit()

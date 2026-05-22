@@ -70,7 +70,8 @@ export default function Upload() {
       toast.success('Analiz tugadi!')
       navigate(`/predictions/${pred.id}`)
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Yuklash xatosi')
+      const msg = err.response?.data?.detail || 'Yuklash xatosi'
+      toast.error(msg, { duration: 6000 })
     } finally {
       setLoading(false)
     }

@@ -118,10 +118,20 @@ export default function PredictionResult() {
         </div>
       )}
 
-      <div className="card bg-yellow-50 border border-yellow-200">
+      <div className="card bg-yellow-50 border border-yellow-200 space-y-2">
         <p className="text-xs text-yellow-800 text-center">
           ⚠️ Bu AI yordamchi tizimi hisoblanadi. Yakuniy diagnoz faqat malakali shifokor tomonidan qo'yiladi.
         </p>
+        {pred.analysis_mode === 'heuristic' ? (
+          <p className="text-xs text-orange-700 text-center bg-orange-50 rounded p-2 border border-orange-200">
+            🔬 <b>Heuristic rejim</b> — trenirovka qilingan model yuklanmagan.
+            Natijalar to'qima zichligiga asoslanadi.
+          </p>
+        ) : (
+          <p className="text-xs text-green-700 text-center bg-green-50 rounded p-2 border border-green-200">
+            🤖 <b>AI Model rejim</b> — trenirovka qilingan EfficientNet-B4 ishlamoqda.
+          </p>
+        )}
       </div>
     </div>
   )

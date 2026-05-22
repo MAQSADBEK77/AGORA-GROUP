@@ -159,7 +159,7 @@ Imkoniyatlari:
 
 Saqlanadigan ma’lumotlar:
 - Bemor ma’lumotlari
-- Mammografiya rasmlari
+- c
 - Prediction natijalari
 - Analiz tarixi
 

@@ -62,6 +62,7 @@ class PredictionOut(BaseModel):
     benign_prob: Optional[float]
     malignant_prob: Optional[float]
     heatmap_path: Optional[str]
+    analysis_mode: Optional[str] = "heuristic"
     created_at: datetime
 
     class Config:

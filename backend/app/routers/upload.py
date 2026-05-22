@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user
+from ..ai.validator import is_mammography_image
 import os, shutil, uuid
 
 router = APIRouter(prefix="/api", tags=["Upload"])
@@ -71,6 +72,12 @@ async def upload_image(
 
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
+
+    # Mammografiya rasmi ekanligini tekshirish
+    is_valid, reason = is_mammography_image(file_path)
+    if not is_valid:
+        os.remove(file_path)
+        raise HTTPException(status_code=422, detail=f"Noto'g'ri rasm: {reason}")
 
     image = models.MammographyImage(
         patient_id=patient_id,

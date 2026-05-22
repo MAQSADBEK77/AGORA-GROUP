@@ -71,6 +71,7 @@ class Prediction(Base):
     benign_prob = Column(Float)
     malignant_prob = Column(Float)
     heatmap_path = Column(String(500))
+    analysis_mode = Column(String(20), default="heuristic")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     image = relationship("MammographyImage", back_populates="prediction")

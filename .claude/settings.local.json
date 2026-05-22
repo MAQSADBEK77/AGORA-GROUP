@@ -8,7 +8,8 @@
       "Bash(npm --version)",
       "PowerShell(python --version)",
       "PowerShell(node --version)",
-      "PowerShell(npm --version)"
+      "PowerShell(npm --version)",
+      "Bash(del \"c:\\\\Users\\\\Maqsadbek\\\\Desktop\\\\AGORA GROUP\\\\backend\\\\mammoai.db\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\Maqsadbek\\Desktop\\AGORA GROUP\\backend\\app"
