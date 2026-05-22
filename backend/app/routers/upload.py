@@ -98,6 +98,29 @@ def get_image(image_id: int, db: Session = Depends(get_db),
     return img
 
 
+@router.get("/image-file/{image_id}")
+def serve_image_file(image_id: int, db: Session = Depends(get_db),
+                     current_user: models.User = Depends(get_current_user)):
+    """Rasm faylini to'g'ridan-to'g'ri qaytaradi (path muammolarini hal qiladi)."""
+    from fastapi.responses import FileResponse
+    img = db.query(models.MammographyImage).filter(
+        models.MammographyImage.id == image_id).first()
+    if not img:
+        raise HTTPException(status_code=404, detail="Rasm topilmadi")
+    path = img.file_path
+    if not os.path.exists(path):
+        # Relative path sinab ko'rish
+        fname = os.path.basename(path.replace("\\", "/"))
+        alt   = os.path.join(UPLOAD_DIR, fname)
+        if os.path.exists(alt):
+            path = alt
+        else:
+            raise HTTPException(status_code=404, detail="Fayl topilmadi")
+    ext      = os.path.splitext(path)[1].lower()
+    mtype    = "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png"
+    return FileResponse(path, media_type=mtype)
+
+
 @router.get("/patients/{patient_id}/images", response_model=list[schemas.ImageOut])
 def get_patient_images(patient_id: int, db: Session = Depends(get_db),
                        current_user: models.User = Depends(get_current_user)):

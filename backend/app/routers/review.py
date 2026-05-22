@@ -50,15 +50,22 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
                .filter(models.MammographyImage.id != image_id)
                .all())
 
-    labeled_cases = [
-        {
+    labeled_cases = []
+    for r in reviews:
+        fp = r.image.file_path if r.image else ""
+        # Fayl mavjudligini tekshirish
+        import os as _os
+        if not _os.path.exists(fp):
+            fname = _os.path.basename(fp.replace("\\", "/"))
+            alt   = _os.path.join(_os.getenv("UPLOAD_DIR", "./uploads"), fname)
+            if _os.path.exists(alt):
+                fp = alt
+        labeled_cases.append({
             "image_id":    r.image_id,
             "label":       r.label.value,
-            "image_path":  r.image.file_path,
-            "patient_name": r.image.patient.full_name if r.image.patient else "",
-        }
-        for r in reviews
-    ]
+            "image_path":  fp,
+            "patient_name": r.image.patient.full_name if r.image and r.image.patient else "",
+        })
 
     result = predict_from_labeled(image.file_path, labeled_cases)
 

@@ -82,10 +82,7 @@ export default function ReviewDetail() {
   // Rasm URL ni to'g'ri hisoblash
   function getImageUrl(img) {
     if (!img) return null
-    // Windows va Linux path larni ikkalasini ham handle qilish
-    const fp = (img.file_path || '').replace(/\\/g, '/')
-    const fname = fp.split('/').filter(Boolean).pop() || img.filename
-    return `/uploads/${fname}`
+    return `/api/image-file/${img.id}`
   }
 
   if (error) return (
