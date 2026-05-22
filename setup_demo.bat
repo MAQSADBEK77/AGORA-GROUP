@@ -11,7 +11,7 @@ echo.
 cd /d "%~dp0backend"
 call venv\Scripts\activate.bat
 
-pip install kaggle pillow numpy -q
+pip install requests pillow numpy -q
 
 echo.
 echo Boshlashdan avval:

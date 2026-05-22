@@ -40,7 +40,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-100 text-xs text-gray-400 text-center">
-        © 2024 MammoAI v2
+        © 2026 MammoAI v2
       </div>
     </aside>
   )

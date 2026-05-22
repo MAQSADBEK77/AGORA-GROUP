@@ -35,12 +35,6 @@ except ImportError:
     install("numpy")
     import numpy as np
 
-try:
-    import kaggle
-except ImportError:
-    print("kaggle o'rnatilmoqda...")
-    install("kaggle")
-
 # ─── Sozlamalar ───
 
 BASE_DIR    = Path(__file__).parent
@@ -97,24 +91,68 @@ def download_mias():
     DATA_DIR.mkdir(exist_ok=True)
     print("\n[1/4] MIAS dataset yuklanmoqda (50MB)...")
 
-    kaggle_json = Path.home() / ".kaggle" / "kaggle.json"
-    if not kaggle_json.exists():
-        print("\n  kaggle.json topilmadi!")
-        print("  1. kaggle.com → Settings → API → Create New Token")
-        print("  2. kaggle.json ni C:\\Users\\<ism>\\.kaggle\\ ga qo'ying")
-        json_path = input("  Yoki kaggle.json yo'lini kiriting: ").strip().strip('"')
-        if json_path and Path(json_path).exists():
-            dest = Path.home() / ".kaggle"
-            dest.mkdir(exist_ok=True)
-            shutil.copy(json_path, dest / "kaggle.json")
-            os.chmod(dest / "kaggle.json", 0o600)
-        else:
-            print("  kaggle.json kerak. Chiqilmoqda.")
-            sys.exit(1)
+    # kaggle.json ni loyiha papkasidan ham qidirish
+    project_json  = BASE_DIR.parent / "kaggle.json"   # AGORA GROUP/kaggle.json
+    project_json2 = BASE_DIR / "kaggle.json"           # backend/kaggle.json
+    default_json  = Path.home() / ".kaggle" / "kaggle.json"
 
-    os.chdir(DATA_DIR)
-    os.system("kaggle datasets download -d kmader/mias-mammography --unzip -q")
-    os.chdir(BASE_DIR)
+    src = None
+    for candidate in [project_json, project_json2, default_json]:
+        if candidate.exists():
+            src = candidate
+            print(f"  kaggle.json topildi: {src}")
+            break
+
+    if src is None:
+        print("  kaggle.json topilmadi!")
+        print("  Uni 'AGORA GROUP' papkasiga qo'ying va qayta ishga tushiring.")
+        sys.exit(1)
+
+    # kaggle.json dan username va key o'qish
+    import json
+    with open(src, "r") as f:
+        creds = json.load(f)
+    username = creds.get("username") or creds.get("KAGGLE_USERNAME")
+    key      = creds.get("key")      or creds.get("KAGGLE_KEY")
+
+    if not username or not key:
+        print(f"  kaggle.json ichida username/key topilmadi: {src}")
+        sys.exit(1)
+
+    print(f"  Foydalanuvchi: {username}")
+
+    # Kaggle API orqali to'g'ridan-to'g'ri yuklash (CLI siz)
+    import requests, zipfile, io
+
+    url  = "https://www.kaggle.com/api/v1/datasets/download/kmader/mias-mammography"
+    auth = (username, key)
+
+    print("  Yuklanmoqda... (50MB, 1-3 daqiqa)")
+    resp = requests.get(url, auth=auth, stream=True, timeout=300)
+
+    if resp.status_code == 401:
+        print("  Autentifikatsiya xatosi — kaggle.json ni tekshiring")
+        sys.exit(1)
+    if resp.status_code != 200:
+        print(f"  Yuklash xatosi: {resp.status_code} — {resp.text[:200]}")
+        sys.exit(1)
+
+    # ZIP ni xotiraga yuklab, ochish
+    total = int(resp.headers.get("content-length", 0))
+    downloaded = 0
+    chunks = []
+    for chunk in resp.iter_content(chunk_size=1024 * 1024):
+        chunks.append(chunk)
+        downloaded += len(chunk)
+        if total:
+            pct = downloaded / total * 100
+            print(f"\r  {pct:.0f}% ({downloaded//1024//1024}MB / {total//1024//1024}MB)", end="", flush=True)
+    print()
+
+    print("  ZIP ochilmoqda...")
+    zip_data = b"".join(chunks)
+    with zipfile.ZipFile(io.BytesIO(zip_data)) as z:
+        z.extractall(DATA_DIR)
 
     pgm_files = list(DATA_DIR.rglob("*.pgm"))
     print(f"  {len(pgm_files)} ta PGM rasm topildi")
@@ -148,6 +186,41 @@ def convert_and_organize(records: list[dict], pgm_dir: Path) -> dict[str, list[P
         print(f"  {lbl}: {len(files)} ta rasm")
 
     return organized
+
+
+def ensure_db_schema():
+    """Bazani yangi sxemaga moslashtiradi."""
+    import sqlite3
+    conn = sqlite3.connect(str(DB_PATH))
+    cur  = conn.cursor()
+    migrations = [
+        "ALTER TABLE mammography_images ADD COLUMN status TEXT DEFAULT 'reviewed'",
+        "ALTER TABLE predictions ADD COLUMN cancer_prob REAL",
+        "ALTER TABLE predictions ADD COLUMN analysis_mode TEXT DEFAULT 'heuristic'",
+        """CREATE TABLE IF NOT EXISTS doctor_reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            image_id INTEGER UNIQUE NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            label TEXT NOT NULL,
+            description TEXT,
+            reviewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )""",
+        """CREATE TABLE IF NOT EXISTS ai_predictions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            image_id INTEGER UNIQUE NOT NULL,
+            label TEXT NOT NULL,
+            confidence REAL NOT NULL,
+            similar_cases TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )""",
+    ]
+    for sql in migrations:
+        try:
+            cur.execute(sql)
+            conn.commit()
+        except Exception:
+            pass
+    conn.close()
 
 
 def import_to_db(organized: dict[str, list[Path]]):
@@ -290,6 +363,7 @@ def main():
 
     pgm_dir    = DATA_DIR
     organized  = convert_and_organize(records, pgm_dir)
+    ensure_db_schema()
     import_to_db(organized)
     build_embeddings()
 

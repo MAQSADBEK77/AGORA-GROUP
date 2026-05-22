@@ -1,13 +1,38 @@
-import json
+import json, os
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user
 from ..ai.predictor import predict_from_labeled, index_labeled_image
 
 router = APIRouter(prefix="/api", tags=["Review"])
+
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
+
+
+@router.get("/img/{image_id}")
+def serve_image(image_id: int, db: Session = Depends(get_db)):
+    """Rasm faylini qaytaradi — auth kerak emas."""
+    img = db.query(models.MammographyImage).filter(
+        models.MammographyImage.id == image_id).first()
+    if not img:
+        raise HTTPException(status_code=404, detail="Topilmadi")
+
+    path = img.file_path or ""
+    if not os.path.exists(path):
+        fname = os.path.basename(path.replace("\\", "/"))
+        alt   = os.path.join(UPLOAD_DIR, fname)
+        path  = alt if os.path.exists(alt) else ""
+
+    if not path or not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Fayl yo'q")
+
+    ext   = os.path.splitext(path)[1].lower()
+    mtype = "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png"
+    return FileResponse(path, media_type=mtype)
 
 
 def _require_radiolog(current_user: models.User):

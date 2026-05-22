@@ -83,7 +83,7 @@ export default function ReviewDetail() {
   // Rasm URL ni to'g'ri hisoblash
   function getImageUrl(img) {
     if (!img) return null
-    return `/api/image-file/${img.id}`
+    return `/api/img/${img.id}`
   }
 
   if (error) return (

@@ -10,7 +10,10 @@
       "PowerShell(node --version)",
       "PowerShell(npm --version)",
       "Bash(del \"c:\\\\Users\\\\Maqsadbek\\\\Desktop\\\\AGORA GROUP\\\\backend\\\\mammoai.db\")",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Maqsadbek\\Desktop\\AGORA GROUP\\backend\\app"
