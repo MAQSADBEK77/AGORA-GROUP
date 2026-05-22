@@ -159,16 +159,24 @@ export default function Dashboard() {
           subtitle="Bajarilgan analizlar" />
       </div>
 
-      {/* Row 2: Diagnosis stats */}
+      {/* Row 2: Diagnosis stats — clickable */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Normal"         value={stats?.normal_count}         icon={CheckCircle}
-          gradient="bg-gradient-to-br from-emerald-400 to-emerald-600" />
+          gradient="bg-gradient-to-br from-emerald-400 to-emerald-600"
+          subtitle="Bemorlar ro'yxati →"
+          onClick={() => navigate('/history?label=Normal')} />
         <StatCard label="Benign"         value={stats?.benign_count}         icon={AlertTriangle}
-          gradient="bg-gradient-to-br from-amber-400 to-amber-600" />
+          gradient="bg-gradient-to-br from-amber-400 to-amber-600"
+          subtitle="Bemorlar ro'yxati →"
+          onClick={() => navigate('/history?label=Benign')} />
         <StatCard label="Malignant"      value={stats?.malignant_count}      icon={AlertCircle}
-          gradient="bg-gradient-to-br from-red-500 to-red-700" />
+          gradient="bg-gradient-to-br from-red-500 to-red-700"
+          subtitle="Bemorlar ro'yxati →"
+          onClick={() => navigate('/history?label=Malignant')} />
         <StatCard label="Very Malignant" value={stats?.very_malignant_count} icon={XCircle}
-          gradient="bg-gradient-to-br from-red-800 to-red-950" />
+          gradient="bg-gradient-to-br from-red-800 to-red-950"
+          subtitle="Bemorlar ro'yxati →"
+          onClick={() => navigate('/history?label=Very Malignant')} />
       </div>
 
       {/* Row 3: Charts + Pending */}

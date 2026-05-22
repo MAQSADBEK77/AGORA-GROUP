@@ -15,7 +15,7 @@ ALLOWED_EXTS  = {".jpg", ".jpeg", ".png", ".dcm"}
 def create_patient(patient: schemas.PatientCreate,
                    db: Session = Depends(get_db),
                    current_user: models.User = Depends(get_current_user)):
-    db_p = models.Patient(**patient.dict())
+    db_p = models.Patient(**patient.dict(), is_demo=0)
     db.add(db_p)
     db.commit()
     db.refresh(db_p)
@@ -27,11 +27,29 @@ def create_patient(patient: schemas.PatientCreate,
 
 @router.get("/patients", response_model=list[schemas.PatientOut])
 def list_patients(search: str = "",
+                  label: str = "",
                   db: Session = Depends(get_db),
                   current_user: models.User = Depends(get_current_user)):
-    q = db.query(models.Patient)
+    from sqlalchemy import text as _text
+    # Faqat real (demo bo'lmagan) bemorlar
+    q = db.query(models.Patient).filter(models.Patient.is_demo == 0)
+
     if search:
-        q = q.filter(models.Patient.full_name.ilike(f"%{search}%"))
+        q = q.filter(
+            models.Patient.full_name.ilike(f"%{search}%") |
+            models.Patient.phone.ilike(f"%{search}%")
+        )
+
+    if label:
+        # Diagnozi label ga mos bemorlar
+        labeled_ids = db.execute(_text("""
+            SELECT DISTINCT mi.patient_id
+            FROM mammography_images mi
+            JOIN doctor_reviews dr ON dr.image_id = mi.id
+            WHERE dr.label = :label
+        """), {"label": label}).scalars().all()
+        q = q.filter(models.Patient.id.in_(labeled_ids))
+
     return q.order_by(models.Patient.created_at.desc()).all()
 
 

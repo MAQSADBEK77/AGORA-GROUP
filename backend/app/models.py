@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Enum, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
@@ -50,6 +50,7 @@ class Patient(Base):
     birth_year = Column(Integer)
     phone      = Column(String(20))
     notes      = Column(Text)
+    is_demo    = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     images = relationship("MammographyImage", back_populates="patient")
