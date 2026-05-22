@@ -9,23 +9,15 @@ const LABEL_INFO = {
     color: 'text-green-600',
     bg: 'bg-green-50',
     border: 'border-green-200',
-    text: 'Mammografiya tasviri normal ko\'rinishda. Patologik o\'zgarishlar aniqlanmadi.',
+    text: 'Mammografiya tasviri normal ko\'rinishda. Saraton belgilari aniqlanmadi.',
     recommendation: 'Yillik profilaktik tekshiruvni davom ettiring.',
   },
-  Benign: {
-    icon: AlertTriangle,
-    color: 'text-yellow-600',
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
-    text: 'Xavfsiz o\'zgarish aniqlandi. Kuzatuvni davom ettirish tavsiya etiladi.',
-    recommendation: 'Radiolog bilan maslahat oling va 6 oydan keyin qayta tekshiruv o\'tkazing.',
-  },
-  Malignant: {
+  Cancer: {
     icon: AlertCircle,
     color: 'text-red-600',
     bg: 'bg-red-50',
     border: 'border-red-200',
-    text: 'Xavfli o\'zgarish ehtimoli aniqlandi. Darhol mutaxassis ko\'rigidan o\'tish zarur.',
+    text: 'Saraton belgilari ehtimoli aniqlandi. Darhol mutaxassis ko\'rigidan o\'tish zarur.',
     recommendation: 'Onkolog va radiolog bilan zudlik bilan maslahatlashing.',
   },
 }
@@ -87,9 +79,8 @@ export default function PredictionResult() {
       <div className="card">
         <h3 className="font-semibold text-gray-800 mb-4">Ehtimollik (Confidence)</h3>
         <div className="space-y-4">
-          <ProbBar label="Normal" value={pred.normal_prob || 0} color="bg-green-500" />
-          <ProbBar label="Benign" value={pred.benign_prob || 0} color="bg-yellow-500" />
-          <ProbBar label="Malignant" value={pred.malignant_prob || 0} color="bg-red-500" />
+          <ProbBar label="Normal"  value={pred.normal_prob || 0} color="bg-green-500" />
+          <ProbBar label="Cancer"  value={pred.cancer_prob || 0} color="bg-red-500" />
         </div>
         <p className="mt-4 text-sm text-gray-500">
           Umumiy ishonch darajasi: <span className="font-bold text-gray-800">{Math.round(pred.confidence * 100)}%</span>

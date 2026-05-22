@@ -1,65 +1,57 @@
+"""
+Notebook bilan mos predictor:
+  - ResNet18 (pretrained=True, fc -> 2 klass)
+  - Klasslar: 0=normal, 1=cancer
+  - Transform: Resize(224), ToTensor, Normalize([0.5,0.5,0.5],[0.5,0.5,0.5])
+  - Model fayli: model_breast.pth
+"""
+
 import os
-import json
 import numpy as np
 from PIL import Image
 
 UPLOAD_DIR  = os.getenv("UPLOAD_DIR", "./uploads")
-MODEL_PATH  = os.getenv("MODEL_PATH", "./model/mammo_model.pth")
-META_PATH   = os.path.splitext(MODEL_PATH)[0].replace("mammo_model", "model_meta") + ".json"
+MODEL_PATH  = os.getenv("MODEL_PATH", "./model/model_breast.pth")
 HEATMAP_DIR = os.path.join(UPLOAD_DIR, "heatmaps")
-NUM_CLASSES = 3
-CLASSES     = ["Normal", "Benign", "Malignant"]
+NUM_CLASSES = 2
+CLASSES     = ["Normal", "Cancer"]
 
-_model  = None
-_device = None
+_model   = None
+_device  = None
 _torch_ok = False
 
 try:
     import torch
     import torch.nn as nn
-    _device  = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    import torchvision.models as tv_models
+    import torchvision.transforms as T
+    _device   = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     _torch_ok = True
 except ImportError:
     pass
 
-
-def _build_model():
-    """Model arxitekturasini meta-fayldan yoki default dan quradi."""
-    arch = "efficientnet_b4"
-    if os.path.exists(META_PATH):
-        try:
-            with open(META_PATH) as f:
-                arch = json.load(f).get("model", arch)
-        except Exception:
-            pass
-
-    try:
-        import timm
-        model = timm.create_model(arch, pretrained=False, num_classes=NUM_CLASSES)
-    except Exception:
-        import torchvision.models as tv
-        model = tv.resnet50(weights=None)
-        model.fc = __import__("torch").nn.Linear(model.fc.in_features, NUM_CLASSES)
-
-    return model
-
-
-def _get_transform():
+# Notebook dagi transform bilan to'liq mos
+_TRANSFORM = None
+if _torch_ok:
     import torchvision.transforms as T
-    return T.Compose([
+    _TRANSFORM = T.Compose([
         T.Resize((224, 224)),
-        T.Grayscale(num_output_channels=3),
         T.ToTensor(),
-        T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
     ])
+
+
+def model_is_ready() -> bool:
+    return _torch_ok and os.path.exists(MODEL_PATH)
 
 
 def _load_model():
     global _model
     if _model is not None:
         return _model
-    import torch
-    model = _build_model()
+
+    model = tv_models.resnet18(weights=None)
+    model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
     model.load_state_dict(torch.load(MODEL_PATH, map_location=_device))
     model.to(_device)
     model.eval()
@@ -68,58 +60,44 @@ def _load_model():
     return _model
 
 
-def model_is_ready() -> bool:
-    return _torch_ok and os.path.exists(MODEL_PATH)
-
-
-# ──────────────── Heuristic fallback ────────────────
+# ─────────────── Heuristic fallback (deterministik) ───────────────
 
 def _heuristic_predict(image_path: str) -> dict:
-    """
-    PyTorch yoki trenirovka qilingan model yo'q bo'lganda ishlatiladi.
-    Deterministik: bir xil rasm → bir xil natija.
-    Tibbiy asos: to'qima zichligi (BI-RADS density).
-    """
     try:
-        img = Image.open(image_path).convert("L").resize((224, 224))
+        img  = Image.open(image_path).convert("L").resize((224, 224))
+        gray = np.array(img, dtype=np.float32)
     except Exception:
-        return {"predicted_class": 0, "confidence": 0.60,
-                "probabilities": [0.60, 0.25, 0.15],
-                "heatmap_path": None, "mode": "heuristic"}
+        return {"predicted_class": 0, "confidence": 0.65,
+                "probabilities": [0.65, 0.35], "heatmap_path": None, "mode": "heuristic"}
 
-    gray = np.array(img, dtype=np.float32)
     tissue_mask = gray > 25
     if tissue_mask.sum() < 500:
         return {"predicted_class": 0, "confidence": 0.80,
-                "probabilities": [0.80, 0.12, 0.08],
-                "heatmap_path": None, "mode": "heuristic"}
+                "probabilities": [0.80, 0.20], "heatmap_path": None, "mode": "heuristic"}
 
     tissue = gray[tissue_mask]
     n = len(tissue)
-    low  = float(np.sum((tissue > 25)  & (tissue <= 90))  / n)
-    mid  = float(np.sum((tissue > 90)  & (tissue <= 170)) / n)
-    high = float(np.sum((tissue > 170) & (tissue <= 230)) / n)
-    vbrt = float(np.sum(tissue > 230)                      / n)
 
+    high_density = float(np.sum(tissue > 170) / n)
+    very_bright  = float(np.sum(tissue > 230) / n)
     cx = np.abs(np.arange(224) - 112) / 112.0
     cy = np.abs(np.arange(224).reshape(-1, 1) - 112) / 112.0
-    periph = ((gray > 180) * ((cx + cy) > 1.2)).mean()
+    periph = float(((gray > 180) * ((cx + cy) > 1.2)).mean())
 
-    normal_s    = low * 0.6 + (1 - high) * 0.3 + (1 - vbrt) * 0.1
-    benign_s    = mid * 0.5 + high * 0.3 + (1 - periph) * 0.2
-    malignant_s = high * 0.4 + vbrt * 0.35 + periph * 0.25
+    cancer_score = high_density * 0.45 + very_bright * 0.35 + periph * 0.20
+    cancer_score = min(max(cancer_score, 0.0), 1.0)
+    normal_score = 1.0 - cancer_score
 
-    total = normal_s + benign_s + malignant_s + 1e-8
-    probs = [normal_s / total, benign_s / total, malignant_s / total]
+    probs = [normal_score, cancer_score]
     cls   = int(np.argmax(probs))
     return {"predicted_class": cls, "confidence": float(probs[cls]),
             "probabilities": probs, "heatmap_path": None, "mode": "heuristic"}
 
 
-# ──────────────── Grad-CAM ────────────────
+# ─────────────── Grad-CAM ───────────────
 
-def _run_gradcam(model, tensor, cls_idx: int, orig_img: Image.Image,
-                 image_id: int) -> str | None:
+def _run_gradcam(model, tensor, cls_idx: int,
+                 orig_img: Image.Image, image_id: int):
     try:
         import torch, cv2
         os.makedirs(HEATMAP_DIR, exist_ok=True)
@@ -131,15 +109,8 @@ def _run_gradcam(model, tensor, cls_idx: int, orig_img: Image.Image,
             acts.append(out)
             out.register_hook(lambda g: grads.append(g))
 
-        # Son conv layer — timm EfficientNet va ResNet uchun
-        target = None
-        for name, m in model.named_modules():
-            if isinstance(m, torch.nn.Conv2d):
-                target = m
-        if target is None:
-            return None
-
-        hook = target.register_forward_hook(fwd_hook)
+        # ResNet18 ning oxirgi conv layeri: layer4
+        hook = model.layer4.register_forward_hook(fwd_hook)
         model.zero_grad()
         out = model(tensor)
         out[0, cls_idx].backward()
@@ -150,11 +121,10 @@ def _run_gradcam(model, tensor, cls_idx: int, orig_img: Image.Image,
 
         g   = grads[0].squeeze().cpu().numpy()
         a   = acts[0].squeeze().cpu().numpy()
-        w   = g.mean(axis=(1, 2)) if g.ndim == 3 else g.mean()
-        cam = np.zeros(a.shape[1:] if a.ndim == 3 else a.shape, dtype=np.float32)
-        if a.ndim == 3:
-            for i, wi in enumerate(w):
-                cam += wi * a[i]
+        w   = g.mean(axis=(1, 2))
+        cam = np.zeros(a.shape[1:], dtype=np.float32)
+        for i, wi in enumerate(w):
+            cam += wi * a[i]
         cam = np.maximum(cam, 0)
         if cam.max() > 0:
             cam /= cam.max()
@@ -171,18 +141,16 @@ def _run_gradcam(model, tensor, cls_idx: int, orig_img: Image.Image,
         return None
 
 
-# ──────────────── Ana predict funksiya ────────────────
+# ─────────────── Asosiy funksiya ───────────────
 
 def predict_image(image_path: str, image_id: int) -> dict:
     if not model_is_ready():
         return _heuristic_predict(image_path)
 
     try:
-        import torch
         model  = _load_model()
-        tf     = _get_transform()
         img    = Image.open(image_path).convert("RGB")
-        tensor = tf(img).unsqueeze(0).to(_device)
+        tensor = _TRANSFORM(img).unsqueeze(0).to(_device)
 
         with torch.no_grad():
             logits = model(tensor)
@@ -201,5 +169,5 @@ def predict_image(image_path: str, image_id: int) -> dict:
             "mode":            "model",
         }
     except Exception as e:
-        print(f"[MammoAI] Model xatosi: {e} — heuristikga o'tildi")
+        print(f"[MammoAI] Model xatosi: {e}")
         return _heuristic_predict(image_path)

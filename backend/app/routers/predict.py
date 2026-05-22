@@ -27,16 +27,14 @@ def run_prediction(image_id: int, db: Session = Depends(get_db),
     result = predict_image(image.file_path, image_id)
 
     label_map = {0: models.PredictionLabel.normal,
-                 1: models.PredictionLabel.benign,
-                 2: models.PredictionLabel.malignant}
+                 1: models.PredictionLabel.cancer}
 
     prediction = models.Prediction(
         image_id=image_id,
         label=label_map[result["predicted_class"]],
         confidence=result["confidence"],
         normal_prob=result["probabilities"][0],
-        benign_prob=result["probabilities"][1],
-        malignant_prob=result["probabilities"][2],
+        cancer_prob=result["probabilities"][1],
         heatmap_path=result.get("heatmap_path"),
         analysis_mode=result.get("mode", "heuristic"),
     )
@@ -95,6 +93,5 @@ def get_dashboard_stats(db: Session = Depends(get_db),
         total_images=total_images,
         total_predictions=total_predictions,
         normal_count=counts.get(models.PredictionLabel.normal, 0),
-        benign_count=counts.get(models.PredictionLabel.benign, 0),
-        malignant_count=counts.get(models.PredictionLabel.malignant, 0),
+        cancer_count=counts.get(models.PredictionLabel.cancer, 0),
     )

@@ -16,7 +16,7 @@ const StatCard = ({ label, value, icon: Icon, color }) => (
   </div>
 )
 
-const PIE_COLORS = ['#22c55e', '#f59e0b', '#ef4444']
+const PIE_COLORS = ['#22c55e', '#ef4444']
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
@@ -42,8 +42,7 @@ export default function Dashboard() {
 
   const pieData = [
     { name: 'Normal', value: stats?.normal_count || 0 },
-    { name: 'Benign', value: stats?.benign_count || 0 },
-    { name: 'Malignant', value: stats?.malignant_count || 0 },
+    { name: 'Cancer', value: stats?.cancer_count || 0 },
   ]
 
   const labelBadge = (label) => {
@@ -57,11 +56,11 @@ export default function Dashboard() {
       <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        <StatCard label="Bemorlar" value={stats?.total_patients} icon={Users} color="bg-blue-500" />
-        <StatCard label="Rasmlar" value={stats?.total_images} icon={ImageIcon} color="bg-indigo-500" />
-        <StatCard label="Analizlar" value={stats?.total_predictions} icon={Activity} color="bg-purple-500" />
-        <StatCard label="Normal" value={stats?.normal_count} icon={CheckCircle} color="bg-green-500" />
-        <StatCard label="Xavfli" value={stats?.malignant_count} icon={AlertTriangle} color="bg-red-500" />
+        <StatCard label="Bemorlar" value={stats?.total_patients}   icon={Users}        color="bg-blue-500" />
+        <StatCard label="Rasmlar"  value={stats?.total_images}     icon={ImageIcon}    color="bg-indigo-500" />
+        <StatCard label="Analizlar" value={stats?.total_predictions} icon={Activity}   color="bg-purple-500" />
+        <StatCard label="Normal"   value={stats?.normal_count}     icon={CheckCircle}  color="bg-green-500" />
+        <StatCard label="Cancer"   value={stats?.cancer_count}     icon={AlertTriangle} color="bg-red-500" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

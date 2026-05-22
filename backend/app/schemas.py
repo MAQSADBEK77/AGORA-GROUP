@@ -59,8 +59,7 @@ class PredictionOut(BaseModel):
     label: PredictionLabel
     confidence: float
     normal_prob: Optional[float]
-    benign_prob: Optional[float]
-    malignant_prob: Optional[float]
+    cancer_prob: Optional[float]
     heatmap_path: Optional[str]
     analysis_mode: Optional[str] = "heuristic"
     created_at: datetime
@@ -86,5 +85,4 @@ class DashboardStats(BaseModel):
     total_images: int
     total_predictions: int
     normal_count: int
-    benign_count: int
-    malignant_count: int
+    cancer_count: int

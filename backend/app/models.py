@@ -13,8 +13,7 @@ class UserRole(str, enum.Enum):
 
 class PredictionLabel(str, enum.Enum):
     normal = "Normal"
-    benign = "Benign"
-    malignant = "Malignant"
+    cancer = "Cancer"
 
 
 class User(Base):
@@ -68,8 +67,7 @@ class Prediction(Base):
     label = Column(Enum(PredictionLabel), nullable=False)
     confidence = Column(Float, nullable=False)
     normal_prob = Column(Float)
-    benign_prob = Column(Float)
-    malignant_prob = Column(Float)
+    cancer_prob = Column(Float)
     heatmap_path = Column(String(500))
     analysis_mode = Column(String(20), default="heuristic")
     created_at = Column(DateTime(timezone=True), server_default=func.now())

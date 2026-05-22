@@ -5,7 +5,7 @@ import api from '../api/axios'
 
 const labelBadge = (label) => {
   if (!label) return null
-  const cls = { Normal: 'badge-normal', Benign: 'badge-benign', Malignant: 'badge-malignant' }
+  const cls = { Normal: 'badge-normal', Cancer: 'badge-malignant' }
   return <span className={cls[label] || 'badge-normal'}>{label}</span>
 }
 
