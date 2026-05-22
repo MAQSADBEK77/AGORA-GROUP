@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Users, ImageIcon, Clock, CheckCircle, AlertTriangle,
-  AlertCircle, XCircle, TrendingUp, Activity
+  AlertCircle, XCircle, TrendingUp, Activity, Upload, Search, X
 } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
+import toast from 'react-hot-toast'
 import api from '../api/axios'
 
 const PIE_COLORS  = ['#10b981', '#f59e0b', '#ef4444', '#7f1d1d']
@@ -51,20 +52,57 @@ const CustomTooltip = ({ active, payload }) => {
 export default function Dashboard() {
   const [stats, setStats]       = useState(null)
   const [pending, setPending]   = useState([])
-  const [loading, setLoading]   = useState(true)
+  const [loading, setLoading]     = useState(true)
+  const [uploadState, setUploadState] = useState({ step: 1, search: '', patients: [], selected: null, file: null, preview: null, uploading: false })
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('user') || '{}')
-  const isDoctor = ['radiolog', 'admin'].includes(user.role)
+  const isDoctor  = ['radiolog', 'admin'].includes(user.role)
+  const isNurse   = ['hamshira', 'admin'].includes(user.role)
 
-  useEffect(() => {
-    Promise.all([
+  const refreshStats = async () => {
+    const [s, p] = await Promise.all([
       api.get('/dashboard/stats'),
       isDoctor ? api.get('/pending') : Promise.resolve({ data: [] }),
-    ]).then(([s, p]) => {
-      setStats(s.data)
-      setPending(p.data)
-    }).finally(() => setLoading(false))
+    ])
+    setStats(s.data)
+    setPending(p.data)
+  }
+
+  useEffect(() => {
+    refreshStats().finally(() => setLoading(false))
   }, [])
+
+  // Upload helpers
+  const searchPatients = async () => {
+    if (!uploadState.search.trim()) return
+    const { data } = await api.get(`/patients?search=${uploadState.search}`)
+    setUploadState(u => ({ ...u, patients: data }))
+  }
+  const onFileChange = e => {
+    const f = e.target.files[0]
+    if (!f) return
+    const ext = f.name.split('.').pop().toLowerCase()
+    if (!['jpg','jpeg','png','dcm'].includes(ext)) { toast.error('Faqat JPG, PNG, DICOM'); return }
+    const preview = ext !== 'dcm' ? URL.createObjectURL(f) : null
+    setUploadState(u => ({ ...u, file: f, preview }))
+  }
+  const handleUpload = async () => {
+    if (!uploadState.file || !uploadState.selected) return
+    setUploadState(u => ({ ...u, uploading: true }))
+    try {
+      const fd = new FormData()
+      fd.append('patient_id', uploadState.selected.id)
+      fd.append('file', uploadState.file)
+      await api.post('/upload', fd)
+      toast.success('Rasm yuklandi! Radiolog ko\'rib chiqadi.')
+      setUploadState({ step: 1, search: '', patients: [], selected: null, file: null, preview: null, uploading: false })
+      refreshStats()
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Yuklash xatosi', { duration: 6000 })
+    } finally {
+      setUploadState(u => ({ ...u, uploading: false }))
+    }
+  }
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -172,20 +210,17 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Pending queue */}
+        {/* Pending queue (radiolog) */}
         {isDoctor && (
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-gray-800 dark:text-white">Kutayotgan rasmlar</h3>
-              {pending.length > 0 && (
-                <span className="badge-pending">{pending.length} ta</span>
-              )}
+              {pending.length > 0 && <span className="badge-pending">{pending.length} ta</span>}
             </div>
             {pending.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <CheckCircle size={32} className="text-emerald-400 mb-2" />
                 <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Hammasi tekshirilgan</p>
-                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Yangi rasmlar kutilmoqda</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -193,24 +228,94 @@ export default function Dashboard() {
                   <button key={img.id} onClick={() => navigate(`/review/${img.id}`)}
                     className="w-full flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20
                                hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-colors text-left">
-                    <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Clock size={14} className="text-amber-600 dark:text-amber-400" />
-                    </div>
+                    <Clock size={14} className="text-amber-500 flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-800 dark:text-slate-200 truncate">{img.filename}</p>
-                      <p className="text-xs text-gray-400 dark:text-slate-500">
-                        {new Date(img.uploaded_at).toLocaleString('uz-UZ')}
-                      </p>
+                      <p className="text-xs text-gray-400 dark:text-slate-500">{new Date(img.uploaded_at).toLocaleString('uz-UZ')}</p>
                     </div>
                   </button>
                 ))}
                 {pending.length > 4 && (
                   <button onClick={() => navigate('/review')}
-                    className="w-full text-center text-sm text-blue-600 dark:text-blue-400 py-2
-                               hover:underline font-medium">
-                    Yana {pending.length - 4} ta ko'rish →
+                    className="w-full text-center text-sm text-blue-600 dark:text-blue-400 py-2 hover:underline font-medium">
+                    Yana {pending.length - 4} ta →
                   </button>
                 )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Upload mini-form (hamshira) */}
+        {isNurse && (
+          <div className="card">
+            <h3 className="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+              <Upload size={16} className="text-blue-500" /> Tez yuklash
+            </h3>
+
+            {uploadState.step === 1 ? (
+              <div className="space-y-3">
+                <p className="text-xs text-gray-500 dark:text-slate-400">Bemorni tanlang</p>
+                <div className="flex gap-2">
+                  <input className="input text-sm" placeholder="Ism qidirish..."
+                    value={uploadState.search}
+                    onChange={e => setUploadState(u => ({ ...u, search: e.target.value }))}
+                    onKeyDown={e => e.key === 'Enter' && searchPatients()} />
+                  <button onClick={searchPatients} className="btn-secondary px-3">
+                    <Search size={14} />
+                  </button>
+                </div>
+                <div className="space-y-1 max-h-36 overflow-y-auto">
+                  {uploadState.patients.map(p => (
+                    <button key={p.id}
+                      onClick={() => setUploadState(u => ({ ...u, selected: p, step: 2 }))}
+                      className="w-full text-left px-3 py-2 text-sm rounded-lg border border-gray-100 dark:border-slate-700
+                                 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 transition-colors">
+                      <span className="font-medium text-gray-800 dark:text-slate-200">{p.full_name}</span>
+                      {p.birth_year && <span className="text-gray-400 ml-2 text-xs">{p.birth_year}</span>}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => navigate('/upload')}
+                  className="w-full text-center text-xs text-blue-600 dark:text-blue-400 hover:underline py-1">
+                  To'liq yuklash sahifasi →
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-lg">
+                    {uploadState.selected?.full_name}
+                  </span>
+                  <button onClick={() => setUploadState(u => ({ ...u, step: 1, selected: null, file: null, preview: null }))}
+                    className="text-gray-400 hover:text-gray-600 p-1">
+                    <X size={14} />
+                  </button>
+                </div>
+
+                {uploadState.preview ? (
+                  <div className="relative">
+                    <img src={uploadState.preview} className="w-full h-28 object-cover rounded-lg bg-black" />
+                    <button onClick={() => setUploadState(u => ({ ...u, file: null, preview: null }))}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5">
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="block border-2 border-dashed border-gray-200 dark:border-slate-600
+                                    rounded-xl p-4 text-center cursor-pointer hover:border-blue-400 transition-colors">
+                    <Upload size={24} className="mx-auto text-gray-400 mb-1" />
+                    <p className="text-xs text-gray-500 dark:text-slate-400">JPG, PNG, DICOM yuklang</p>
+                    <input type="file" accept=".jpg,.jpeg,.png,.dcm" className="hidden" onChange={onFileChange} />
+                  </label>
+                )}
+
+                <button onClick={handleUpload} disabled={!uploadState.file || uploadState.uploading}
+                  className="btn-primary w-full text-sm py-2">
+                  {uploadState.uploading
+                    ? <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Yuklanmoqda...</>
+                    : <><Upload size={14} /> Yuborish</>}
+                </button>
               </div>
             )}
           </div>

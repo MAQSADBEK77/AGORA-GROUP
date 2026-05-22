@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff } from 'lucide-react'
+import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2 } from 'lucide-react'
 import api from '../api/axios'
+import ImageZoom from '../components/ImageZoom'
 
 const LABELS = ['Normal', 'Benign', 'Malignant', 'Very Malignant']
 
@@ -29,6 +30,7 @@ export default function ReviewDetail() {
   const [submitting, setSubmitting] = useState(false)
   const [aiLoading, setAiLoading]   = useState(false)
   const [imgError, setImgError]     = useState(false)
+  const [zoomOpen, setZoomOpen]     = useState(false)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
 
@@ -112,19 +114,35 @@ export default function ReviewDetail() {
 
         {/* Rasm */}
         <div className="card">
-          <h3 className="font-semibold text-gray-800 mb-3">Mammografiya Rasmi</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-gray-800 dark:text-white">Mammografiya Rasmi</h3>
+            {!imgError && (
+              <button onClick={() => setZoomOpen(true)}
+                className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400
+                           hover:bg-blue-50 dark:hover:bg-blue-900/20 px-2 py-1.5 rounded-lg transition-colors">
+                <Maximize2 size={13} /> Kattalashtirish
+              </button>
+            )}
+          </div>
           {imgError ? (
-            <div className="flex flex-col items-center justify-center h-48 bg-gray-50 rounded-lg text-gray-400">
+            <div className="flex flex-col items-center justify-center h-48 bg-gray-50 dark:bg-slate-700 rounded-lg text-gray-400">
               <ImageOff size={40} className="mb-2 opacity-40" />
               <p className="text-sm">Rasm ko'rsatilmadi</p>
             </div>
           ) : (
-            <img
-              src={getImageUrl(image)}
-              alt="mammogram"
-              className="w-full rounded-lg object-contain bg-black max-h-80"
-              onError={() => setImgError(true)}
-            />
+            <div className="relative group cursor-zoom-in" onClick={() => setZoomOpen(true)}>
+              <img
+                src={getImageUrl(image)}
+                alt="mammogram"
+                className="w-full rounded-lg object-contain bg-black max-h-80 hover:opacity-95 transition-opacity"
+                onError={() => setImgError(true)}
+              />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                <div className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                  <Maximize2 size={12} /> Kattalashtirish uchun bosing
+                </div>
+              </div>
+            </div>
           )}
           <div className="mt-3 text-xs text-gray-500 space-y-1">
             <p>Fayl: {image.filename}</p>
@@ -289,6 +307,14 @@ export default function ReviewDetail() {
           )}
         </div>
       </div>
+
+      {zoomOpen && !imgError && (
+        <ImageZoom
+          src={getImageUrl(image)}
+          alt={image.filename}
+          onClose={() => setZoomOpen(false)}
+        />
+      )}
     </div>
   )
 }

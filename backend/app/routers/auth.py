@@ -68,3 +68,51 @@ def delete_user(user_id: int, db: Session = Depends(get_db),
     db.delete(user)
     db.commit()
     return {"message": "Foydalanuvchi o'chirildi"}
+
+
+@router.put("/profile", response_model=schemas.UserOut)
+def update_profile(data: schemas.ProfileUpdate,
+                   db: Session = Depends(get_db),
+                   current_user: models.User = Depends(get_current_user)):
+    if data.full_name:
+        current_user.full_name = data.full_name
+    if data.email:
+        existing = db.query(models.User).filter(
+            models.User.email == data.email,
+            models.User.id != current_user.id
+        ).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Bu email band")
+        current_user.email = data.email
+    if data.password:
+        if len(data.password) < 6:
+            raise HTTPException(status_code=400, detail="Parol kamida 6 belgi bo'lishi kerak")
+        current_user.hashed_password = hash_password(data.password)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.put("/users/{user_id}", response_model=schemas.UserOut)
+def update_user(user_id: int,
+                data: schemas.ProfileUpdate,
+                db: Session = Depends(get_db),
+                current_user: models.User = Depends(get_current_user)):
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Ruxsat yo'q")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Topilmadi")
+    if data.full_name:
+        user.full_name = data.full_name
+    if data.email:
+        existing = db.query(models.User).filter(
+            models.User.email == data.email, models.User.id != user_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Bu email band")
+        user.email = data.email
+    if data.password:
+        user.hashed_password = hash_password(data.password)
+    db.commit()
+    db.refresh(user)
+    return user
