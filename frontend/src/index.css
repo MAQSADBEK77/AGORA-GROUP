@@ -4,37 +4,76 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-slate-100 font-sans transition-colors duration-300;
   }
+  * { @apply transition-colors duration-200; }
 }
 
 @layer components {
+  /* Buttons */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg
-           transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2 px-4 rounded-xl
+           shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
+           flex items-center justify-center gap-2;
   }
   .btn-secondary {
-    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg
-           transition-colors duration-200;
+    @apply bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600
+           text-gray-700 dark:text-slate-200 font-medium py-2 px-4 rounded-xl border
+           border-gray-200 dark:border-slate-600 shadow-sm transition-all duration-200
+           flex items-center justify-center gap-2;
   }
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg
-           transition-colors duration-200;
+    @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-xl
+           shadow-sm transition-all duration-200 flex items-center justify-center gap-2;
   }
+
+  /* Cards */
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+    @apply bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100
+           dark:border-slate-700 p-6 animate-fade-in;
   }
+  .card-hover {
+    @apply card hover:shadow-md hover:border-blue-200 dark:hover:border-blue-500/30
+           cursor-pointer transition-all duration-200;
+  }
+
+  /* Inputs */
   .input {
-    @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none
-           focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm;
+    @apply w-full bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600
+           rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-slate-100
+           placeholder-gray-400 dark:placeholder-slate-400
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           transition-all duration-200;
   }
-  .badge-normal {
-    @apply bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full;
+
+  /* Badges */
+  .badge-normal    { @apply bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .badge-benign    { @apply bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .badge-malignant { @apply bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .badge-very-malignant { @apply bg-red-900 dark:bg-red-950 text-white text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .badge-pending   { @apply bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 text-xs font-semibold px-2.5 py-1 rounded-full; }
+
+  /* Stat card */
+  .stat-card {
+    @apply card flex items-center gap-4 hover:shadow-md transition-all duration-300;
   }
-  .badge-benign {
-    @apply bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded-full;
+  .stat-icon {
+    @apply w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0;
   }
-  .badge-malignant {
-    @apply bg-red-100 text-red-700 text-xs font-medium px-2 py-1 rounded-full;
+
+  /* Page title */
+  .page-title {
+    @apply text-2xl font-bold text-gray-900 dark:text-white tracking-tight;
+  }
+
+  /* Section */
+  .section-title {
+    @apply text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3;
   }
 }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-slate-600 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-gray-400 dark:bg-slate-500; }

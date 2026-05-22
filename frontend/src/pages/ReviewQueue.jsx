@@ -1,40 +1,59 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Clock, CheckCircle, ImageIcon, User } from 'lucide-react'
+import { Clock, CheckCircle, ImageIcon, Brain, ChevronRight } from 'lucide-react'
 import api from '../api/axios'
+
+const LABEL_BADGE = {
+  Normal:          'badge-normal',
+  Benign:          'badge-benign',
+  Malignant:       'badge-malignant',
+  'Very Malignant':'badge-very-malignant',
+}
 
 export default function ReviewQueue() {
   const navigate = useNavigate()
-  const [tab, setTab] = useState('pending')
+  const [tab, setTab]     = useState('pending')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setLoading(true)
-    const url = tab === 'pending' ? '/pending' : '/reviewed'
-    api.get(url).then(r => setItems(r.data)).finally(() => setLoading(false))
+    api.get(tab === 'pending' ? '/pending' : '/reviewed')
+      .then(r => setItems(r.data))
+      .finally(() => setLoading(false))
   }, [tab])
 
-  const labelColor = {
-    Normal:          'badge-normal',
-    Benign:          'badge-benign',
-    Malignant:       'badge-malignant',
-    'Very Malignant':'bg-red-900 text-white text-xs font-medium px-2 py-1 rounded-full',
-  }
-
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-800">Ko'rib Chiqish Navbati</h2>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="page-title">Ko'rib Chiqish Navbati</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            Radiolog tomonidan tahlil qilinadigan rasmlar
+          </p>
+        </div>
+        <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl">
+          <Brain size={14} className="text-blue-600 dark:text-blue-400" />
+          <span className="text-xs font-medium text-blue-700 dark:text-blue-400">AI tayyor</span>
+        </div>
+      </div>
 
-      <div className="flex gap-2">
-        <button onClick={() => setTab('pending')}
-          className={tab === 'pending' ? 'btn-primary' : 'btn-secondary'}>
-          <Clock size={16} className="inline mr-1" /> Kutmoqda
-        </button>
-        <button onClick={() => setTab('reviewed')}
-          className={tab === 'reviewed' ? 'btn-primary' : 'btn-secondary'}>
-          <CheckCircle size={16} className="inline mr-1" /> Tekshirilgan
-        </button>
+      {/* Tabs */}
+      <div className="flex gap-2 bg-gray-100 dark:bg-slate-800 p-1 rounded-xl w-fit">
+        {[
+          { id: 'pending',  icon: Clock,        label: 'Kutmoqda' },
+          { id: 'reviewed', icon: CheckCircle,  label: 'Tekshirilgan' },
+        ].map(({ id, icon: Icon, label }) => (
+          <button key={id} onClick={() => setTab(id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              tab === id
+                ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-400 shadow-sm'
+                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
+            }`}>
+            <Icon size={15} />
+            {label}
+          </button>
+        ))}
       </div>
 
       {loading ? (
@@ -42,49 +61,52 @@ export default function ReviewQueue() {
           <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full" />
         </div>
       ) : items.length === 0 ? (
-        <div className="card text-center py-16 text-gray-400">
-          <ImageIcon size={40} className="mx-auto mb-3 opacity-40" />
-          <p>{tab === 'pending' ? 'Barcha rasmlar tekshirilgan' : 'Hali tekshirilgan rasm yo\'q'}</p>
+        <div className="card text-center py-16">
+          {tab === 'pending'
+            ? <><CheckCircle size={48} className="mx-auto mb-3 text-emerald-400" />
+                <p className="font-medium text-gray-600 dark:text-slate-300">Barcha rasmlar tekshirilgan</p>
+                <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">Yangi yuklashlar kutilmoqda</p></>
+            : <><ImageIcon size={48} className="mx-auto mb-3 text-gray-300 dark:text-slate-600" />
+                <p className="font-medium text-gray-600 dark:text-slate-300">Tekshirilgan rasm yo'q</p></>}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {items.map(img => (
-            <div key={img.id}
-              onClick={() => navigate(`/review/${img.id}`)}
-              className="card cursor-pointer hover:shadow-md transition-shadow border border-transparent hover:border-blue-200">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <ImageIcon size={18} className="text-gray-400" />
-                  <span className="text-sm font-medium text-gray-800 truncate max-w-[140px]">
-                    {img.filename}
-                  </span>
-                </div>
-                {img.review ? (
-                  <span className={labelColor[img.review.label] || 'badge-normal'}>
-                    {img.review.label}
-                  </span>
-                ) : (
-                  <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full font-medium">
-                    Kutmoqda
-                  </span>
-                )}
+            <button key={img.id} onClick={() => navigate(`/review/${img.id}`)}
+              className="card-hover text-left group">
+              {/* Preview placeholder */}
+              <div className="h-32 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800
+                              rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+                <img src={`/api/img/${img.id}`} alt={img.filename}
+                  className="w-full h-full object-cover rounded-xl"
+                  onError={e => { e.target.style.display='none' }} />
+                <ImageIcon size={32} className="text-slate-300 dark:text-slate-600" />
               </div>
 
-              <p className="text-xs text-gray-500 mb-2">
-                {new Date(img.uploaded_at).toLocaleString('uz-UZ')}
-              </p>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-semibold text-gray-800 dark:text-slate-200 text-sm truncate">{img.filename}</p>
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                    {new Date(img.uploaded_at).toLocaleString('uz-UZ')}
+                  </p>
+                </div>
+                {img.review
+                  ? <span className={`${LABEL_BADGE[img.review.label] || 'badge-normal'} flex-shrink-0`}>{img.review.label}</span>
+                  : <span className="badge-pending flex-shrink-0">Kutmoqda</span>}
+              </div>
 
               {img.review?.description && (
-                <p className="text-xs text-gray-600 bg-gray-50 rounded p-2 line-clamp-2">
-                  {img.review.description}
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-3 bg-gray-50 dark:bg-slate-700/50
+                               rounded-lg p-2 line-clamp-2 italic">
+                  "{img.review.description}"
                 </p>
               )}
 
-              <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-1 text-xs text-gray-400">
-                <User size={12} />
-                <span>Rasm #{img.id}</span>
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
+                <span className="text-xs text-gray-400 dark:text-slate-500">Rasm #{img.id}</span>
+                <ChevronRight size={14} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
