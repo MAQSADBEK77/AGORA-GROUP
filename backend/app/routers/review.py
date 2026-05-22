@@ -43,28 +43,30 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
     if image.ai_prediction:
         return image.ai_prediction
 
-    # Labeled rasmlarni olish
-    reviews = db.query(models.DoctorReview).all()
-    labeled_cases = []
+    # Labeled rasmlarni bitta query bilan olish (N+1 dan qochish)
+    from sqlalchemy import text
     upload_dir = os.getenv("UPLOAD_DIR", "./uploads")
 
-    for r in reviews:
-        if r.image_id == image_id:
-            continue
-        try:
-            fp = r.image.file_path if r.image else ""
-            if not os.path.exists(fp):
-                fname = os.path.basename(fp.replace("\\", "/"))
-                alt   = os.path.join(upload_dir, fname)
-                fp    = alt if os.path.exists(alt) else fp
-            labeled_cases.append({
-                "image_id":   r.image_id,
-                "label":      r.label.value,
-                "image_path": fp,
-                "patient_name": "",
-            })
-        except Exception:
-            continue
+    rows = db.execute(text("""
+        SELECT dr.image_id, dr.label, mi.file_path
+        FROM doctor_reviews dr
+        JOIN mammography_images mi ON dr.image_id = mi.id
+        WHERE dr.image_id != :img_id
+    """), {"img_id": image_id}).fetchall()
+
+    labeled_cases = []
+    for row in rows:
+        fp = row[2] or ""
+        if not os.path.exists(fp):
+            fname = os.path.basename(fp.replace("\\", "/"))
+            alt   = os.path.join(upload_dir, fname)
+            fp    = alt if os.path.exists(alt) else fp
+        labeled_cases.append({
+            "image_id":   row[0],
+            "label":      row[1],
+            "image_path": fp,
+            "patient_name": "",
+        })
 
     try:
         result = predict_from_labeled(image.file_path, labeled_cases)
