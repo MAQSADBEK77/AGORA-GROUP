@@ -54,8 +54,9 @@ export default function ReviewDetail() {
       setAiPred(data)
       if (!form.label && data.label) setForm(f => ({ ...f, label: data.label }))
       toast.success('AI tahlil tayyor')
-    } catch {
-      toast.error('AI tahlil xatosi')
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'AI tahlil xatosi'
+      toast.error(msg, { duration: 5000 })
     } finally {
       setAiLoading(false)
     }

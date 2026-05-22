@@ -40,41 +40,47 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
     if not image:
         raise HTTPException(status_code=404, detail="Rasm topilmadi")
 
-    # Mavjud taxmin bo'lsa qaytarish
     if image.ai_prediction:
         return image.ai_prediction
 
-    # Barcha labeled rasmlarni olish (DB dan)
-    reviews = (db.query(models.DoctorReview)
-               .join(models.MammographyImage)
-               .filter(models.MammographyImage.id != image_id)
-               .all())
-
+    # Labeled rasmlarni olish
+    reviews = db.query(models.DoctorReview).all()
     labeled_cases = []
+    upload_dir = os.getenv("UPLOAD_DIR", "./uploads")
+
     for r in reviews:
-        fp = r.image.file_path if r.image else ""
-        # Fayl mavjudligini tekshirish
-        import os as _os
-        if not _os.path.exists(fp):
-            fname = _os.path.basename(fp.replace("\\", "/"))
-            alt   = _os.path.join(_os.getenv("UPLOAD_DIR", "./uploads"), fname)
-            if _os.path.exists(alt):
-                fp = alt
-        labeled_cases.append({
-            "image_id":    r.image_id,
-            "label":       r.label.value,
-            "image_path":  fp,
-            "patient_name": r.image.patient.full_name if r.image and r.image.patient else "",
-        })
+        if r.image_id == image_id:
+            continue
+        try:
+            fp = r.image.file_path if r.image else ""
+            if not os.path.exists(fp):
+                fname = os.path.basename(fp.replace("\\", "/"))
+                alt   = os.path.join(upload_dir, fname)
+                fp    = alt if os.path.exists(alt) else fp
+            labeled_cases.append({
+                "image_id":   r.image_id,
+                "label":      r.label.value,
+                "image_path": fp,
+                "patient_name": "",
+            })
+        except Exception:
+            continue
 
-    result = predict_from_labeled(image.file_path, labeled_cases)
+    try:
+        result = predict_from_labeled(image.file_path, labeled_cases)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI xatosi: {str(e)}")
 
-    # Saqlash
-    label_enum = models.ReviewLabel(result["label"])
+    try:
+        label_val  = result.get("label", "Normal")
+        label_enum = models.ReviewLabel(label_val)
+    except ValueError:
+        label_enum = models.ReviewLabel.normal
+
     pred = models.AIPrediction(
         image_id=image_id,
         label=label_enum,
-        confidence=result["confidence"],
+        confidence=float(result.get("confidence", 0.0)),
         similar_cases=json.dumps(result.get("similar_cases", []), ensure_ascii=False),
     )
     db.add(pred)
