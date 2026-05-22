@@ -19,6 +19,13 @@ backend/model/*.pth
 *.db
 *.sqlite3
 
+# MIAS dataset (katta fayllar - GitHub 100MB limit)
+backend/mias_data/
+backend/data/
+*.tar.gz
+*.h5
+*.zip
+
 # Docker
 *.log
 
