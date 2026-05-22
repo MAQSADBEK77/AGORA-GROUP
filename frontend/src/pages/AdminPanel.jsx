@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save } from 'lucide-react'
+import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save, ImageOff, AlertTriangle } from 'lucide-react'
 import api from '../api/axios'
 
 const ROLE_LABELS = { admin: 'Administrator', hamshira: 'Hamshira', radiolog: 'Radiolog' }
@@ -21,10 +21,13 @@ export default function AdminPanel() {
   const [submitting, setSubmitting] = useState(false)
   const [editUser, setEditUser] = useState(null)
   const [editForm, setEditForm] = useState({ full_name: '', email: '', password: '' })
+  const [uploadStats, setUploadStats] = useState(null)
+  const [clearing, setClearing]       = useState(false)
+  const [showClearConfirm, setShowClearConfirm] = useState(false)
 
   useEffect(() => {
     if (user.role !== 'admin') navigate('/dashboard')
-    else loadUsers()
+    else { loadUsers(); loadUploadStats() }
   }, [])
 
   async function loadUsers() {
@@ -32,6 +35,25 @@ export default function AdminPanel() {
       const { data } = await api.get('/auth/users')
       setUsers(data)
     } finally { setLoading(false) }
+  }
+
+  async function loadUploadStats() {
+    try {
+      const { data } = await api.get('/admin/uploads/stats')
+      setUploadStats(data)
+    } catch {}
+  }
+
+  async function clearUploads() {
+    setClearing(true)
+    try {
+      const { data } = await api.delete('/admin/uploads/clear')
+      toast.success(`${data.deleted_images} ta rasm o'chirildi`)
+      setUploadStats({ uploaded_count: 0 })
+      setShowClearConfirm(false)
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Xato')
+    } finally { setClearing(false) }
   }
 
   async function addUser(e) {
@@ -137,6 +159,36 @@ export default function AdminPanel() {
         </div>
       )}
 
+      {/* Yuklangan bemorlar rasmlarini tozalash */}
+      <div className="card border border-orange-100 dark:border-orange-900/30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/40 rounded-xl flex items-center justify-center">
+              <ImageOff size={18} className="text-orange-600 dark:text-orange-400" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 dark:text-white">Yuklangan bemorlar rasmlari</h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+                Hamshira yuklagan rasmlar (dataset rasmlari saqlanadi)
+                {uploadStats !== null && (
+                  <span className="ml-2 font-semibold text-orange-600 dark:text-orange-400">
+                    — {uploadStats.uploaded_count} ta rasm
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowClearConfirm(true)}
+            disabled={!uploadStats || uploadStats.uploaded_count === 0}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+                       bg-orange-500 hover:bg-orange-600 text-white transition-all
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+            <Trash2 size={15} /> Tozalash
+          </button>
+        </div>
+      </div>
+
       <div className="card p-0 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700">
           <h3 className="font-bold text-gray-800 dark:text-white">
@@ -202,6 +254,39 @@ export default function AdminPanel() {
           </table>
         </div>
       </div>
+
+      {/* Clear confirm modal */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm animate-slide-up p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                <AlertTriangle size={22} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 dark:text-white">Rasmlarni o'chirish</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400">Bu amalni qaytarib bo'lmaydi</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-700 dark:text-slate-300 mb-6 bg-orange-50 dark:bg-orange-900/20 rounded-xl p-3 border border-orange-200 dark:border-orange-800">
+              <strong>{uploadStats?.uploaded_count} ta</strong> bemor rasmi va ularning
+              diagnozlari bazadan o'chiriladi. MIAS dataset rasmlari saqlanib qoladi.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={clearUploads}
+                disabled={clearing}
+                className="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold
+                           rounded-xl transition-all disabled:opacity-50 text-sm">
+                {clearing ? 'O\'chirilmoqda...' : 'Ha, o\'chirish'}
+              </button>
+              <button onClick={() => setShowClearConfirm(false)} className="btn-secondary">
+                Bekor
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit modal */}
       {editUser && (

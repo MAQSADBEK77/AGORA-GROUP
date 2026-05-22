@@ -1,4 +1,4 @@
-import json, os
+import json, os, shutil
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -203,3 +203,80 @@ def get_reviewed(skip: int = 0, limit: int = 20,
             .filter(models.MammographyImage.status == models.ImageStatus.reviewed)
             .order_by(models.MammographyImage.uploaded_at.desc())
             .offset(skip).limit(limit).all())
+
+
+# ─── Admin: yuklangan bemorlar rasmlarini tozalash ───
+
+@router.get("/admin/uploads/stats")
+def get_upload_stats(db: Session = Depends(get_db),
+                     current_user: models.User = Depends(get_current_user)):
+    """Datasetdan tashqari yuklangan rasmlar soni."""
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+
+    upload_dir = os.getenv("UPLOAD_DIR", "./uploads")
+    total = (db.query(models.MammographyImage)
+             .filter(models.MammographyImage.file_path.like("%uploads%"))
+             .filter(~models.MammographyImage.filename.like("mdb%"))
+             .count())
+    return {"uploaded_count": total}
+
+
+@router.delete("/admin/uploads/clear")
+def clear_uploaded_images(db: Session = Depends(get_db),
+                          current_user: models.User = Depends(get_current_user)):
+    """Datasetdan tashqari yuklangan barcha bemorlar rasmlarini o'chiradi."""
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+
+    upload_dir = os.getenv("UPLOAD_DIR", "./uploads")
+
+    # Dataset rasmlari (mdb* nomli) dan tashqari barchasini topish
+    images = (db.query(models.MammographyImage)
+              .filter(models.MammographyImage.file_path.like("%uploads%"))
+              .filter(~models.MammographyImage.filename.like("mdb%"))
+              .all())
+
+    deleted_files = 0
+    deleted_db    = 0
+    errors        = []
+
+    for img in images:
+        # Faylni o'chirish
+        path = img.file_path or ""
+        if not os.path.exists(path):
+            fname = os.path.basename(path.replace("\\", "/"))
+            path  = os.path.join(upload_dir, fname)
+
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+                deleted_files += 1
+            except Exception as e:
+                errors.append(str(e))
+
+        # Embedding faylini o'chirish
+        emb_path = os.path.join(upload_dir, "embeddings", f"{img.id}.npy")
+        if os.path.exists(emb_path):
+            try:
+                os.remove(emb_path)
+            except Exception:
+                pass
+
+        # DB dan o'chirish (cascade: review, ai_prediction ham o'chadi)
+        db.delete(img)
+        deleted_db += 1
+
+    db.commit()
+
+    log = models.Log(user_id=current_user.id, action="clear_uploads",
+                     details=f"deleted {deleted_db} images, {deleted_files} files")
+    db.add(log)
+    db.commit()
+
+    return {
+        "success": True,
+        "deleted_images": deleted_db,
+        "deleted_files": deleted_files,
+        "errors": errors[:5] if errors else [],
+    }
