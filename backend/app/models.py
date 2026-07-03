@@ -98,6 +98,11 @@ class AIPrediction(Base):
     label         = Column(Enum(ReviewLabel, values_callable=_by_value), nullable=False)
     confidence    = Column(Float, nullable=False)
     similar_cases = Column(Text)   # JSON: eng o'xshash labellar
+    # Shubhali (lesion) mintaqa — rasm o'lchamiga nisbatan normallashtirilgan (0..1) koordinatalar
+    lesion_x      = Column(Float, nullable=True)
+    lesion_y      = Column(Float, nullable=True)
+    lesion_width  = Column(Float, nullable=True)
+    lesion_height = Column(Float, nullable=True)
     created_at    = Column(DateTime(timezone=True), server_default=func.now())
 
     image = relationship("MammographyImage", back_populates="ai_prediction")

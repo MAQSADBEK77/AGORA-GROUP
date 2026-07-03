@@ -7,6 +7,7 @@ from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user
 from ..ai.predictor import predict_from_labeled, index_labeled_image
+from ..ai.lesion import detect_lesion_region
 
 router = APIRouter(prefix="/api", tags=["Review"])
 
@@ -104,11 +105,22 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
     except ValueError:
         label_enum = models.ReviewLabel.normal
 
+    lesion_box = None
+    if label_enum != models.ReviewLabel.normal:
+        try:
+            lesion_box = detect_lesion_region(image.file_path)
+        except Exception:
+            lesion_box = None
+
     pred = models.AIPrediction(
         image_id=image_id,
         label=label_enum,
         confidence=float(result.get("confidence", 0.0)),
         similar_cases=json.dumps(result.get("similar_cases", []), ensure_ascii=False),
+        lesion_x=lesion_box["x"] if lesion_box else None,
+        lesion_y=lesion_box["y"] if lesion_box else None,
+        lesion_width=lesion_box["width"] if lesion_box else None,
+        lesion_height=lesion_box["height"] if lesion_box else None,
     )
     db.add(pred)
     db.commit()

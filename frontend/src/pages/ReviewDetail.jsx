@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2 } from 'lucide-react'
 import api from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
+import LesionOverlay from '../components/LesionOverlay'
 
 const LABELS = ['Normal', 'Benign', 'Malignant', 'Very Malignant']
 
 const LABEL_STYLE = {
-  'Normal':        { color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   icon: CheckCircle },
-  'Benign':        { color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', icon: AlertTriangle },
-  'Malignant':     { color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       icon: AlertCircle },
-  'Very Malignant':{ color: 'text-red-900',    bg: 'bg-red-100 border-red-500',      icon: XCircle },
+  'Normal':        { color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   icon: CheckCircle,  hex: '#16a34a' },
+  'Benign':        { color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', icon: AlertTriangle, hex: '#ca8a04' },
+  'Malignant':     { color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       icon: AlertCircle,  hex: '#dc2626' },
+  'Very Malignant':{ color: 'text-red-900',    bg: 'bg-red-100 border-red-500',      icon: XCircle,      hex: '#7f1d1d' },
 }
 
 function parseSimilarCases(raw) {
@@ -31,6 +32,7 @@ export default function ReviewDetail() {
   const [aiLoading, setAiLoading]   = useState(false)
   const [imgError, setImgError]     = useState(false)
   const [zoomOpen, setZoomOpen]     = useState(false)
+  const imgRef = useRef(null)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
 
@@ -103,6 +105,11 @@ export default function ReviewDetail() {
 
   const similarCases = parseSimilarCases(aiPred?.similar_cases)
 
+  const lesionBox = (aiPred?.lesion_x != null && aiPred?.lesion_width)
+    ? { x: aiPred.lesion_x, y: aiPred.lesion_y, width: aiPred.lesion_width, height: aiPred.lesion_height }
+    : null
+  const lesionColor = (LABEL_STYLE[aiPred?.label] || LABEL_STYLE['Normal']).hex
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <button onClick={() => navigate('/review')}
@@ -132,11 +139,15 @@ export default function ReviewDetail() {
           ) : (
             <div className="relative group cursor-zoom-in" onClick={() => setZoomOpen(true)}>
               <img
+                ref={imgRef}
                 src={getImageUrl(image)}
                 alt="mammogram"
                 className="w-full rounded-lg object-contain bg-black max-h-80 hover:opacity-95 transition-opacity"
                 onError={() => setImgError(true)}
               />
+              {lesionBox && (
+                <LesionOverlay box={lesionBox} color={lesionColor} label="Shubhali mintaqa" imgRef={imgRef} />
+              )}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                 <div className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5">
                   <Maximize2 size={12} /> Kattalashtirish uchun bosing
@@ -152,6 +163,11 @@ export default function ReviewDetail() {
                 {image.status === 'pending' ? 'Kutmoqda' : 'Tekshirilgan'}
               </span>
             </p>
+            {lesionBox && (
+              <p className="text-orange-500">
+                AI aniqlagan taxminiy shubhali mintaqa rasmda ramka bilan ko'rsatilgan — yakuniy tashxis radiolog tomonidan tasdiqlanadi
+              </p>
+            )}
           </div>
         </div>
 

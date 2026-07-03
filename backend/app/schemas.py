@@ -82,6 +82,10 @@ class AIPredictionOut(BaseModel):
     label: ReviewLabel
     confidence: float
     similar_cases: Optional[str]
+    lesion_x: Optional[float] = None
+    lesion_y: Optional[float] = None
+    lesion_width: Optional[float] = None
+    lesion_height: Optional[float] = None
     created_at: datetime
 
     class Config:

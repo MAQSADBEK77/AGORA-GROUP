@@ -19,6 +19,10 @@ def migrate():
     migrations = [
         ("predictions", "cancer_prob",    "ALTER TABLE predictions ADD COLUMN cancer_prob REAL"),
         ("predictions", "analysis_mode",  "ALTER TABLE predictions ADD COLUMN analysis_mode TEXT DEFAULT 'heuristic'"),
+        ("ai_predictions", "lesion_x",      "ALTER TABLE ai_predictions ADD COLUMN lesion_x REAL"),
+        ("ai_predictions", "lesion_y",      "ALTER TABLE ai_predictions ADD COLUMN lesion_y REAL"),
+        ("ai_predictions", "lesion_width",  "ALTER TABLE ai_predictions ADD COLUMN lesion_width REAL"),
+        ("ai_predictions", "lesion_height", "ALTER TABLE ai_predictions ADD COLUMN lesion_height REAL"),
         # Eski ustunlarni tozalash (SQLite ALTER DROP yo'q, shuning uchun shunchaki o'tkazib yuboramiz)
     ]
 
