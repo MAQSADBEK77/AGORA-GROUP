@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Clock, CheckCircle, ImageIcon, Brain, ChevronRight } from 'lucide-react'
-import api from '../api/axios'
+import api, { API_BASE_URL } from '../api/axios'
 
 const LABEL_BADGE = {
   Normal:          'badge-normal',
@@ -77,7 +77,7 @@ export default function ReviewQueue() {
               {/* Preview placeholder */}
               <div className="h-32 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800
                               rounded-xl mb-4 flex items-center justify-center overflow-hidden">
-                <img src={`/api/img/${img.id}`} alt={img.filename}
+                <img src={`${API_BASE_URL}/img/${img.id}`} alt={img.filename}
                   className="w-full h-full object-cover rounded-xl"
                   onError={e => { e.target.style.display='none' }} />
                 <ImageIcon size={32} className="text-slate-300 dark:text-slate-600" />

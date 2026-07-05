@@ -1,6 +1,6 @@
 import json, os, shutil
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 from .. import models, schemas
@@ -8,6 +8,7 @@ from ..database import get_db
 from ..auth import get_current_user
 from ..ai.predictor import predict_from_labeled, index_labeled_image
 from ..ai.lesion import detect_lesion_region
+from ..reports import generate_diagnosis_pdf
 
 router = APIRouter(prefix="/api", tags=["Review"])
 
@@ -22,18 +23,38 @@ def serve_image(image_id: int, db: Session = Depends(get_db)):
     if not img:
         raise HTTPException(status_code=404, detail="Topilmadi")
 
-    path = img.file_path or ""
-    if not os.path.exists(path):
-        fname = os.path.basename(path.replace("\\", "/"))
-        alt   = os.path.join(UPLOAD_DIR, fname)
-        path  = alt if os.path.exists(alt) else ""
-
+    path = _resolve_image_path(img)
     if not path or not os.path.exists(path):
         raise HTTPException(status_code=404, detail="Fayl yo'q")
 
     ext   = os.path.splitext(path)[1].lower()
     mtype = "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png"
     return FileResponse(path, media_type=mtype)
+
+
+def _resolve_image_path(img: models.MammographyImage) -> str:
+    path = img.file_path or ""
+    if not os.path.exists(path):
+        fname = os.path.basename(path.replace("\\", "/"))
+        alt   = os.path.join(UPLOAD_DIR, fname)
+        path  = alt if os.path.exists(alt) else path
+    return path
+
+
+@router.get("/report/{image_id}/pdf")
+def download_report_pdf(image_id: int, db: Session = Depends(get_db),
+                        current_user: models.User = Depends(get_current_user)):
+    image = db.query(models.MammographyImage).filter(
+        models.MammographyImage.id == image_id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Rasm topilmadi")
+
+    pdf_bytes = generate_diagnosis_pdf(image, _resolve_image_path(image))
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="tashxis_{image_id}.pdf"'},
+    )
 
 
 def _require_radiolog(current_user: models.User):

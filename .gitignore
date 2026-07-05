@@ -22,6 +22,7 @@ backend/model/*.pth
 # MIAS dataset (katta fayllar - GitHub 100MB limit)
 backend/mias_data/
 backend/data/
+backend/cbis_data/
 *.tar.gz
 *.h5
 *.zip

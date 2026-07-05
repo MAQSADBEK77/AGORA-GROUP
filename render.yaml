@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: mammoai-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: UPLOAD_DIR
+        value: /app/uploads
+
+  - type: web
+    name: mammoai-frontend
+    runtime: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      # Backend deploy bo'lgach uning haqiqiy URL'ini shu yerga yozing
+      # (odatda https://mammoai-backend.onrender.com/api bo'ladi)
+      - key: VITE_API_URL
+        value: https://mammoai-backend.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

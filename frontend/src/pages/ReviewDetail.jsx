@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2 } from 'lucide-react'
-import api from '../api/axios'
+import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown } from 'lucide-react'
+import api, { API_BASE_URL } from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
 import LesionOverlay from '../components/LesionOverlay'
 
@@ -32,6 +32,7 @@ export default function ReviewDetail() {
   const [aiLoading, setAiLoading]   = useState(false)
   const [imgError, setImgError]     = useState(false)
   const [zoomOpen, setZoomOpen]     = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
   const imgRef = useRef(null)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
@@ -87,7 +88,26 @@ export default function ReviewDetail() {
   // Rasm URL ni to'g'ri hisoblash
   function getImageUrl(img) {
     if (!img) return null
-    return `/api/img/${img.id}`
+    return `${API_BASE_URL}/img/${img.id}`
+  }
+
+  async function downloadPdf() {
+    setPdfLoading(true)
+    try {
+      const res = await api.get(`/report/${id}/pdf`, { responseType: 'blob' })
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `tashxis_${id}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      toast.error('PDF yuklab olishda xatolik')
+    } finally {
+      setPdfLoading(false)
+    }
   }
 
   if (error) return (
@@ -112,10 +132,21 @@ export default function ReviewDetail() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <button onClick={() => navigate('/review')}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
-        <ArrowLeft size={16} /> Ko'rib chiqish navbati
-      </button>
+      <div className="flex items-center justify-between">
+        <button onClick={() => navigate('/review')}
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
+          <ArrowLeft size={16} /> Ko'rib chiqish navbati
+        </button>
+
+        {image.review && (
+          <button onClick={downloadPdf} disabled={pdfLoading}
+            className="btn-secondary text-sm flex items-center gap-1.5">
+            {pdfLoading
+              ? <><div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />Tayyorlanmoqda...</>
+              : <><FileDown size={14} /> Tashxis hisoboti (PDF)</>}
+          </button>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
