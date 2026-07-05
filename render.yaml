@@ -17,10 +17,8 @@ services:
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
-      # Backend deploy bo'lgach uning haqiqiy URL'ini shu yerga yozing
-      # (odatda https://mammoai-backend.onrender.com/api bo'ladi)
       - key: VITE_API_URL
-        value: https://mammoai-backend.onrender.com/api
+        value: https://mammoai-backend-dk61.onrender.com/api
     routes:
       - type: rewrite
         source: /*
