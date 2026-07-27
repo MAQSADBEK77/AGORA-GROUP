@@ -23,6 +23,7 @@ def migrate():
         ("ai_predictions", "lesion_y",      "ALTER TABLE ai_predictions ADD COLUMN lesion_y REAL"),
         ("ai_predictions", "lesion_width",  "ALTER TABLE ai_predictions ADD COLUMN lesion_width REAL"),
         ("ai_predictions", "lesion_height", "ALTER TABLE ai_predictions ADD COLUMN lesion_height REAL"),
+        ("patients", "dicom_patient_id", "ALTER TABLE patients ADD COLUMN dicom_patient_id TEXT"),
         # Eski ustunlarni tozalash (SQLite ALTER DROP yo'q, shuning uchun shunchaki o'tkazib yuboramiz)
     ]
 

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user
-from ..dicom_utils import dicom_to_png
+from ..dicom_utils import dicom_to_png, read_dicom, render_png, extract_patient_info
 import os, shutil, uuid
 
 router = APIRouter(prefix="/api", tags=["Upload"])
@@ -106,6 +106,84 @@ async def upload_image(patient_id: int = Form(...),
                       details=f"image_id={image.id}, patient_id={patient_id}"))
     db.commit()
     return image
+
+
+@router.post("/upload/dicom-folder", response_model=schemas.DicomBatchResponse)
+async def upload_dicom_folder(files: list[UploadFile] = File(...),
+                              db: Session = Depends(get_db),
+                              current_user: models.User = Depends(get_current_user)):
+    """Butun papka (ko'p bemor/ko'p rasm) yuklanganda — bemor har bir DICOM
+    faylining o'z ichidagi PatientID tegidan aniqlanadi/yaratiladi."""
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    results: list[schemas.DicomBatchResult] = []
+    uploaded = patients_created = patients_matched = 0
+
+    for file in files:
+        ext = os.path.splitext(file.filename)[1].lower()
+        if ext != ".dcm":
+            continue  # papka ichidagi DICOM bo'lmagan fayllar o'tkazib yuboriladi
+
+        uid      = uuid.uuid4().hex
+        dcm_path = os.path.join(UPLOAD_DIR, f"{uid}.dcm")
+        with open(dcm_path, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+
+        try:
+            ds       = read_dicom(dcm_path)
+            info     = extract_patient_info(ds)
+            png_path = os.path.join(UPLOAD_DIR, f"{uid}.png")
+            render_png(ds, png_path)
+        except Exception as e:
+            os.remove(dcm_path)
+            results.append(schemas.DicomBatchResult(
+                filename=file.filename, status="error", detail=str(e)))
+            continue
+
+        patient = None
+        if info["patient_id"]:
+            patient = db.query(models.Patient).filter(
+                models.Patient.dicom_patient_id == info["patient_id"]).first()
+
+        if patient:
+            patients_matched += 1
+        else:
+            patient = models.Patient(
+                full_name=info["full_name"] or f"Noma'lum bemor ({info['patient_id'] or uid[:8]})",
+                birth_year=info["birth_year"],
+                dicom_patient_id=info["patient_id"],
+                is_demo=0,
+            )
+            db.add(patient)
+            db.commit()
+            db.refresh(patient)
+            patients_created += 1
+
+        image = models.MammographyImage(
+            patient_id=patient.id,
+            uploaded_by=current_user.id,
+            filename=file.filename,
+            file_path=png_path,
+            file_format="DCM",
+            status=models.ImageStatus.pending,
+        )
+        db.add(image)
+        db.commit()
+        db.refresh(image)
+        uploaded += 1
+
+        results.append(schemas.DicomBatchResult(
+            filename=file.filename, status="ok",
+            patient_name=patient.full_name, image_id=image.id))
+
+    db.add(models.Log(user_id=current_user.id, action="upload_dicom_folder",
+                      details=f"{uploaded} rasm, {patients_created} yangi bemor, {patients_matched} mos kelgan"))
+    db.commit()
+
+    return schemas.DicomBatchResponse(
+        total=len(files), uploaded=uploaded,
+        patients_created=patients_created, patients_matched=patients_matched,
+        results=results,
+    )
 
 
 @router.get("/images/{image_id}", response_model=schemas.ImageOut)

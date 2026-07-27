@@ -45,13 +45,14 @@ class User(Base):
 class Patient(Base):
     __tablename__ = "patients"
 
-    id         = Column(Integer, primary_key=True, index=True)
-    full_name  = Column(String(150), nullable=False)
-    birth_year = Column(Integer)
-    phone      = Column(String(20))
-    notes      = Column(Text)
-    is_demo    = Column(Integer, default=0)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    id               = Column(Integer, primary_key=True, index=True)
+    full_name        = Column(String(150), nullable=False)
+    birth_year       = Column(Integer)
+    phone            = Column(String(20))
+    notes            = Column(Text)
+    is_demo          = Column(Integer, default=0)
+    dicom_patient_id = Column(String(64), index=True, nullable=True)  # DICOM PatientID (0010,0020) — takroriy bemorni aniqlash uchun
+    created_at       = Column(DateTime(timezone=True), server_default=func.now())
 
     images = relationship("MammographyImage", back_populates="patient")
 

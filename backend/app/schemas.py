@@ -53,10 +53,27 @@ class PatientOut(BaseModel):
     birth_year: Optional[int]
     phone: Optional[str]
     notes: Optional[str]
+    dicom_patient_id: Optional[str] = None
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class DicomBatchResult(BaseModel):
+    filename: str
+    status: str  # "ok" | "error"
+    patient_name: Optional[str] = None
+    image_id: Optional[int] = None
+    detail: Optional[str] = None
+
+
+class DicomBatchResponse(BaseModel):
+    total: int
+    uploaded: int
+    patients_created: int
+    patients_matched: int
+    results: List[DicomBatchResult]
 
 
 class DoctorReviewCreate(BaseModel):
