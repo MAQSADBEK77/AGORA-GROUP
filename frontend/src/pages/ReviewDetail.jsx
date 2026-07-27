@@ -170,7 +170,7 @@ export default function ReviewDetail() {
   const panels = siblings.length ? siblings : [image]
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <button onClick={() => navigate('/review')}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
@@ -187,7 +187,7 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
 
         {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada */}
         <div className="card">
@@ -197,7 +197,7 @@ export default function ReviewDetail() {
             </h3>
           </div>
 
-          <div className={`grid gap-3 ${panels.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <div className={`grid bg-black rounded-lg overflow-hidden ${panels.length > 1 ? 'grid-cols-2 gap-px' : 'grid-cols-1'}`}>
             {panels.map(p => {
               const pLesion = (p.ai_prediction?.lesion_x != null && p.ai_prediction?.lesion_width)
                 ? { x: p.ai_prediction.lesion_x, y: p.ai_prediction.lesion_y,
@@ -206,7 +206,7 @@ export default function ReviewDetail() {
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
 
               return (
-                <div key={p.id} className="relative group cursor-zoom-in bg-black rounded-lg overflow-hidden"
+                <div key={p.id} className="relative group cursor-zoom-in bg-black"
                   onClick={() => setZoomImage(p)}>
                   <span className="absolute top-1.5 left-1.5 z-10 text-[10px] font-bold bg-black/70 text-white px-1.5 py-0.5 rounded">
                     {panelLabel(p)}
@@ -218,7 +218,7 @@ export default function ReviewDetail() {
                     ref={setImgRef(p.id)}
                     src={getImageUrl(p)}
                     alt={panelLabel(p)}
-                    className="w-full object-contain bg-black max-h-64 hover:opacity-95 transition-opacity"
+                    className="w-full object-contain bg-black max-h-[520px] hover:opacity-95 transition-opacity"
                     onError={e => { e.target.style.opacity = 0.15 }}
                   />
                   {pLesion && (
