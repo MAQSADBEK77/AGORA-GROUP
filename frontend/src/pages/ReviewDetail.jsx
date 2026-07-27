@@ -15,12 +15,27 @@ const LABEL_STYLE = {
   'Very Malignant':{ color: 'text-red-900',    bg: 'bg-red-100 border-red-500',      icon: XCircle,      hex: '#7f1d1d' },
 }
 
-// Standart mammografiya ko'rinish tartibi: R CC, L CC, R MLO, L MLO, ...
+// DICOM ViewPosition (CC/MLO) tegi ko'pincha bo'sh yoki notekis keladi, shuning
+// uchun buni faqat R/L ichida ikkinchi darajali tartiblash uchun ishlatamiz.
+// Asosiy tartib — R va L rasmlarni har qatorda bittadan (yonma-yon, taqqoslash
+// uchun) navbatma-navbat joylashtirish: R,L,R,L... (professional viewer kabi).
 const VIEW_ORDER = { CC: 0, MLO: 1 }
-const SIDE_ORDER  = { R: 0, L: 1 }
-function viewSortKey(img) {
-  return (VIEW_ORDER[img.view_position] ?? 9) * 10 + (SIDE_ORDER[img.laterality] ?? 9)
+function viewRank(img) {
+  return VIEW_ORDER[String(img.view_position || '').toUpperCase()] ?? 9
 }
+
+function arrangeForComparison(images) {
+  const rs     = images.filter(i => i.laterality === 'R').sort((a, b) => viewRank(a) - viewRank(b))
+  const ls     = images.filter(i => i.laterality === 'L').sort((a, b) => viewRank(a) - viewRank(b))
+  const others = images.filter(i => !['R', 'L'].includes(i.laterality))
+  const out = []
+  for (let k = 0; k < Math.max(rs.length, ls.length); k++) {
+    if (rs[k]) out.push(rs[k])
+    if (ls[k]) out.push(ls[k])
+  }
+  return [...out, ...others]
+}
+
 function panelLabel(img) {
   const parts = [img.laterality, img.view_position].filter(Boolean)
   return parts.length ? parts.join(' ') : `#${img.id}`
@@ -62,8 +77,7 @@ export default function ReviewDetail() {
 
         try {
           const sib = await api.get(`/patients/${r.data.patient_id}/images`)
-          const sorted = [...sib.data].sort((a, b) => viewSortKey(a) - viewSortKey(b))
-          setSiblings(sorted)
+          setSiblings(arrangeForComparison(sib.data))
         } catch {
           setSiblings([r.data])
         }
