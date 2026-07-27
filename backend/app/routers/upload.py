@@ -112,11 +112,13 @@ async def upload_image(patient_id: int = Form(...),
 async def upload_dicom_folder(files: list[UploadFile] = File(...),
                               db: Session = Depends(get_db),
                               current_user: models.User = Depends(get_current_user)):
-    """Butun papka (ko'p bemor/ko'p rasm) yuklanganda — bemor har bir DICOM
-    faylining o'z ichidagi PatientID tegidan aniqlanadi/yaratiladi."""
+    """Bir papka = bitta bemor. Papka ichidagi barcha .dcm fayllar (bemorning
+    turli ko'rinishlari — R/L, CC/MLO) shu bitta bemorga biriktiriladi;
+    bemor DICOM metama'lumotidan (birinchi topilgan fayldan) aniqlanadi."""
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     results: list[schemas.DicomBatchResult] = []
-    uploaded = patients_created = patients_matched = 0
+    processed = []  # (filename, png_path)
+    patient_info = None
 
     for file in files:
         ext = os.path.splitext(file.filename)[1].lower()
@@ -139,29 +141,42 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
                 filename=file.filename, status="error", detail=str(e)))
             continue
 
-        patient = None
-        if info["patient_id"]:
+        # Butun papka uchun bemor ma'lumoti — birinchi topilgan (PatientID yoki ism bor) fayldan olinadi
+        if patient_info is None and (info["patient_id"] or info["full_name"]):
+            patient_info = info
+
+        processed.append((file.filename, png_path))
+
+    # --- Bitta bemorni aniqlash/yaratish (butun papka uchun bir marta) ---
+    patient = None
+    patients_created = patients_matched = 0
+    if processed:
+        if patient_info and patient_info["patient_id"]:
             patient = db.query(models.Patient).filter(
-                models.Patient.dicom_patient_id == info["patient_id"]).first()
+                models.Patient.dicom_patient_id == patient_info["patient_id"]).first()
 
         if patient:
-            patients_matched += 1
+            patients_matched = 1
         else:
+            uid = uuid.uuid4().hex[:8]
             patient = models.Patient(
-                full_name=info["full_name"] or f"Noma'lum bemor ({info['patient_id'] or uid[:8]})",
-                birth_year=info["birth_year"],
-                dicom_patient_id=info["patient_id"],
+                full_name=(patient_info and patient_info["full_name"])
+                          or f"Noma'lum bemor ({(patient_info and patient_info['patient_id']) or uid})",
+                birth_year=patient_info["birth_year"] if patient_info else None,
+                dicom_patient_id=patient_info["patient_id"] if patient_info else None,
                 is_demo=0,
             )
             db.add(patient)
             db.commit()
             db.refresh(patient)
-            patients_created += 1
+            patients_created = 1
 
+    uploaded = 0
+    for filename, png_path in processed:
         image = models.MammographyImage(
             patient_id=patient.id,
             uploaded_by=current_user.id,
-            filename=file.filename,
+            filename=filename,
             file_path=png_path,
             file_format="DCM",
             status=models.ImageStatus.pending,
@@ -170,13 +185,12 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
         db.commit()
         db.refresh(image)
         uploaded += 1
-
         results.append(schemas.DicomBatchResult(
-            filename=file.filename, status="ok",
+            filename=filename, status="ok",
             patient_name=patient.full_name, image_id=image.id))
 
     db.add(models.Log(user_id=current_user.id, action="upload_dicom_folder",
-                      details=f"{uploaded} rasm, {patients_created} yangi bemor, {patients_matched} mos kelgan"))
+                      details=f"{uploaded} rasm, bemor: {patient.full_name if patient else '-'}"))
     db.commit()
 
     return schemas.DicomBatchResponse(
