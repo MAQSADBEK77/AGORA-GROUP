@@ -82,6 +82,9 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
                current_user: models.User = Depends(get_current_user)):
     _require_radiolog(current_user)
 
+    # AI tahlil hozircha o'chirilgan — dastur DICOM formatiga moslashtirilmoqda.
+    raise HTTPException(status_code=503, detail="AI tahlil hozircha o'chirilgan")
+
     image = db.query(models.MammographyImage).filter(
         models.MammographyImage.id == image_id).first()
     if not image:

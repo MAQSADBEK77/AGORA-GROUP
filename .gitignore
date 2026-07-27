@@ -27,6 +27,10 @@ backend/cbis_data/
 *.h5
 *.zip
 
+# Haqiqiy bemor DICOM fayllari (PHI bor - hech qachon commit qilinmasin)
+dcm/
+*.dcm
+
 # Docker
 *.log
 

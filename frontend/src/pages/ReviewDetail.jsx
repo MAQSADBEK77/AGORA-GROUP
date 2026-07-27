@@ -210,12 +210,7 @@ export default function ReviewDetail() {
                 <Brain size={18} className="text-purple-500" /> AI Tahlil
               </h3>
               {!aiPred && (
-                <button onClick={loadAiPrediction} disabled={aiLoading}
-                  className="btn-secondary text-sm flex items-center gap-1.5">
-                  {aiLoading
-                    ? <><div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />Tahlil...</>
-                    : 'AI dan so\'rang'}
-                </button>
+                <span className="text-xs text-gray-400 italic">AI tahlil hozircha o'chirilgan</span>
               )}
             </div>
 

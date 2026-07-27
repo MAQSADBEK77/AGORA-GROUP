@@ -3,12 +3,13 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user
-from ..ai.validator import is_mammography_image
+from ..dicom_utils import dicom_to_png
 import os, shutil, uuid
 
 router = APIRouter(prefix="/api", tags=["Upload"])
 UPLOAD_DIR    = os.getenv("UPLOAD_DIR", "./uploads")
-ALLOWED_EXTS  = {".jpg", ".jpeg", ".png", ".dcm"}
+# Hozircha dastur faqat DICOM (.dcm) formatini qabul qiladi — AI tahlil vaqtincha o'chirilgan.
+ALLOWED_EXTS  = {".dcm"}
 
 
 @router.post("/patients", response_model=schemas.PatientOut)
@@ -69,31 +70,32 @@ async def upload_image(patient_id: int = Form(...),
                        current_user: models.User = Depends(get_current_user)):
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in ALLOWED_EXTS:
-        raise HTTPException(status_code=400, detail="Faqat JPG, PNG, DICOM formatlar")
+        raise HTTPException(status_code=400, detail="Faqat DICOM (.dcm) fayllar qabul qilinadi")
 
     patient = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Bemor topilmadi")
 
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    fname     = f"{uuid.uuid4().hex}{ext}"
-    file_path = os.path.join(UPLOAD_DIR, fname)
+    uid       = uuid.uuid4().hex
+    dcm_path  = os.path.join(UPLOAD_DIR, f"{uid}.dcm")
+    png_path  = os.path.join(UPLOAD_DIR, f"{uid}.png")
 
-    with open(file_path, "wb") as f:
+    with open(dcm_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    # Mammografiya validatsiyasi
-    valid, reason = is_mammography_image(file_path)
-    if not valid:
-        os.remove(file_path)
-        raise HTTPException(status_code=422, detail=f"Noto'g'ri rasm: {reason}")
+    try:
+        dicom_to_png(dcm_path, png_path)
+    except Exception as e:
+        os.remove(dcm_path)
+        raise HTTPException(status_code=422, detail=f"DICOM faylni o'qib bo'lmadi: {e}")
 
     image = models.MammographyImage(
         patient_id=patient_id,
         uploaded_by=current_user.id,
         filename=file.filename,
-        file_path=file_path,
-        file_format=ext.lstrip(".").upper(),
+        file_path=png_path,
+        file_format="DCM",
         status=models.ImageStatus.pending,
     )
     db.add(image)

@@ -43,12 +43,11 @@ export default function Upload() {
     const f = e.target.files[0]
     if (!f) return
     const ext = f.name.split('.').pop().toLowerCase()
-    if (!['jpg', 'jpeg', 'png', 'dcm'].includes(ext)) {
-      return toast.error('Faqat JPG, PNG, DICOM formatlar')
+    if (ext !== 'dcm') {
+      return toast.error('Hozircha faqat DICOM (.dcm) fayllar qabul qilinadi')
     }
     setFile(f)
-    if (ext !== 'dcm') setPreview(URL.createObjectURL(f))
-    else setPreview(null)
+    setPreview(null)
   }
 
   const onDrop = useCallback((e) => {
@@ -188,11 +187,11 @@ export default function Upload() {
             ) : (
               <>
                 <UploadIcon size={40} className="mx-auto text-gray-400 mb-3" />
-                <p className="text-sm font-medium text-gray-600">Rasmni tortib tashlang yoki bosing</p>
-                <p className="text-xs text-gray-400 mt-1">JPG, PNG, DICOM • Maks 50 MB</p>
+                <p className="text-sm font-medium text-gray-600">DICOM faylni tortib tashlang yoki bosing</p>
+                <p className="text-xs text-gray-400 mt-1">Hozircha faqat .dcm format • Maks 50 MB</p>
               </>
             )}
-            <input id="fileInput" type="file" accept=".jpg,.jpeg,.png,.dcm"
+            <input id="fileInput" type="file" accept=".dcm"
               className="hidden" onChange={onFileChange} />
           </div>
 
