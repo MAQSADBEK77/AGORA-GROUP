@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown } from 'lucide-react'
@@ -15,6 +15,17 @@ const LABEL_STYLE = {
   'Very Malignant':{ color: 'text-red-900',    bg: 'bg-red-100 border-red-500',      icon: XCircle,      hex: '#7f1d1d' },
 }
 
+// Standart mammografiya ko'rinish tartibi: R CC, L CC, R MLO, L MLO, ...
+const VIEW_ORDER = { CC: 0, MLO: 1 }
+const SIDE_ORDER  = { R: 0, L: 1 }
+function viewSortKey(img) {
+  return (VIEW_ORDER[img.view_position] ?? 9) * 10 + (SIDE_ORDER[img.laterality] ?? 9)
+}
+function panelLabel(img) {
+  const parts = [img.laterality, img.view_position].filter(Boolean)
+  return parts.length ? parts.join(' ') : `#${img.id}`
+}
+
 function parseSimilarCases(raw) {
   if (!raw) return []
   if (Array.isArray(raw)) return raw
@@ -25,21 +36,21 @@ export default function ReviewDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [image, setImage]       = useState(null)
+  const [siblings, setSiblings] = useState([])
   const [error, setError]       = useState(null)
   const [aiPred, setAiPred]     = useState(null)
   const [form, setForm]         = useState({ label: '', description: '' })
   const [submitting, setSubmitting] = useState(false)
   const [aiLoading, setAiLoading]   = useState(false)
-  const [imgError, setImgError]     = useState(false)
-  const [zoomOpen, setZoomOpen]     = useState(false)
+  const [zoomImage, setZoomImage]   = useState(null)
   const [pdfLoading, setPdfLoading] = useState(false)
-  const imgRef = useRef(null)
+  const imgRefs = useRef({})
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
 
   useEffect(() => {
     api.get(`/images/${id}`)
-      .then(r => {
+      .then(async r => {
         setImage(r.data)
         if (r.data.review) {
           setForm({
@@ -48,6 +59,14 @@ export default function ReviewDetail() {
           })
         }
         if (r.data.ai_prediction) setAiPred(r.data.ai_prediction)
+
+        try {
+          const sib = await api.get(`/patients/${r.data.patient_id}/images`)
+          const sorted = [...sib.data].sort((a, b) => viewSortKey(a) - viewSortKey(b))
+          setSiblings(sorted)
+        } catch {
+          setSiblings([r.data])
+        }
       })
       .catch(() => setError('Rasm ma\'lumotlari yuklanmadi'))
   }, [id])
@@ -72,11 +91,16 @@ export default function ReviewDetail() {
     if (!form.label) return toast.error('Diagnoz tanlang')
     setSubmitting(true)
     try {
-      await api.post(`/review/${id}`, {
+      const targetIds = siblings.length ? siblings.map(s => s.id) : [id]
+      await Promise.all(targetIds.map(imgId => api.post(`/review/${imgId}`, {
         label: form.label,
         description: form.description || null,
-      })
-      toast.success('Diagnoz saqlandi! AI yangilandi.')
+      })))
+      toast.success(
+        targetIds.length > 1
+          ? `Diagnoz ${targetIds.length} ta rasmga saqlandi! AI yangilandi.`
+          : 'Diagnoz saqlandi! AI yangilandi.'
+      )
       navigate('/review')
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Saqlash xatosi')
@@ -85,11 +109,16 @@ export default function ReviewDetail() {
     }
   }
 
-  // Rasm URL ni to'g'ri hisoblash
   function getImageUrl(img) {
     if (!img) return null
     return `${API_BASE_URL}/img/${img.id}`
   }
+
+  function getImgRefObj(imgId) {
+    if (!imgRefs.current[imgId]) imgRefs.current[imgId] = { current: null }
+    return imgRefs.current[imgId]
+  }
+  const setImgRef = useCallback((imgId) => (el) => { getImgRefObj(imgId).current = el }, [])
 
   async function downloadPdf() {
     setPdfLoading(true)
@@ -124,14 +153,10 @@ export default function ReviewDetail() {
   )
 
   const similarCases = parseSimilarCases(aiPred?.similar_cases)
-
-  const lesionBox = (aiPred?.lesion_x != null && aiPred?.lesion_width)
-    ? { x: aiPred.lesion_x, y: aiPred.lesion_y, width: aiPred.lesion_width, height: aiPred.lesion_height }
-    : null
-  const lesionColor = (LABEL_STYLE[aiPred?.label] || LABEL_STYLE['Normal']).hex
+  const panels = siblings.length ? siblings : [image]
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <button onClick={() => navigate('/review')}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
@@ -148,57 +173,61 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6">
 
-        {/* Rasm */}
+        {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada */}
         <div className="card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-800 dark:text-white">Mammografiya Rasmi</h3>
-            {!imgError && (
-              <button onClick={() => setZoomOpen(true)}
-                className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400
-                           hover:bg-blue-50 dark:hover:bg-blue-900/20 px-2 py-1.5 rounded-lg transition-colors">
-                <Maximize2 size={13} /> Kattalashtirish
-              </button>
-            )}
+            <h3 className="font-semibold text-gray-800 dark:text-white">
+              Mammografiya Rasmlari {panels.length > 1 && <span className="text-gray-400 font-normal text-sm">({panels.length} ta ko'rinish)</span>}
+            </h3>
           </div>
-          {imgError ? (
-            <div className="flex flex-col items-center justify-center h-48 bg-gray-50 dark:bg-slate-700 rounded-lg text-gray-400">
-              <ImageOff size={40} className="mb-2 opacity-40" />
-              <p className="text-sm">Rasm ko'rsatilmadi</p>
-            </div>
-          ) : (
-            <div className="relative group cursor-zoom-in" onClick={() => setZoomOpen(true)}>
-              <img
-                ref={imgRef}
-                src={getImageUrl(image)}
-                alt="mammogram"
-                className="w-full rounded-lg object-contain bg-black max-h-80 hover:opacity-95 transition-opacity"
-                onError={() => setImgError(true)}
-              />
-              {lesionBox && (
-                <LesionOverlay box={lesionBox} color={lesionColor} label="Shubhali mintaqa" imgRef={imgRef} />
-              )}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                <div className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                  <Maximize2 size={12} /> Kattalashtirish uchun bosing
+
+          <div className={`grid gap-3 ${panels.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            {panels.map(p => {
+              const pLesion = (p.ai_prediction?.lesion_x != null && p.ai_prediction?.lesion_width)
+                ? { x: p.ai_prediction.lesion_x, y: p.ai_prediction.lesion_y,
+                    width: p.ai_prediction.lesion_width, height: p.ai_prediction.lesion_height }
+                : null
+              const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
+
+              return (
+                <div key={p.id} className="relative group cursor-zoom-in bg-black rounded-lg overflow-hidden"
+                  onClick={() => setZoomImage(p)}>
+                  <span className="absolute top-1.5 left-1.5 z-10 text-[10px] font-bold bg-black/70 text-white px-1.5 py-0.5 rounded">
+                    {panelLabel(p)}
+                  </span>
+                  {p.status === 'reviewed' && (
+                    <CheckCircle size={14} className="absolute top-1.5 right-1.5 z-10 text-green-400" />
+                  )}
+                  <img
+                    ref={setImgRef(p.id)}
+                    src={getImageUrl(p)}
+                    alt={panelLabel(p)}
+                    className="w-full object-contain bg-black max-h-64 hover:opacity-95 transition-opacity"
+                    onError={e => { e.target.style.opacity = 0.15 }}
+                  />
+                  {pLesion && (
+                    <LesionOverlay box={pLesion} color={pColor} label="Shubhali mintaqa" imgRef={getImgRefObj(p.id)} />
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-black/60 text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
+                      <Maximize2 size={10} /> Kattalashtirish
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )
+            })}
+          </div>
+
           <div className="mt-3 text-xs text-gray-500 space-y-1">
-            <p>Fayl: {image.filename}</p>
+            <p>Bemor: {image.patient_id ? `#${image.patient_id}` : '—'} • Fayllar: {panels.length}</p>
             <p>Yuklangan: {new Date(image.uploaded_at).toLocaleString('uz-UZ')}</p>
             <p>Status:
               <span className={`ml-1 font-medium ${image.status === 'pending' ? 'text-yellow-600' : 'text-green-600'}`}>
                 {image.status === 'pending' ? 'Kutmoqda' : 'Tekshirilgan'}
               </span>
             </p>
-            {lesionBox && (
-              <p className="text-orange-500">
-                AI aniqlagan taxminiy shubhali mintaqa rasmda ramka bilan ko'rsatilgan — yakuniy tashxis radiolog tomonidan tasdiqlanadi
-              </p>
-            )}
           </div>
         </div>
 
@@ -273,6 +302,11 @@ export default function ReviewDetail() {
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <User size={18} /> Doktor Xulosasi
               </h3>
+              {panels.length > 1 && (
+                <p className="text-xs text-blue-600 bg-blue-50 rounded p-2 mb-3">
+                  Diagnoz shu bemorning barcha {panels.length} ta ko'rinishiga birgalikda saqlanadi.
+                </p>
+              )}
               <form onSubmit={submitReview} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -316,7 +350,7 @@ export default function ReviewDetail() {
                 </button>
 
                 <p className="text-xs text-gray-400 text-center">
-                  Saqlash bilan AI bu rasmni trening ma'lumot sifatida oladi
+                  Saqlash bilan AI bu rasm(lar)ni trening ma'lumot sifatida oladi
                 </p>
               </form>
             </div>
@@ -350,11 +384,11 @@ export default function ReviewDetail() {
         </div>
       </div>
 
-      {zoomOpen && !imgError && (
+      {zoomImage && (
         <ImageZoom
-          src={getImageUrl(image)}
-          alt={image.filename}
-          onClose={() => setZoomOpen(false)}
+          src={getImageUrl(zoomImage)}
+          alt={panelLabel(zoomImage)}
+          onClose={() => setZoomImage(null)}
         />
       )}
     </div>

@@ -81,3 +81,12 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 2. CBIS-DDSM'ni to'liq (yoki kattaroq namunada) bazaga import qilish + embedding hisoblash.
 3. Foydalanuvchi so'ragan holatda — GitHub'dagi juda keng ruxsatli Personal Access Token'larni o'chirib, kamroq huquqli (faqat `repo`) tokenlar bilan almashtirish tavsiya etiladi.
 4. AI tahlilni qayta yoqish — hozircha DICOM'dan kelgan PNG'lar ustida KNN/embedding pipeline sinovdan o'tkazilmagan (ehtimol ishlaydi, chunki oddiy grayscale PNG, lekin tasdiqlanmagan).
+
+## 8. Bitta bemorning barcha rasmlari — bitta oynada grid ko'rinish
+
+- Foydalanuvchi professional DICOM viewer (DMED) skrinshotini ko'rsatib, xuddi shunday — bitta bemorning 4 ta ko'rinishi (R/L, CC/MLO) ko'rib chiqish sahifasida BITTA oynada, yonma-yon ko'rinishini so'radi.
+- `backend/app/models.py` — `MammographyImage`ga `laterality` (R/L) va `view_position` (CC/MLO) ustunlari qo'shildi; `migrate.py`ga ham qo'shildi.
+- `backend/app/routers/upload.py` (`/api/upload/dicom-folder`) — endi har bir faylning laterality/view_position tegi ham DICOM'dan o'qib, shu rasmga saqlanadi.
+- `frontend/src/pages/ReviewDetail.jsx` — qayta yozildi: endi rasmning `patient_id`si orqali `/api/patients/{id}/images` chaqirilib, bemorning BARCHA rasmlari olinadi, standart tartibda (R CC, L CC, R MLO, L MLO) saralanib, 2x2 grid'da ko'rsatiladi. Har bir panelda laterality/view yorlig'i bor, bosilganda o'sha rasm kattalashadi. Diagnoz formasi endi BITTA saqlashda guruhdagi barcha rasmlarga birgalikda yoziladi (har biriga alohida `/api/review/{id}` chaqiriladi).
+- Test: haqiqiy `dcm/` papkadagi 4 faylni yuklab, natijani statik HTML orqali skrinshot qildim — natija foydalanuvchi ko'rsatgan referens ko'rinishga (2x2, R/L CC/MLO yorliqlari bilan) mos keldi.
+- Eslatma: `ReviewQueue.jsx` (navbat ro'yxati) hali ham har bir rasmni alohida qator qilib ko'rsatadi (bitta bemorning 4 rasmi = 4 qator) — buni ham bemor bo'yicha guruhlashni so'rashsa, keyingi ish bo'ladi.

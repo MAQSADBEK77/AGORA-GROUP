@@ -53,4 +53,5 @@ def extract_patient_info(ds) -> dict:
         "birth_year": birth_year,
         "sex": getattr(ds, "PatientSex", None),
         "laterality": getattr(ds, "ImageLaterality", None),
+        "view_position": getattr(ds, "ViewPosition", None),
     }

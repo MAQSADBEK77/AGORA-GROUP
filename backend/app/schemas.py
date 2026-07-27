@@ -114,6 +114,8 @@ class ImageOut(BaseModel):
     patient_id: int
     filename: str
     file_format: Optional[str]
+    laterality: Optional[str] = None
+    view_position: Optional[str] = None
     status: ImageStatus
     uploaded_at: datetime
     review: Optional[DoctorReviewOut]
