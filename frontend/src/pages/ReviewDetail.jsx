@@ -187,9 +187,9 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
+      <div className="relative">
 
-        {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada */}
+        {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada, to'liq kenglikda */}
         <div className="card">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-800 dark:text-white">
@@ -245,7 +245,18 @@ export default function ReviewDetail() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* AI Tahlil / Doktor Xulosasi — kerak bo'lmagunча yon tomonda yashiringan,
+            sichqoncha olib borilganda chapdan animatsiya bilan chiqadigan panel */}
+        <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 group/drawer print:hidden h-[85vh]">
+          <div className="absolute inset-y-0 left-0 w-[30px] bg-blue-600 rounded-r-lg shadow-lg
+                          flex flex-col items-center justify-center gap-1">
+            <Brain size={16} className="text-white" />
+            <span className="text-white text-[10px] font-semibold [writing-mode:vertical-rl]">Diagnoz</span>
+          </div>
+          <div className="absolute inset-y-0 left-0 w-80 -translate-x-full group-hover/drawer:translate-x-0
+                          transition-transform duration-300 ease-out overflow-y-auto bg-white dark:bg-slate-800
+                          rounded-r-2xl shadow-2xl border border-l-0 border-gray-200 dark:border-slate-700
+                          p-4 space-y-4">
           {/* AI tahlil */}
           <div className="card">
             <div className="flex items-center justify-between mb-3">
@@ -395,6 +406,7 @@ export default function ReviewDetail() {
               </div>
             )
           )}
+          </div>
         </div>
       </div>
 

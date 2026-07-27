@@ -96,3 +96,10 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Haqiqiy foydalanishda `ViewPosition` (CC/MLO) DICOM tegi ko'pincha **bo'sh** kelib chiqdi (fayl eksport qiluvchi tizimga bog'liq) — shu sabab avvalgi saralash R,R,L,L bo'lib qolar edi (referens viewer'dagidek R,L yonma-yon emas).
 - Yechim: endi asosiy tartib — R va L rasmlarni navbatma-navbat (R,L,R,L...) joylashtirish, CC/MLO tegi esa faqat R/L guruh ICHIDA (mavjud bo'lsa) ikkinchi darajali tartiblash uchun ishlatiladi. Shunday qilib har qatorda doim bitta R + bitta L bo'ladi (taqqoslash uchun qulay), tegi bo'sh bo'lsa ham.
 - Haqiqiy bemor rasmlari (production bazadagi #13) bilan sinab, natija to'g'ri chiqishi tasdiqlandi.
+
+### 8.2. AI/Diagnoz paneli — chapdan chiqadigan yashirin panel (vertikal monitor uchun)
+
+- Foydalanuvchi: dastur **vertikal (portret) monitorda** ochiladi, shuning uchun eni cheklangan — radiolog uchun eng muhimi 4 ta rasmni iloji boricha kattaroq va qulay ko'rish. Doimiy o'ng panel (AI Tahlil + Doktor Xulosasi) bu uchun joy yeyar edi.
+- Yechim: sahifa tuzilishi o'zgartirildi — rasmlar endi butun kenglikni egallaydi (o'ng ustun olib tashlandi). AI/Diagnoz paneli endi ekranning chap chetiga **fixed** qilib biriktirilgan, standart holatda faqat ingichka (30px) ko'k tasma ko'rinadi ("Diagnoz" yozuvi bilan). Sichqoncha o'sha tasma ustiga kelganda (`group-hover`), panel 0.3s animatsiya bilan to'liq (320px) chapdan chiqib, rasm ustiga overlay bo'lib yozadi.
+- Amalga oshirish: ikkita `position:absolute` element (ingichka tasma + to'liq panel) umumiy `fixed` ota-konteyner ichida, panel `-translate-x-full` (butunlay yashirin) dan `group-hover:translate-x-0` ga o'tadi.
+- Statik HTML orqali (asl loyihaning compiled Tailwind CSS fayli bilan) ikkala holatni — yopiq va hover qilingan — skrinshot qilib tekshirdim, ikkalasi ham to'g'ri ishladi.
