@@ -73,14 +73,18 @@ def _code_meaning(seq):
         return None
 
 
-def parse_cad_sr(ds) -> dict | None:
-    """Mammography CAD SR hisobotidan (masalan FUJIFILM M-CAD) topilmalarni
-    tomon (chap/o'ng) bo'yicha yig'ib qaytaradi. DICOM SR ichidagi "by-reference"
-    bog'lanishlar (Referenced Content Item Identifier) orqali har bir topilma
-    qaysi rasmga tegishli ekani (demak — qaysi tomon) aniqlanadi."""
-    algorithm = None
-    summary_text = None
+def _scoord_points(item) -> list:
+    """SCOORD content-item'idan (x,y) juftliklar ro'yxatini qaytaradi."""
+    data = list(item.get("GraphicData", []))
+    return [[round(float(data[i])), round(float(data[i + 1]))] for i in range(0, len(data) - 1, 2)]
 
+
+def parse_cad_sr(ds) -> dict | None:
+    """Mammography CAD SR hisobotidan (masalan FUJIFILM M-CAD) topilmalarni to'liq
+    o'qiydi: har bir kaltsifikatsiya to'plami, undagi HAR BIR alohida kaltsifikatsiyaning
+    markazi va aniq konturi (outline), tomon (chap/o'ng) bo'yicha guruhlangan holda.
+    DICOM SR ichidagi "by-reference" bog'lanishlar (Referenced Content Item Identifier)
+    orqali har bir topilma qaysi rasmga (demak — qaysi tomonga) tegishli ekani aniqlanadi."""
     path_to_item: dict[tuple, object] = {}
 
     def index(item, path=()):
@@ -101,64 +105,94 @@ def parse_cad_sr(ds) -> dict | None:
                     lat = "L" if "Left" in raw else ("R" if "Right" in raw else None)
             image_laterality[path] = lat
 
-    by_side = {
-        "L": {"clusters": 0, "calcifications": 0, "points": []},
-        "R": {"clusters": 0, "calcifications": 0, "points": []},
-    }
+    def find_side(sub_item):
+        for c in sub_item.get("ContentSequence", []):
+            if "ReferencedContentItemIdentifier" in c:
+                ref_path = tuple(int(x) for x in c.ReferencedContentItemIdentifier)[1:]
+                return image_laterality.get(ref_path)
+            r = find_side(c)
+            if r:
+                return r
+        return None
+
+    def parse_calcification(item) -> dict:
+        calc = {"center": None, "outline": []}
+        for c in item.get("ContentSequence", []):
+            if c.get("ValueType") != "SCOORD":
+                continue
+            name = _code_meaning(c.get("ConceptNameCodeSequence", []))
+            pts = _scoord_points(c)
+            if name == "Center" and pts:
+                calc["center"] = pts[0]
+            elif name == "Outline" and pts:
+                calc["outline"] = pts
+        return calc
+
+    by_side = {"L": {"clusters": []}, "R": {"clusters": []}}
     found_any = False
 
     for path, item in path_to_item.items():
         if _code_meaning(item.get("ConceptNameCodeSequence", [])) != "Single Image Finding":
             continue
-        finding_type = _code_meaning(item.get("ConceptCodeSequence", []))
-        if finding_type != "Calcification Cluster":
+        if _code_meaning(item.get("ConceptCodeSequence", [])) != "Calcification Cluster":
             continue
 
-        # Shu topilma ichidagi birinchi "Referenced Content Item Identifier" orqali
-        # qaysi IMAGE'ga tegishli ekanini aniqlaymiz (DICOM SR by-reference path —
-        # oldida qo'shimcha "1" indeksi bilan keladi, shu sabab uni tashlab yuboramiz)
-        def find_ref(sub_item):
-            for c in sub_item.get("ContentSequence", []):
-                if "ReferencedContentItemIdentifier" in c:
-                    ref_path = tuple(int(x) for x in c.ReferencedContentItemIdentifier)[1:]
-                    return image_laterality.get(ref_path)
-                r = find_ref(c)
-                if r:
-                    return r
-            return None
-        side = find_ref(item)
+        side = find_side(item)
+        if not side:
+            continue
+        found_any = True
 
-        if side:
-            found_any = True
-            by_side[side]["clusters"] += 1
-            for c in item.get("ContentSequence", []):
-                name = _code_meaning(c.get("ConceptNameCodeSequence", []))
-                if name == "Number of calcifications":
-                    try:
-                        by_side[side]["calcifications"] += int(c.MeasuredValueSequence[0].NumericValue)
-                    except Exception:
-                        pass
-                elif (name == "Center" and c.get("ValueType") == "SCOORD"
-                      and c.get("GraphicType") == "POINT" and "GraphicData" in c):
-                    x, y = c.GraphicData[0], c.GraphicData[1]
-                    by_side[side]["points"].append([round(float(x)), round(float(y))])
+        cluster = {"center": None, "count": 0, "calcifications": []}
+        for c in item.get("ContentSequence", []):
+            name = _code_meaning(c.get("ConceptNameCodeSequence", []))
+            if name == "Number of calcifications":
+                try:
+                    cluster["count"] = int(c.MeasuredValueSequence[0].NumericValue)
+                except Exception:
+                    pass
+            elif name == "Center" and c.get("ValueType") == "SCOORD":
+                pts = _scoord_points(c)
+                if pts:
+                    cluster["center"] = pts[0]
+            elif _code_meaning(c.get("ConceptCodeSequence", [])) == "Individual Calcification":
+                cluster["calcifications"].append(parse_calcification(c))
+        by_side[side]["clusters"].append(cluster)
 
     if not found_any:
         return None
 
+    summary_text = None
     for item in path_to_item.values():
         if _code_meaning(item.get("ConceptNameCodeSequence", [])) == "CAD Processing and Findings Summary":
             summary_text = _code_meaning(item.get("ConceptCodeSequence", []))
             break
 
-    algorithm_name = ""
+    algorithm_name = algorithm_version = ""
     for item in path_to_item.values():
-        if _code_meaning(item.get("ConceptNameCodeSequence", [])) == "Algorithm Name":
+        cname = _code_meaning(item.get("ConceptNameCodeSequence", []))
+        if cname == "Algorithm Name" and not algorithm_name:
             algorithm_name = item.get("TextValue", "") or ""
+        elif cname == "Algorithm Version" and not algorithm_version:
+            algorithm_version = item.get("TextValue", "") or ""
+        if algorithm_name and algorithm_version:
             break
+
+    detections_performed = []
+    analyses_attempted = None
+    for item in path_to_item.values():
+        cname = _code_meaning(item.get("ConceptNameCodeSequence", []))
+        if cname == "Detection Performed":
+            val = _code_meaning(item.get("ConceptCodeSequence", []))
+            if val and val not in detections_performed:
+                detections_performed.append(val)
+        elif cname == "Summary of Analyses":
+            analyses_attempted = _code_meaning(item.get("ConceptCodeSequence", [])) != "Not Attempted"
 
     return {
         "algorithm": algorithm_name or str(getattr(ds, "Manufacturer", "")),
+        "algorithm_version": algorithm_version,
         "summary": summary_text,
+        "detections_performed": detections_performed,
+        "analyses_attempted": analyses_attempted,
         "by_side": by_side,
     }

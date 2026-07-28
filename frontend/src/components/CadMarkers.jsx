@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react'
 
 /**
- * `points` — DICOM piksel koordinatalari ([x, y] juftliklari), rasmning
- * asl (natural) o'lchamiga nisbatan. `imgRef` orqali object-contain
- * letterboxing hisobga olinadi.
+ * `shapes` — [{ type: 'polygon', points: [[x,y],...] } | { type: 'point', point: [x,y] }]
+ * DICOM piksel koordinatalarida (rasmning asl o'lchamiga nisbatan). SVG `viewBox`
+ * rasmning natural o'lchamiga moslanadi, shu sababli koordinatalar to'g'ridan-to'g'ri
+ * (hech qanday qo'shimcha hisob-kitobsiz) rasm ustiga to'g'ri tushadi.
  */
-export default function CadMarkers({ points, color = '#f97316', title, imgRef }) {
-  const [markers, setMarkers] = useState([])
+export default function CadMarkers({ shapes, color = '#f97316', imgRef }) {
+  const [box, setBox] = useState(null)
 
   useEffect(() => {
     const el = imgRef?.current
-    if (!points?.length || !el) { setMarkers([]); return }
+    if (!shapes?.length || !el) { setBox(null); return }
 
     function compute() {
       if (!el.naturalWidth || !el.naturalHeight || !el.clientWidth || !el.clientHeight) return
       const scale     = Math.min(el.clientWidth / el.naturalWidth, el.clientHeight / el.naturalHeight)
       const renderedW = el.naturalWidth * scale
       const renderedH = el.naturalHeight * scale
-      const offsetX   = (el.clientWidth - renderedW) / 2
-      const offsetY   = (el.clientHeight - renderedH) / 2
-      setMarkers(points.map(([x, y]) => ({
-        left: offsetX + (x / el.naturalWidth) * renderedW,
-        top:  offsetY + (y / el.naturalHeight) * renderedH,
-      })))
+      setBox({
+        left: (el.clientWidth - renderedW) / 2,
+        top: (el.clientHeight - renderedH) / 2,
+        width: renderedW,
+        height: renderedH,
+        natW: el.naturalWidth,
+        natH: el.naturalHeight,
+      })
     }
 
     compute()
@@ -33,16 +36,25 @@ export default function CadMarkers({ points, color = '#f97316', title, imgRef })
       el.removeEventListener('load', compute)
       ro.disconnect()
     }
-  }, [points, imgRef])
+  }, [shapes, imgRef])
+
+  if (!box) return null
+
+  const strokeW = Math.max(box.natW / 500, 2)
 
   return (
-    <>
-      {markers.map((m, i) => (
-        <div key={i} title={title}
-          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 animate-pulse"
-          style={{ left: m.left, top: m.top, width: 18, height: 18, borderColor: color, boxShadow: `0 0 0 2px rgba(0,0,0,0.4)` }}
-        />
+    <svg className="absolute pointer-events-none animate-pulse"
+      style={{ left: box.left, top: box.top, width: box.width, height: box.height }}
+      viewBox={`0 0 ${box.natW} ${box.natH}`} preserveAspectRatio="none">
+      {shapes.map((s, i) => (
+        s.type === 'polygon' ? (
+          <polygon key={i} points={s.points.map(p => p.join(',')).join(' ')}
+            fill="none" stroke={color} strokeWidth={strokeW} strokeLinejoin="round" />
+        ) : (
+          <circle key={i} cx={s.point[0]} cy={s.point[1]} r={box.natW / 220}
+            fill="none" stroke={color} strokeWidth={strokeW} />
+        )
       ))}
-    </>
+    </svg>
   )
 }

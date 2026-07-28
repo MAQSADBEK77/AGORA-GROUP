@@ -59,6 +59,25 @@ function findCadSummary(panels) {
   return null
 }
 
+// Har bir alohida kaltsifikatsiyaning aniq konturi (bo'lsa) yoki markazi — rasm ustida chizish uchun
+function cadShapesForSide(cadSummary, side) {
+  const clusters = cadSummary?.by_side?.[side]?.clusters || []
+  const shapes = []
+  for (const cluster of clusters) {
+    for (const calc of cluster.calcifications || []) {
+      if (calc.outline?.length >= 3) shapes.push({ type: 'polygon', points: calc.outline })
+      else if (calc.center) shapes.push({ type: 'point', point: calc.center })
+    }
+  }
+  return shapes
+}
+
+function cadCounts(cadSummary, side) {
+  const clusters = cadSummary?.by_side?.[side]?.clusters || []
+  const calcifications = clusters.reduce((sum, c) => sum + (c.calcifications?.length || c.count || 0), 0)
+  return { clusters: clusters.length, calcifications }
+}
+
 const FOOTER_MIN_H = 110
 const FOOTER_MAX_RATIO = 0.85
 const FOOTER_H_KEY = 'reviewFooterHeight'
@@ -268,7 +287,7 @@ export default function ReviewDetail() {
                     width: p.ai_prediction.lesion_width, height: p.ai_prediction.lesion_height }
                 : null
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
-              const cadPoints = cadSummary?.by_side?.[p.laterality]?.points || []
+              const cadShapes = cadShapesForSide(cadSummary, p.laterality)
 
               return (
                 <div key={p.id} className="relative group cursor-zoom-in bg-black flex items-center justify-center"
@@ -289,8 +308,8 @@ export default function ReviewDetail() {
                   {pLesion && (
                     <LesionOverlay box={pLesion} color={pColor} label="Shubhali mintaqa" imgRef={getImgRefObj(p.id)} />
                   )}
-                  {cadPoints.length > 0 && (
-                    <CadMarkers points={cadPoints} title="Apparat CAD: kaltsifikatsiya to'plami" imgRef={getImgRefObj(p.id)} />
+                  {cadShapes.length > 0 && (
+                    <CadMarkers shapes={cadShapes} imgRef={getImgRefObj(p.id)} />
                   )}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="bg-black/60 text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
@@ -400,28 +419,44 @@ export default function ReviewDetail() {
             <div className="mb-3 border-t border-gray-100 dark:border-slate-700 pt-3">
               <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm mb-2">
                 <AlertTriangle size={16} className="text-orange-500" /> Apparat CAD hisoboti
-                <span className="text-[11px] font-normal text-gray-400">({cadSummary.algorithm})</span>
+                <span className="text-[11px] font-normal text-gray-400">
+                  ({cadSummary.algorithm}{cadSummary.algorithm_version ? ` v${cadSummary.algorithm_version}` : ''})
+                </span>
               </h3>
+
+              {cadSummary.detections_performed?.length > 0 && (
+                <p className="text-[11px] text-gray-500 mb-2">
+                  O'tkazilgan tekshiruvlar: {cadSummary.detections_performed.join(', ')}
+                </p>
+              )}
+
               <div className="flex flex-wrap gap-2">
                 {['L', 'R'].map(side => {
-                  const s = cadSummary.by_side?.[side]
-                  if (!s) return null
-                  const hasFindings = s.clusters > 0
+                  const { clusters, calcifications } = cadCounts(cadSummary, side)
+                  const hasFindings = clusters > 0
                   return (
                     <div key={side}
                       className={`text-xs px-3 py-2 rounded-lg border ${
                         hasFindings ? 'bg-orange-50 border-orange-300 text-orange-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
                       <span className="font-semibold">{SIDE_LABEL[side]}:</span>{' '}
                       {hasFindings
-                        ? `${s.clusters} ta kaltsifikatsiya to'plami (${s.calcifications} ta)`
+                        ? `${clusters} ta kaltsifikatsiya to'plami (${calcifications} ta alohida)`
                         : 'topilma yo\'q'}
                     </div>
                   )
                 })}
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">
-                Topilgan joylar rasmda <span className="text-orange-500 font-medium">to'q sariq halqa</span> bilan belgilangan
-                (tegishli tomon ko'rinishlarida — aniq CC/MLO farqi DICOM'da yo'q bo'lgani uchun ikkalasida ham).
+
+              {cadSummary.analyses_attempted === false && (
+                <p className="text-[11px] text-red-500 bg-red-50 rounded p-2 mt-2">
+                  ⚠ Apparat faqat joylarni <b>aniqladi</b> (detection) — xavflilik darajasini baholovchi
+                  tahlil (malignancy/BI-RADS scoring) <b>o'tkazilmagan</b>. Yakuniy baho butunlay radiologga bog'liq.
+                </p>
+              )}
+
+              <p className="text-[11px] text-gray-400 mt-2">
+                Topilgan har bir kaltsifikatsiyaning aniq konturi rasmda <span className="text-orange-500 font-medium">to'q sariq chiziq</span> bilan
+                belgilangan (tegishli tomon ko'rinishlarida — aniq CC/MLO farqi DICOM'da yo'q bo'lgani uchun ikkalasida ham).
                 Bu — mammografiya apparatining o'z tahlili, bizning AI natijasidan mustaqil. Yakuniy tashxis radiolog tomonidan tasdiqlanadi.
               </p>
             </div>
