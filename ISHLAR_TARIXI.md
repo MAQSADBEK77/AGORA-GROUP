@@ -146,6 +146,14 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - `ReviewDetail.jsx` — footer'da yangi "Apparat CAD hisoboti" bo'limi: har tomon uchun topilma bor/yo'qligi va soni, "bizning AI'dan mustaqil" degan aniq izoh bilan.
 - Test: haqiqiy SR fayl bilan sinaldi — natija to'g'ri chiqdi (chap: 5 klaster/12 kaltsifikatsiya, o'ng: topilma yo'q), keyin test ma'lumotlari tozalandi.
 
+### 12.1. Topilmalarni rasm ustida belgilab ko'rsatish
+
+- Foydalanuvchi: faqat son emas, aniq qayerda ekanini ham ko'rish kerak.
+- `parse_cad_sr` endi har bir klasterning markaz koordinatasini (DICOM piksel birligida) ham qaytaradi.
+- Yangi `CadMarkers.jsx` — bu koordinatalarni rasmning haqiqiy `naturalWidth/Height`iga nisbatan hisoblab, to'q sariq halqa bilan belgilaydi (LesionOverlay bilan bir xil object-contain letterboxing mantig'i).
+- **Cheklov**: SR hisobot rasmlarga **SOPInstanceUID** orqali bog'langan, lekin bu real namunada SR "For Processing" versiyaga ishora qiladi — bizda saqlangan fayllar boshqa UID'ga ega. Shuningdek, bizning fayllarda `ViewPosition` (CC/MLO) ham bo'sh, shu sabab ANIQ qaysi rasm (MLO yoki CC) ekanini ajratib bo'lmaydi. Shuning uchun belgilar **shu tomonning barcha rasmlarida** ko'rsatiladi (aniq bitta rasmda emas) — bu haqda footer'da ochiq izoh bor.
+- Test: haqiqiy rasmlar bilan skrinshot orqali tekshirildi — belgilar ikkala L-ko'rinishda ham to'qima ustida, bir xil mantiqiy hududda chiqdi.
+
 ### 10.2. Sticky footer'ni sudrab kattalashtirish/kichraytirish + rasmlarni maksimal kattalashtirish
 
 - Foydalanuvchi so'radi: pastki sticky footer'ning tepa chegarasida sudrab (tepaga/pastga) kichraytirib-kattalashtirish mumkin bo'lsin, va 4 ta rasm ham maksimal katta ko'rinsin.
