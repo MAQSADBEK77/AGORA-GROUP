@@ -242,3 +242,36 @@ saqlanadi, ustuvorlik foydalanuvchi bilan kelishilgach navbat bilan bajariladi.
 29. Ovozli diktovka (speech-to-text) — tavsif maydoni uchun.
 
 Keyingi safar: foydalanuvchi bilan ustuvorlikni kelishib, shu ro'yxatdan tanlab bajarish kerak.
+
+## 14. Foydalanuvchi backlog'idan birinchi 10 band bajarildi (2026-07-29, avtonom rejimda)
+
+Foydalanuvchi uxlab, "eng yaxshi tartibni o'zing tanla, to'xtama, savol berma" dedi.
+Ustuvorlik: xavfsiz, kam xatarli, tez natija beradigan ishlardan boshlandi.
+
+1. **Navbatni bemor bo'yicha guruhlash** — `/pending`, `/reviewed` endpointlari `patient_name`
+   qaytaradi; `ReviewQueue.jsx` endi bitta bemorning barcha rasmlarini BITTA kartaga
+   birlashtiradi (rasm soni belgisi bilan), eng "og'ir" diagnozni ko'rsatadi.
+2. **Qidiruv + tezkor sana filtri** — bemor ismi bo'yicha qidiruv, "Hammasi/Bugungi/Shu hafta" tablar.
+3. **Klaviatura tezkor tugmalari** (`ReviewDetail.jsx`) — 1-4 diagnoz, Ctrl/Cmd+Enter saqlash,
+   ←/→ yoki [/] navbatda oldingi/keyingi bemor, Esc — navbatga qaytish (matn maydonlarida ishlamaydi).
+4. **Tezkor shablon iboralar** — Izoh maydoni ostida `<select>`, tanlansa matnga qo'shiladi.
+5. **BI-RADS (0-6)** — `DoctorReview.birads` ustuni, mavjud Normal/Benign/Malignant/Very Malignant
+   tizimiga QO'SHIMCHA (uni almashtirmadi — xavfsizlik uchun), forma/o'qish/PDF'da ko'rinadi.
+6. **Admin audit-log UI** — `GET /api/admin/logs`, AdminPanel'da yig'iladigan jadval.
+7. **CSV eksport** — `GET /api/export/reviews.csv` (admin/radiolog), AdminPanel'da yuklab olish tugmasi.
+8. **Login rate-limiting** — bir email uchun 15 daqiqada 5 martadan ortiq xato parol → 429,
+   xotirada saqlanadi (Redis kerak emas, bitta jarayonli joylashtirish uchun yetarli).
+9. **Sessiya auto-logout** — 20 daqiqa harakatsizlikdan keyin avtomatik chiqish (`ProtectedRoute.jsx`).
+10. **Brauzer print tugmasi** — "Chop etish" (PDF yuklab olishdan tashqari), `@media print` orqali
+    faqat rasm+yakuniy xulosa ko'rinadi, menyu/forma yashiriladi.
+
+**Muhim eslatma (ehtiyot bo'lish uchun)**: shu ishlar davomida test paytida BITTA marta haqiqiy
+mavjud rasm (image_id=1, patient 25 — foydalanuvchining o'z DICOM testidan qolgan) ustida
+`/api/review/1` chaqirilib, tasodifan "reviewed" holatiga o'tkazib qo'yilgan edi. Darhol
+sezilib, review yozuvi o'chirildi, status "pending"ga qaytarildi, embedding fayli tozalandi.
+**Xulosa**: keyingi safar yozuvchi (POST/PUT/DELETE) testlar uchun HAR DOIM yangi, alohida
+test-bemor yaratish kerak (upload orqali) — mavjud ID'lardan HECH QACHON foydalanmaslik kerak.
+
+Davom etayotgan ishlar: ruler asbobi, rasm sifat tekshiruvi, Draft/Final oqimi, shaxsiy
+statistika, bulk select, bildirishnoma, QA dashboard, sinxron zoom/pan+flicker, PDF logotip —
+navbatda, autonom davom etilmoqda.
