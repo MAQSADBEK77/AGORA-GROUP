@@ -69,10 +69,13 @@ def _require_radiolog(current_user: models.User):
 def get_pending_images(db: Session = Depends(get_db),
                        current_user: models.User = Depends(get_current_user)):
     _require_radiolog(current_user)
-    return (db.query(models.MammographyImage)
-            .filter(models.MammographyImage.status == models.ImageStatus.pending)
-            .order_by(models.MammographyImage.uploaded_at.desc())
-            .all())
+    images = (db.query(models.MammographyImage)
+              .filter(models.MammographyImage.status == models.ImageStatus.pending)
+              .order_by(models.MammographyImage.uploaded_at.desc())
+              .all())
+    for img in images:
+        img.patient_name = img.patient.full_name if img.patient else None
+    return images
 
 
 # ─── AI taxmin (labeled rasmlar bilan solishtirish) ───
@@ -234,13 +237,16 @@ def dashboard_stats(db: Session = Depends(get_db),
 # ─── Barcha reviewed rasmlar ───
 
 @router.get("/reviewed", response_model=list[schemas.ImageOut])
-def get_reviewed(skip: int = 0, limit: int = 20,
+def get_reviewed(skip: int = 0, limit: int = 200,
                  db: Session = Depends(get_db),
                  current_user: models.User = Depends(get_current_user)):
-    return (db.query(models.MammographyImage)
-            .filter(models.MammographyImage.status == models.ImageStatus.reviewed)
-            .order_by(models.MammographyImage.uploaded_at.desc())
-            .offset(skip).limit(limit).all())
+    images = (db.query(models.MammographyImage)
+              .filter(models.MammographyImage.status == models.ImageStatus.reviewed)
+              .order_by(models.MammographyImage.uploaded_at.desc())
+              .offset(skip).limit(limit).all())
+    for img in images:
+        img.patient_name = img.patient.full_name if img.patient else None
+    return images
 
 
 # ─── Admin: yuklangan bemorlar rasmlarini tozalash ───

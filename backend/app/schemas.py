@@ -112,6 +112,7 @@ class AIPredictionOut(BaseModel):
 class ImageOut(BaseModel):
     id: int
     patient_id: int
+    patient_name: Optional[str] = None
     filename: str
     file_format: Optional[str]
     laterality: Optional[str] = None
