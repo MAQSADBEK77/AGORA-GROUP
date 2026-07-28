@@ -1,3 +1,4 @@
+import time
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from .. import models, schemas
@@ -6,11 +7,37 @@ from ..auth import hash_password, verify_password, create_access_token, get_curr
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
+# Login uchun oddiy xotiradagi rate-limiting (brute-force himoyasi).
+# Ko'p foydalanuvchili/ko'p jarayonli joylashtirishda bu Redis kabi umumiy
+# xotiraga ko'chirilishi kerak — hozircha bitta jarayonli joylashtirish yetarli.
+_failed_attempts: dict[str, list[float]] = {}
+MAX_ATTEMPTS = 5
+WINDOW_SECONDS = 15 * 60
+
+
+def _check_rate_limit(email: str):
+    now = time.time()
+    attempts = [t for t in _failed_attempts.get(email, []) if now - t < WINDOW_SECONDS]
+    _failed_attempts[email] = attempts
+    if len(attempts) >= MAX_ATTEMPTS:
+        wait_min = int((WINDOW_SECONDS - (now - attempts[0])) / 60) + 1
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Juda ko'p noto'g'ri urinish. {wait_min} daqiqadan keyin qayta urinib ko'ring."
+        )
+
+
+def _record_failure(email: str):
+    _failed_attempts.setdefault(email, []).append(time.time())
+
 
 @router.post("/login", response_model=schemas.Token)
 def login(request: schemas.LoginRequest, db: Session = Depends(get_db)):
+    _check_rate_limit(request.email)
+
     user = db.query(models.User).filter(models.User.email == request.email).first()
     if not user or not verify_password(request.password, user.hashed_password):
+        _record_failure(request.email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email yoki parol noto'g'ri"
@@ -18,6 +45,7 @@ def login(request: schemas.LoginRequest, db: Session = Depends(get_db)):
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Foydalanuvchi bloklangan")
 
+    _failed_attempts.pop(request.email, None)
     token = create_access_token({"sub": str(user.id), "role": user.role})
     return {"access_token": token, "token_type": "bearer", "user": user}
 
