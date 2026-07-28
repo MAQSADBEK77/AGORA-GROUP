@@ -1,7 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { X, ZoomIn, ZoomOut, RotateCcw, Contrast, SunMedium, FlipHorizontal2, Ruler } from 'lucide-react'
+import { X, ZoomIn, ZoomOut, RotateCcw, Contrast, SunMedium, FlipHorizontal2, Ruler, Pencil, Eraser } from 'lucide-react'
 
-export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
+const ANNOTATION_COLOR = '#ef4444'
+
+export default function ImageZoom({ src, alt, onClose, pixelSpacing, imageId, initialAnnotations, onSaveAnnotations, canDraw = true }) {
   const [scale, setScale]     = useState(1)
   const [pos, setPos]         = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
@@ -11,6 +13,9 @@ export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
   const [adjustOpen, setAdjustOpen] = useState(false)
   const [rulerMode, setRulerMode]   = useState(false)
   const [rulerPoints, setRulerPoints] = useState([])
+  const [drawMode, setDrawMode]     = useState(false)
+  const [annotations, setAnnotations] = useState(initialAnnotations || [])
+  const [currentPath, setCurrentPath] = useState(null)
   const dragStart = useRef(null)
   const imgRef    = useRef(null)
   const pictureRef = useRef(null)
@@ -20,6 +25,25 @@ export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
     setScale(1); setPos({ x: 0, y: 0 })
     setContrast(100); setBrightness(100); setInverted(false)
     setRulerPoints([])
+  }
+
+  function naturalPointFromEvent(e) {
+    const img = pictureRef.current
+    if (!img) return null
+    const rect = img.getBoundingClientRect()
+    return [
+      (e.clientX - rect.left) / rect.width * img.naturalWidth,
+      (e.clientY - rect.top) / rect.height * img.naturalHeight,
+    ]
+  }
+
+  function saveAnnotations(next) {
+    setAnnotations(next)
+    if (imageId && onSaveAnnotations) onSaveAnnotations(imageId, next)
+  }
+
+  function clearAnnotations() {
+    saveAnnotations([])
   }
 
   function naturalToScreen(pt) {
@@ -63,14 +87,32 @@ export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
 
   const onMouseDown = e => {
     if (rulerMode) { onRulerClick(e); return }
+    if (drawMode && canDraw) {
+      const pt = naturalPointFromEvent(e)
+      if (pt) setCurrentPath([pt])
+      return
+    }
     setDragging(true)
     dragStart.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }
   }
   const onMouseMove = e => {
+    if (drawMode && currentPath) {
+      const pt = naturalPointFromEvent(e)
+      if (pt) setCurrentPath(prev => [...prev, pt])
+      return
+    }
     if (!dragging) return
     setPos({ x: e.clientX - dragStart.current.x, y: e.clientY - dragStart.current.y })
   }
-  const onMouseUp = () => setDragging(false)
+  const onMouseUp = () => {
+    setDragging(false)
+    if (drawMode && currentPath) {
+      if (currentPath.length >= 2) {
+        saveAnnotations([...annotations, { points: currentPath, color: ANNOTATION_COLOR }])
+      }
+      setCurrentPath(null)
+    }
+  }
 
   useEffect(() => {
     const onKey = e => {
@@ -123,6 +165,20 @@ export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
             className={`p-2 rounded-lg transition-colors ${rulerMode ? 'bg-blue-500/30 text-blue-300' : 'hover:bg-white/10 text-white'}`}>
             <Ruler size={18} />
           </button>
+          {canDraw && (
+            <button onClick={() => setDrawMode(v => !v)}
+              title="Erkin chizish (annotatsiya)"
+              className={`p-2 rounded-lg transition-colors ${drawMode ? 'bg-blue-500/30 text-blue-300' : 'hover:bg-white/10 text-white'}`}>
+              <Pencil size={18} />
+            </button>
+          )}
+          {canDraw && annotations.length > 0 && (
+            <button onClick={clearAnnotations}
+              title="Chizilganlarni tozalash"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white">
+              <Eraser size={18} />
+            </button>
+          )}
           <div className="w-px h-5 bg-white/20 mx-1" />
           <button onClick={onClose}
             className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-white">
@@ -158,7 +214,7 @@ export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
       {/* Image */}
       <div ref={imgRef}
         className="flex-1 overflow-hidden flex items-center justify-center"
-        style={{ cursor: rulerMode ? 'crosshair' : (scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'default') }}>
+        style={{ cursor: (rulerMode || drawMode) ? 'crosshair' : (scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'default') }}>
         <img ref={pictureRef} src={src} alt={alt}
           onMouseDown={onMouseDown}
           draggable={false}
@@ -198,9 +254,38 @@ export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
         </div>
       )}
 
+      {/* Erkin chizilgan annotatsiyalar */}
+      {(annotations.length > 0 || currentPath) && (
+        <svg className="fixed inset-0 pointer-events-none z-10" width="100%" height="100%">
+          {annotations.map((path, i) => {
+            const screenPts = path.points.map(([x, y]) => naturalToScreen({ x, y }))
+            if (screenPts.some(p => !p)) return null
+            return (
+              <polyline key={i} points={screenPts.map(p => `${p.x},${p.y}`).join(' ')}
+                fill="none" stroke={path.color || ANNOTATION_COLOR} strokeWidth={2.5}
+                strokeLinecap="round" strokeLinejoin="round" />
+            )
+          })}
+          {currentPath && (() => {
+            const screenPts = currentPath.map(([x, y]) => naturalToScreen({ x, y }))
+            if (screenPts.some(p => !p)) return null
+            return (
+              <polyline points={screenPts.map(p => `${p.x},${p.y}`).join(' ')}
+                fill="none" stroke={ANNOTATION_COLOR} strokeWidth={2.5}
+                strokeLinecap="round" strokeLinejoin="round" opacity={0.7} />
+            )
+          })()}
+        </svg>
+      )}
+      {drawMode && (
+        <div className="text-center py-1 text-xs text-red-400 bg-black/60">
+          Chizish rejimi: rasm ustida sichqonchani bosib torting — avtomatik saqlanadi
+        </div>
+      )}
+
       {/* Hints */}
       <div className="text-center py-2 text-xs text-gray-600">
-        Scroll — zoom • Drag — siljitish • Kontrast — <Contrast size={11} className="inline -mt-0.5" /> • O'lchov — <Ruler size={11} className="inline -mt-0.5" /> • 0 — reset • Esc — yopish
+        Scroll — zoom • Drag — siljitish • Kontrast — <Contrast size={11} className="inline -mt-0.5" /> • O'lchov — <Ruler size={11} className="inline -mt-0.5" /> • Chizish — <Pencil size={11} className="inline -mt-0.5" /> • 0 — reset • Esc — yopish
       </div>
     </div>
   )

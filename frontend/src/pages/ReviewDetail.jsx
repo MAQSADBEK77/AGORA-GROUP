@@ -308,6 +308,19 @@ export default function ReviewDetail() {
     return `${API_BASE_URL}/img/${img.id}`
   }
 
+  async function handleSaveAnnotations(imgId, newAnnotations) {
+    const raw = newAnnotations.length ? JSON.stringify(newAnnotations) : null
+    try {
+      await api.put(`/images/${imgId}/annotations`, { annotations: newAnnotations })
+      const patch = img => img.id === imgId ? { ...img, annotations: raw } : img
+      setSiblings(prev => prev.map(patch))
+      setImage(img => img && patch(img))
+      setZoomImage(img => img && patch(img))
+    } catch {
+      toast.error('Chizmani saqlashda xatolik')
+    }
+  }
+
   function toggleCompareMode() {
     setCompareMode(m => !m)
     setCompareSelected([])
@@ -809,6 +822,10 @@ export default function ReviewDetail() {
           alt={panelLabel(zoomImage)}
           onClose={() => setZoomImage(null)}
           pixelSpacing={zoomImage.pixel_spacing}
+          imageId={zoomImage.id}
+          initialAnnotations={zoomImage.annotations ? JSON.parse(zoomImage.annotations) : []}
+          onSaveAnnotations={handleSaveAnnotations}
+          canDraw={canReview}
         />
       )}
 

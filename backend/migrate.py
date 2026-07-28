@@ -41,6 +41,7 @@ def migrate():
         ("mammography_images", "quality_warnings", "ALTER TABLE mammography_images ADD COLUMN quality_warnings TEXT"),
         ("users", "signature_path", "ALTER TABLE users ADD COLUMN signature_path TEXT"),
         ("mammography_images", "assigned_to", "ALTER TABLE mammography_images ADD COLUMN assigned_to INTEGER"),
+        ("mammography_images", "annotations", "ALTER TABLE mammography_images ADD COLUMN annotations TEXT"),
         # Eski ustunlarni tozalash (SQLite ALTER DROP yo'q, shuning uchun shunchaki o'tkazib yuboramiz)
     ]
 

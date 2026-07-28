@@ -115,6 +115,23 @@ def assign_images(body: schemas.AssignRequest,
     return {"success": True, "updated": len(images)}
 
 
+@router.put("/images/{image_id}/annotations")
+def save_annotations(image_id: int,
+                     body: schemas.AnnotationsUpdate,
+                     db: Session = Depends(get_db),
+                     current_user: models.User = Depends(get_current_user)):
+    """Radiolog rasm ustiga qo'lda chizgan erkin chiziqlarni saqlaydi."""
+    _require_radiolog(current_user)
+    img = db.query(models.MammographyImage).filter(
+        models.MammographyImage.id == image_id).first()
+    if not img:
+        raise HTTPException(status_code=404, detail="Rasm topilmadi")
+
+    img.annotations = json.dumps(body.annotations, ensure_ascii=False) if body.annotations else None
+    db.commit()
+    return {"success": True}
+
+
 # ─── Bildirishnomalar (yangi/shoshilinch kutayotgan holatlar) ───
 
 URGENT_WAIT_HOURS = 24

@@ -75,6 +75,7 @@ class MammographyImage(Base):
     cad_summary   = Column(Text, nullable=True)         # Apparat CAD hisoboti (SR) — JSON, mavjud bo'lsa
     quality_warnings = Column(Text, nullable=True)      # Rasm sifati ogohlantirishlari — JSON list, mavjud bo'lsa
     assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)  # Ish yukini taqsimlash uchun — biriktirilgan radiolog (ixtiyoriy, ko'rish huquqini cheklamaydi)
+    annotations = Column(Text, nullable=True)  # Radiolog qo'lda chizgan erkin chiziqlar — JSON: [{"points":[[x,y],...], "color":"#..."}]
     status      = Column(Enum(ImageStatus, values_callable=_by_value), default=ImageStatus.pending, nullable=False)
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
 

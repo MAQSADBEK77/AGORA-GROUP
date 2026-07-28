@@ -470,3 +470,19 @@ xavfli. Qolganlarini xavfsizlik darajasiga qarab davom ettirilmoqda:
   Test: alohida test-bemor yaratilib, biriktirish/bekor qilish/ro'yxatda to'g'ri
   ko'rsatilishi (`assigned_to_name`) va admin bo'lmagan foydalanuvchida 403 qaytishi
   tekshirildi; UI skrinshot orqali ham tasdiqlandi. Keyin test ma'lumotlari o'chirildi.
+
+- **Erkin chizish / annotatsiya** — `mammography_images.annotations` ustuni (JSON:
+  `[{"points":[[x,y],...], "color":"#.."}]`, DICOM piksel koordinatalarida — CAD
+  markerlar bilan bir xil yondashuv). `PUT /api/images/{id}/annotations` (radiolog/admin).
+  `ImageZoom.jsx`ga qalam (✏️) rejimi qo'shildi — rasm ustida sichqoncha bilan chizilgan
+  chiziq avtomatik saqlanadi (server bilan), o'chirgich (🧹) bilan hammasi tozalanadi.
+  Faqat `canDraw` (radiolog/admin) uchun ko'rinadi — hamshira rasmni ko'rishi mumkin,
+  lekin chiza olmaydi (tugmalar butunlay yashirilgan, backend ham `_require_radiolog`
+  bilan qo'shimcha himoyalangan). Koordinata matematikasi mavjud ruler asbobi bilan bir
+  xil pattern (`naturalToScreen`/rect-asosli) — zoom/pan bilan chizilgan chiziqlar
+  har doim rasmga to'g'ri "yopishib" turadi.
+  Test: headless Chrome + CDP `Input.dispatchMouseEvent` orqali haqiqiy sichqoncha
+  drag simulyatsiya qilindi — chizilgan chiziq ekranda to'g'ri joyda ko'rinishi VA
+  backend'da (`GET /api/pending` javobida) to'g'ri saqlangani tasdiqlandi (draw+reload
+  qilingandan keyin ham chiziq saqlanib qolishi ko'rsatildi). Keyin test ma'lumotlari
+  o'chirildi.
