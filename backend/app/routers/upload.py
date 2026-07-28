@@ -131,8 +131,29 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
             shutil.copyfileobj(file.file, f)
 
         try:
-            ds       = read_dicom(dcm_path)
-            info     = extract_patient_info(ds)
+            ds = read_dicom(dcm_path)
+        except Exception as e:
+            os.remove(dcm_path)
+            results.append(schemas.DicomBatchResult(
+                filename=file.filename, status="error", detail=f"DICOM faylni o'qib bo'lmadi: {e}"))
+            continue
+
+        info = extract_patient_info(ds)
+        # Butun papka uchun bemor ma'lumoti — birinchi topilgan (PatientID yoki ism bor) fayldan olinadi
+        if patient_info is None and (info["patient_id"] or info["full_name"]):
+            patient_info = info
+
+        # Ba'zi .dcm fayllar rasm emas (masalan CAD hisobot/SR, DICOMDIR) — piksel
+        # ma'lumoti yo'q, shuning uchun xato emas, shunchaki o'tkazib yuboriladi
+        if "PixelData" not in ds:
+            os.remove(dcm_path)
+            modality = getattr(ds, "Modality", "?")
+            results.append(schemas.DicomBatchResult(
+                filename=file.filename, status="skipped",
+                detail=f"Rasm emas ({modality} — hisobot/metama'lumot fayli)"))
+            continue
+
+        try:
             png_path = os.path.join(UPLOAD_DIR, f"{uid}.png")
             render_png(ds, png_path)
         except Exception as e:
@@ -140,10 +161,6 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
             results.append(schemas.DicomBatchResult(
                 filename=file.filename, status="error", detail=str(e)))
             continue
-
-        # Butun papka uchun bemor ma'lumoti — birinchi topilgan (PatientID yoki ism bor) fayldan olinadi
-        if patient_info is None and (info["patient_id"] or info["full_name"]):
-            patient_info = info
 
         processed.append((file.filename, png_path, info["laterality"], info["view_position"]))
 
