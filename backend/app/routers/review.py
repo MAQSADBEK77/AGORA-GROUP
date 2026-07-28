@@ -456,3 +456,80 @@ def clear_uploaded_images(db: Session = Depends(get_db),
         "deleted_files": deleted_files,
         "errors": errors[:5] if errors else [],
     }
+
+
+@router.delete("/admin/patients/bulk")
+def bulk_delete_patients(body: schemas.BulkDeleteRequest,
+                         db: Session = Depends(get_db),
+                         current_user: models.User = Depends(get_current_user)):
+    """Bir nechta bemorni (va ularning yuklangan rasmlarini) birdaniga o'chiradi.
+    Dataset (mdb*) rasmlari saqlanadi — clear_uploads bilan bir xil xavfsizlik qoidasi."""
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+    if not body.patient_ids:
+        raise HTTPException(status_code=400, detail="Bemor tanlanmagan")
+
+    upload_dir = os.getenv("UPLOAD_DIR", "./uploads")
+    patient_ids = [int(pid) for pid in body.patient_ids]
+    placeholders = ",".join(str(pid) for pid in patient_ids)
+
+    rows = db.execute(text(f"""
+        SELECT id, file_path, filename FROM mammography_images
+        WHERE patient_id IN ({placeholders})
+          AND filename NOT LIKE 'mdb%'
+    """)).fetchall()
+
+    image_ids = [r[0] for r in rows]
+    deleted_files = 0
+    errors = []
+
+    for img_id, file_path, _ in rows:
+        path = file_path or ""
+        if not os.path.exists(path):
+            fname = os.path.basename(path.replace("\\", "/"))
+            path = os.path.join(upload_dir, fname)
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+                deleted_files += 1
+            except Exception as e:
+                errors.append(str(e))
+
+        emb_path = os.path.join(upload_dir, "embeddings", f"{img_id}.npy")
+        if os.path.exists(emb_path):
+            try:
+                os.remove(emb_path)
+            except Exception:
+                pass
+
+    if image_ids:
+        img_placeholders = ",".join(str(i) for i in image_ids)
+        db.execute(text(f"DELETE FROM ai_predictions WHERE image_id IN ({img_placeholders})"))
+        db.execute(text(f"DELETE FROM doctor_reviews  WHERE image_id IN ({img_placeholders})"))
+        db.execute(text(f"DELETE FROM mammography_images WHERE id IN ({img_placeholders})"))
+        db.commit()
+
+    # Endi rasmi qolmagan bemorlarni (dataset rasmi ham yo'q bo'lsa) o'chirish
+    deleted_patients = 0
+    for pid in patient_ids:
+        remaining = db.query(models.MammographyImage).filter(
+            models.MammographyImage.patient_id == pid).count()
+        if remaining == 0:
+            patient = db.query(models.Patient).filter(models.Patient.id == pid).first()
+            if patient:
+                db.delete(patient)
+                deleted_patients += 1
+    db.commit()
+
+    log = models.Log(user_id=current_user.id, action="bulk_delete_patients",
+                     details=f"patient_ids={patient_ids}, deleted_images={len(image_ids)}, deleted_patients={deleted_patients}")
+    db.add(log)
+    db.commit()
+
+    return {
+        "success": True,
+        "deleted_images": len(image_ids),
+        "deleted_files": deleted_files,
+        "deleted_patients": deleted_patients,
+        "errors": errors[:5] if errors else [],
+    }

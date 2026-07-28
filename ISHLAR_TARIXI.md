@@ -332,3 +332,22 @@ navbatda, autonom davom etilmoqda.
 - Test: ikkita alohida test-bemor (`upload/dicom-folder`) yaratilib, ularga turli diagnoz/BI-RADS
   bilan yakuniy review yozildi, `/api/stats/personal` javobi (son, taqsimot, kunlik qator) qo'lda
   tekshirilgan qiymatlar bilan solishtirilib tasdiqlandi — so'ng barcha test yozuv/fayllar o'chirildi.
+
+## 17. Admin panelda ko'p bemorni birdaniga tanlab o'chirish (bulk select) (2026-07-29, avtonom rejimda)
+
+- `DELETE /api/admin/patients/bulk` (`backend/app/routers/review.py`) — faqat admin, so'rov
+  tanasida `patient_ids: [...]` qabul qiladi. `admin/uploads/clear`dagi bilan bir xil xavfsizlik
+  qoidasi: faqat yuklangan (`uploads/`) rasmlar o'chiriladi, MIAS dataset rasmlari (`mdb*`)
+  HECH QACHON o'chirilmaydi. Har bir tanlangan bemorning fayllari (rasm + AI embedding) diskdan
+  o'chiriladi, `ai_predictions`/`doctor_reviews`/`mammography_images` qatorlari tozalanadi;
+  agar bemorda (dataset rasmisiz) boshqa rasm qolmasa, `patients` yozuvi ham o'chiriladi.
+  Har bir amal audit-logga (`bulk_delete_patients`) yoziladi.
+- Yangi schema: `schemas.BulkDeleteRequest`.
+- Frontend: `frontend/src/pages/PatientHistory.jsx`ga faqat ADMIN uchun "Ko'p tanlash" tugmasi
+  qo'shildi — yoqilganda har bir bemor qatorida checkbox chiqadi, pastda "N ta bemor tanlandi"
+  paneli va "Tanlanganlarni o'chirish" tugmasi ko'rinadi, bosilganda tasdiqlash oynasi
+  (mavjud AdminPanel'dagi "Tozalash" modal andozasi asosida) chiqadi.
+- Test: ikkita alohida test-bemor yaratilib, `DELETE /api/admin/patients/bulk` orqali
+  birgalikda o'chirildi — fayllar diskdan o'chgani, DB qatorlari tozalangani va bemor
+  yozuvlari o'chgani tasdiqlandi; alohida, admin bo'lmagan foydalanuvchi (hamshira) bilan
+  chaqirilganda 403 qaytishi ham tekshirildi.

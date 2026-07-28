@@ -60,6 +60,10 @@ class PatientOut(BaseModel):
         from_attributes = True
 
 
+class BulkDeleteRequest(BaseModel):
+    patient_ids: List[int]
+
+
 class DicomBatchResult(BaseModel):
     filename: str
     status: str  # "ok" | "error" | "skipped"

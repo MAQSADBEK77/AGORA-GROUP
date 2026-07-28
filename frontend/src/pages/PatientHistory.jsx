@@ -3,8 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Search, ChevronRight, User, ImageIcon, Calendar, Phone,
   Filter, X, CheckCircle, AlertTriangle, AlertCircle, XCircle,
-  Clock, Activity
+  Clock, Activity, CheckSquare, Square, Trash2
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '../api/axios'
 
 const LABELS = [
@@ -26,6 +27,8 @@ const LABEL_STYLE = {
 export default function PatientHistory() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const isAdmin = user.role === 'admin'
 
   const [search, setSearch]       = useState('')
   const [activeLabel, setActiveLabel] = useState(searchParams.get('label') || '')
@@ -34,6 +37,41 @@ export default function PatientHistory() {
   const [images, setImages]       = useState({})
   const [loading, setLoading]     = useState(false)
   const debounceRef = useRef(null)
+
+  const [selectMode, setSelectMode]   = useState(false)
+  const [selected, setSelected]       = useState(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false)
+
+  function toggleSelectMode() {
+    setSelectMode(m => !m)
+    setSelected(new Set())
+  }
+
+  function toggleSelected(id, e) {
+    e.stopPropagation()
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  async function bulkDelete() {
+    setBulkDeleting(true)
+    try {
+      const { data } = await api.delete('/admin/patients/bulk', { data: { patient_ids: [...selected] } })
+      toast.success(`${data.deleted_patients} ta bemor, ${data.deleted_images} ta rasm o'chirildi`)
+      setSelected(new Set())
+      setSelectMode(false)
+      setShowBulkConfirm(false)
+      loadPatients()
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "O'chirishda xatolik")
+    } finally {
+      setBulkDeleting(false)
+    }
+  }
 
   async function loadPatients(q = search, lbl = activeLabel) {
     setLoading(true)
@@ -96,13 +134,39 @@ export default function PatientHistory() {
             Yuklangan bemorlar va ularning mammografiya tarixi
           </p>
         </div>
-        {activeLabel && (
-          <button onClick={() => selectLabel('')}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 border border-gray-200 dark:border-slate-700">
-            <X size={14} /> Filterni olib tashlash
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <button onClick={toggleSelectMode}
+              className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition-colors ${
+                selectMode
+                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700'
+                  : 'text-gray-500 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+              }`}>
+              <CheckSquare size={14} /> {selectMode ? 'Tanlashni bekor qilish' : 'Ko\'p tanlash'}
+            </button>
+          )}
+          {activeLabel && (
+            <button onClick={() => selectLabel('')}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 border border-gray-200 dark:border-slate-700">
+              <X size={14} /> Filterni olib tashlash
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Bulk select action bar */}
+      {selectMode && selected.size > 0 && (
+        <div className="card flex items-center justify-between py-3 border border-red-100 dark:border-red-900/30 bg-red-50/50 dark:bg-red-900/10 animate-slide-up">
+          <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
+            {selected.size} ta bemor tanlandi
+          </p>
+          <button onClick={() => setShowBulkConfirm(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+                       bg-red-500 hover:bg-red-600 text-white transition-all">
+            <Trash2 size={14} /> Tanlanganlarni o'chirish
+          </button>
+        </div>
+      )}
 
       {/* Search */}
       <div className="card p-4">
@@ -175,10 +239,15 @@ export default function PatientHistory() {
               className="card p-0 overflow-hidden hover:shadow-md dark:hover:shadow-slate-900/50 transition-all duration-200">
 
               {/* Patient row */}
-              <button onClick={() => togglePatient(p.id)}
+              <button onClick={() => selectMode ? toggleSelected(p.id, { stopPropagation: () => {} }) : togglePatient(p.id)}
                 className="w-full flex items-center justify-between px-5 py-4
                            hover:bg-gray-50 dark:hover:bg-slate-700/40 text-left transition-colors">
                 <div className="flex items-center gap-3.5 min-w-0">
+                  {selectMode && (
+                    <span onClick={e => toggleSelected(p.id, e)} className="flex-shrink-0 text-blue-600 dark:text-blue-400">
+                      {selected.has(p.id) ? <CheckSquare size={20} /> : <Square size={20} className="text-gray-300 dark:text-slate-600" />}
+                    </span>
+                  )}
                   <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl
                                   flex items-center justify-center flex-shrink-0 shadow-sm">
                     <User size={19} className="text-white" />
@@ -261,6 +330,35 @@ export default function PatientHistory() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Bulk delete confirm modal */}
+      {showBulkConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm animate-slide-up p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                <AlertTriangle size={22} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 dark:text-white">Bemorlarni o'chirish</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400">Bu amalni qaytarib bo'lmaydi</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-700 dark:text-slate-300 mb-6 bg-red-50 dark:bg-red-900/20 rounded-xl p-3 border border-red-200 dark:border-red-800">
+              <strong>{selected.size} ta</strong> bemor va ularning barcha yuklangan rasmlari/diagnozlari
+              bazadan butunlay o'chiriladi. MIAS dataset rasmlari saqlanib qoladi.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={bulkDelete} disabled={bulkDeleting}
+                className="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold
+                           rounded-xl transition-all disabled:opacity-50 text-sm">
+                {bulkDeleting ? "O'chirilmoqda..." : "Ha, o'chirish"}
+              </button>
+              <button onClick={() => setShowBulkConfirm(false)} className="btn-secondary">Bekor</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
