@@ -111,3 +111,9 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - `Sidebar.jsx` — o'rniga ANA SHU asosiy navigatsiya menyu yig'iladigan qilindi: standart holatda ingichka (faqat ikonkalar, `w-16`), sichqoncha olib borilganda to'liq kengayadi (`w-64`, matnlar bilan), `fixed` + bo'sh joy egallovchi spacer div orqali asosiy kontent joylashuviga ta'sir qilmaydi.
 - Shu bilan birga: rasmlar orasidagi ortiqcha qora bo'shliq ham tuzatildi — grid ustunlari endi `auto` (rasmning tabiiy o'lchamiga moslashadi), oldingi `w-full` majburiy cho'zish o'rniga.
 - Test: haqiqiy DICOM rasmlar bilan statik mockup orqali qayta tekshirildi — natija to'g'ri (rasmlar tekis tegib turadi, qo'shimcha bo'shliq yo'q).
+
+## 9. Kontrast/yorqinlik va invert asboblari (rasm kattalashtirish oynasida)
+
+- Radiolog o'simta/shubhali to'qimani topishda foydalanishi uchun `ImageZoom.jsx`ga qo'shildi: kontrast slayderi (50-300%), yorqinlik slayderi (50-200%), ranglarni teskari qilish (invert) tugmasi — barchasi CSS `filter` orqali (`contrast()`, `brightness()`, `invert()`), qo'shimcha server so'rovi kerak emas.
+- "Standart" tugmasi va umumiy "reset" (0 tugmasi/RotateCcw) ikkalasi ham kontrast/yorqinlik/invertni asl holatga qaytaradi.
+- Test: haqiqiy mammografiya rasmida standart, yuqori kontrast va invert holatlarini solishtirib skrinshot qildim — to'qima chegaralari sezilarli aniqroq chiqishi tasdiqlandi.
