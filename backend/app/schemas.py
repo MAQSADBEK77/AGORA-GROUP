@@ -103,6 +103,25 @@ class DoctorReviewOut(BaseModel):
         from_attributes = True
 
 
+class SecondOpinionCreate(BaseModel):
+    label: ReviewLabel
+    birads: Optional[int] = None
+    description: Optional[str] = None
+
+
+class SecondOpinionOut(BaseModel):
+    id: int
+    image_id: int
+    label: ReviewLabel
+    birads: Optional[int] = None
+    description: Optional[str]
+    created_at: datetime
+    doctor: Optional[UserOut]
+
+    class Config:
+        from_attributes = True
+
+
 class AIPredictionOut(BaseModel):
     id: int
     image_id: int
@@ -138,6 +157,7 @@ class ImageOut(BaseModel):
     uploaded_at: datetime
     review: Optional[DoctorReviewOut]
     ai_prediction: Optional[AIPredictionOut]
+    second_opinions: List[SecondOpinionOut] = []
 
     class Config:
         from_attributes = True

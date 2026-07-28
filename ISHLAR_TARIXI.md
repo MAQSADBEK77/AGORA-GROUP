@@ -486,3 +486,32 @@ xavfli. Qolganlarini xavfsizlik darajasiga qarab davom ettirilmoqda:
   backend'da (`GET /api/pending` javobida) to'g'ri saqlangani tasdiqlandi (draw+reload
   qilingandan keyin ham chiziq saqlanib qolishi ko'rsatildi). Keyin test ma'lumotlari
   o'chirildi.
+
+- **Ikkinchi fikr (yengil ikki bosqichli o'qish)** — to'liq "double-reading + arbitration"
+  oqimi (ikkala radiolog TASDIQLAMAGUNCHA yakunlanmaydigan qattiq jarayon) juda katta
+  arxitektura o'zgarishi bo'lardi (mavjud "bitta rasm = bitta DoctorReview" unique
+  constraint'ga asoslangan AI o'qitish va statistika butunlay shunga tayangan). Shu sabab
+  YENGIL, xavfsiz variant tanlandi: yangi mustaqil `second_opinions` jadvali — istalgan
+  boshqa radiolog asosiy (yakunlangan) tashxisga QO'SHIMCHA, ixtiyoriy mustaqil fikr
+  qoldirishi mumkin. Bu asosiy `DoctorReview`ni ALMASHTIRMAYDI, rasm holatini yoki AI
+  o'qitilishini o'ZGARTIRMAYDI — butunlay additive.
+  `POST /api/images/{id}/second-opinion`, `DELETE /api/second-opinion/{id}` (faqat
+  o'zi yozgan yoki admin o'chira oladi). `ReviewDetail.jsx`da yakunlangan tashxisdan
+  keyin "Ikkinchi fikr" bo'limi — mavjud fikrlar ro'yxati (asosiy diagnozdan farq qilsa
+  amber "Kelishmovchilik" belgisi bilan) va yangi fikr qo'shish mini-formasi.
+  Test: ikki xil foydalanuvchi (radiolog asosiy "Normal", admin ikkinchi fikr sifatida
+  "Malignant BI-RADS 4") bilan sinovdan o'tkazildi — API javobida `second_opinions`
+  to'g'ri joylashgani va UI'da "Kelishmovchilik" belgisi to'g'ri chiqishi skrinshot orqali
+  tasdiqlandi. Keyin test ma'lumotlari o'chirildi.
+
+**Hali ATAYLAB kechiktirilgan** (jonli infratuzilma yoki juda katta qayta qurish talab
+qiladi, shuning uchun tasodifiy/tekshirilmagan holda qilish xavfli):
+- Ko'p tillilik (i18n) infratuzilmasi — deyarli har bir faylni qayta yozishni talab qiladi.
+- PostgreSQL'ga o'tish + avtomatik zaxira — haqiqiy Postgres serversiz xavfsiz sinab
+  bo'lmaydi, joriy SQLite ishlab turgan tizimni buzish xavfi bor.
+- Bizning natijalarni DICOM SR qilib eksport qilish — boshlanmagan, keyingi navbatda.
+- To'liq "oldingi tekshiruv bilan taqqoslash" infratuzilmasi ATAYLAB alohida qurilmadi —
+  chunki bitta bemorning barcha yuklamalari (`dicom_patient_id` orqali) allaqachon bitta
+  ro'yxatda yig'iladi va 20-banddagi "Taqqoslash" (sinxron zoom/pan + Flicker) rejimi
+  aynan shu ro'yxatdan istalgan 2 tasini solishtirish imkonini beradi — asosiy ehtiyoj
+  qo'shimcha qurilishsiz qondirilgan.

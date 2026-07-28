@@ -84,6 +84,8 @@ class MammographyImage(Base):
     assigned_to_user   = relationship("User", foreign_keys=[assigned_to])
     review             = relationship("DoctorReview", back_populates="image", uselist=False)
     ai_prediction      = relationship("AIPrediction", back_populates="image", uselist=False)
+    second_opinions    = relationship("SecondOpinion", back_populates="image",
+                                       order_by="SecondOpinion.created_at", cascade="all, delete-orphan")
 
 
 class DoctorReview(Base):
@@ -101,6 +103,24 @@ class DoctorReview(Base):
 
     image  = relationship("MammographyImage", back_populates="review")
     doctor = relationship("User", back_populates="reviews")
+
+
+class SecondOpinion(Base):
+    """Ikkinchi radiologning mustaqil fikri — asosiy DoctorReview'ni ALMASHTIRMAYDI,
+    faqat unga qo'shimcha, ixtiyoriy tekshiruv sifatida saqlanadi (yengil ikki bosqichli
+    o'qish — to'liq arbitratsiya oqimisiz)."""
+    __tablename__ = "second_opinions"
+
+    id          = Column(Integer, primary_key=True, index=True)
+    image_id    = Column(Integer, ForeignKey("mammography_images.id"), nullable=False)
+    doctor_id   = Column(Integer, ForeignKey("users.id"), nullable=False)
+    label       = Column(Enum(ReviewLabel, values_callable=_by_value), nullable=False)
+    birads      = Column(Integer, nullable=True)
+    description = Column(Text)
+    created_at  = Column(DateTime(timezone=True), server_default=func.now())
+
+    image  = relationship("MammographyImage", back_populates="second_opinions")
+    doctor = relationship("User")
 
 
 class AIPrediction(Base):

@@ -134,6 +134,9 @@ export default function ReviewDetail() {
   const [showCompare, setShowCompare]         = useState(false)
   const [listening, setListening]             = useState(false)
   const recognitionRef = useRef(null)
+  const [showSecondOpinionForm, setShowSecondOpinionForm] = useState(false)
+  const [secondOpinionForm, setSecondOpinionForm] = useState({ label: '', birads: '', description: '' })
+  const [submittingSecondOpinion, setSubmittingSecondOpinion] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [footerHeight, setFooterHeight] = useState(() => {
     const saved = Number(localStorage.getItem(FOOTER_H_KEY))
@@ -306,6 +309,36 @@ export default function ReviewDetail() {
   function getImageUrl(img) {
     if (!img) return null
     return `${API_BASE_URL}/img/${img.id}`
+  }
+
+  async function submitSecondOpinion() {
+    if (!secondOpinionForm.label) return toast.error('Diagnoz tanlang')
+    setSubmittingSecondOpinion(true)
+    try {
+      const { data } = await api.post(`/images/${id}/second-opinion`, {
+        label: secondOpinionForm.label,
+        birads: secondOpinionForm.birads !== '' ? Number(secondOpinionForm.birads) : null,
+        description: secondOpinionForm.description || null,
+      })
+      setImage(img => ({ ...img, second_opinions: [...(img.second_opinions || []), data] }))
+      setSecondOpinionForm({ label: '', birads: '', description: '' })
+      setShowSecondOpinionForm(false)
+      toast.success("Ikkinchi fikr qo'shildi")
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Xato')
+    } finally {
+      setSubmittingSecondOpinion(false)
+    }
+  }
+
+  async function deleteSecondOpinion(opinionId) {
+    try {
+      await api.delete(`/second-opinion/${opinionId}`)
+      setImage(img => ({ ...img, second_opinions: (img.second_opinions || []).filter(o => o.id !== opinionId) }))
+      toast.success("O'chirildi")
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Xato')
+    }
   }
 
   async function handleSaveAnnotations(imgId, newAnnotations) {
@@ -812,6 +845,81 @@ export default function ReviewDetail() {
                 )}
               </div>
             )
+          )}
+
+          {image.review && !image.review.is_draft && (
+            <div className="border-t border-gray-100 dark:border-slate-700 pt-3 mt-3">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-gray-800 dark:text-white text-sm">
+                  Ikkinchi fikr {image.second_opinions?.length > 0 && `(${image.second_opinions.length})`}
+                </h3>
+                {canReview && (
+                  <button onClick={() => setShowSecondOpinionForm(v => !v)}
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                    {showSecondOpinionForm ? 'Bekor qilish' : "+ Ikkinchi fikr qo'shish"}
+                  </button>
+                )}
+              </div>
+
+              {(image.second_opinions || []).map(op => {
+                const discordant = op.label !== image.review.label
+                return (
+                  <div key={op.id} className={`flex items-start justify-between gap-2 p-2.5 rounded-lg mb-2 border ${
+                    discordant ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-slate-700/40 border-gray-100 dark:border-slate-700'
+                  }`}>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-white">
+                        {op.label}
+                        {op.birads != null && <span className="ml-1.5 text-xs font-normal text-gray-500">BI-RADS {op.birads}</span>}
+                        {discordant && (
+                          <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">
+                            Kelishmovchilik
+                          </span>
+                        )}
+                      </p>
+                      {op.description && <p className="text-xs text-gray-600 dark:text-slate-300 mt-0.5">{op.description}</p>}
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {op.doctor?.full_name || '—'} • {new Date(op.created_at).toLocaleString('uz-UZ')}
+                      </p>
+                    </div>
+                    {(op.doctor?.id === user.id || user.role === 'admin') && (
+                      <button onClick={() => deleteSecondOpinion(op.id)}
+                        className="text-gray-400 hover:text-red-500 p-1 flex-shrink-0">
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+
+              {showSecondOpinionForm && (
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {LABELS.map(lbl => (
+                    <button key={lbl} type="button"
+                      onClick={() => setSecondOpinionForm(f => ({ ...f, label: lbl }))}
+                      className={`px-2.5 py-1.5 rounded-lg border-2 text-xs font-medium transition-all ${
+                        secondOpinionForm.label === lbl
+                          ? 'border-current text-blue-600 bg-blue-50'
+                          : 'border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300'
+                      }`}>
+                      {lbl}
+                    </button>
+                  ))}
+                  <select value={secondOpinionForm.birads}
+                    onChange={e => setSecondOpinionForm(f => ({ ...f, birads: e.target.value }))}
+                    className="input text-xs py-1.5 w-auto">
+                    {BIRADS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                  <input className="input text-xs py-1.5 flex-1 min-w-[150px]" placeholder="Izoh (ixtiyoriy)..."
+                    value={secondOpinionForm.description}
+                    onChange={e => setSecondOpinionForm(f => ({ ...f, description: e.target.value }))} />
+                  <button onClick={submitSecondOpinion} disabled={submittingSecondOpinion || !secondOpinionForm.label}
+                    className="btn-primary text-xs py-1.5 px-3 disabled:opacity-40">
+                    {submittingSecondOpinion ? 'Saqlanmoqda...' : 'Saqlash'}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

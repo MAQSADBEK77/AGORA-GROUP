@@ -301,6 +301,55 @@ def submit_review(image_id: int,
     return review
 
 
+# ─── Ikkinchi fikr (yengil ikki bosqichli o'qish) ───
+
+@router.post("/images/{image_id}/second-opinion", response_model=schemas.SecondOpinionOut)
+def add_second_opinion(image_id: int,
+                       body: schemas.SecondOpinionCreate,
+                       db: Session = Depends(get_db),
+                       current_user: models.User = Depends(get_current_user)):
+    """Boshqa (yoki bir xil) radiolog mustaqil ikkinchi fikr qo'shadi — bu asosiy
+    DoctorReview'ni ALMASHTIRMAYDI, rasm holati/AI o'qitilishiga ta'sir qilmaydi;
+    faqat qo'shimcha nuqtai nazar sifatida saqlanadi va kelishmovchilikni ko'rsatish
+    uchun asosiy xulosa bilan solishtiriladi (frontend'da)."""
+    _require_radiolog(current_user)
+    img = db.query(models.MammographyImage).filter(
+        models.MammographyImage.id == image_id).first()
+    if not img:
+        raise HTTPException(status_code=404, detail="Rasm topilmadi")
+
+    opinion = models.SecondOpinion(
+        image_id=image_id,
+        doctor_id=current_user.id,
+        label=body.label,
+        birads=body.birads,
+        description=body.description,
+    )
+    db.add(opinion)
+    db.commit()
+    db.refresh(opinion)
+
+    log = models.Log(user_id=current_user.id, action="second_opinion",
+                     details=f"image_id={image_id}, label={body.label}")
+    db.add(log)
+    db.commit()
+    return opinion
+
+
+@router.delete("/second-opinion/{opinion_id}")
+def delete_second_opinion(opinion_id: int,
+                          db: Session = Depends(get_db),
+                          current_user: models.User = Depends(get_current_user)):
+    opinion = db.query(models.SecondOpinion).filter(models.SecondOpinion.id == opinion_id).first()
+    if not opinion:
+        raise HTTPException(status_code=404, detail="Topilmadi")
+    if opinion.doctor_id != current_user.id and current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat o'zingiz yozgan fikrni o'chira olasiz")
+    db.delete(opinion)
+    db.commit()
+    return {"success": True}
+
+
 # ─── Dashboard statistika ───
 
 @router.get("/dashboard/stats", response_model=schemas.DashboardStats)
