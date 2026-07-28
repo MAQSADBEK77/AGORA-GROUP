@@ -171,7 +171,7 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
                 filename=file.filename, status="error", detail=str(e)))
             continue
 
-        processed.append((file.filename, png_path, info["laterality"], info["view_position"], info["orientation"]))
+        processed.append((file.filename, png_path, info["laterality"], info["view_position"], info["orientation"], info["pixel_spacing"]))
 
     # --- Bitta bemorni aniqlash/yaratish (butun papka uchun bir marta) ---
     patient = None
@@ -198,7 +198,7 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
             patients_created = 1
 
     uploaded = 0
-    for filename, png_path, laterality, view_position, orientation in processed:
+    for filename, png_path, laterality, view_position, orientation, pixel_spacing in processed:
         image = models.MammographyImage(
             patient_id=patient.id,
             uploaded_by=current_user.id,
@@ -208,6 +208,7 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
             laterality=laterality,
             view_position=view_position,
             patient_orientation=orientation,
+            pixel_spacing=pixel_spacing,
             cad_summary=cad_summary_json,
             status=models.ImageStatus.pending,
         )

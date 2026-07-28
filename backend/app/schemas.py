@@ -120,6 +120,7 @@ class ImageOut(BaseModel):
     laterality: Optional[str] = None
     view_position: Optional[str] = None
     patient_orientation: Optional[str] = None
+    pixel_spacing: Optional[float] = None
     cad_summary: Optional[str] = None
     status: ImageStatus
     uploaded_at: datetime

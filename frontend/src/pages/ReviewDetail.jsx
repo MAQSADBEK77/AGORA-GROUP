@@ -690,6 +690,7 @@ export default function ReviewDetail() {
           src={getImageUrl(zoomImage)}
           alt={panelLabel(zoomImage)}
           onClose={() => setZoomImage(null)}
+          pixelSpacing={zoomImage.pixel_spacing}
         />
       )}
     </div>

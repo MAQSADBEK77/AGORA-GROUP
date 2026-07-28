@@ -27,6 +27,7 @@ def migrate():
         ("mammography_images", "cad_summary", "ALTER TABLE mammography_images ADD COLUMN cad_summary TEXT"),
         ("mammography_images", "patient_orientation", "ALTER TABLE mammography_images ADD COLUMN patient_orientation TEXT"),
         ("doctor_reviews", "birads", "ALTER TABLE doctor_reviews ADD COLUMN birads INTEGER"),
+        ("mammography_images", "pixel_spacing", "ALTER TABLE mammography_images ADD COLUMN pixel_spacing REAL"),
         ("mammography_images", "laterality",    "ALTER TABLE mammography_images ADD COLUMN laterality TEXT"),
         ("mammography_images", "view_position", "ALTER TABLE mammography_images ADD COLUMN view_position TEXT"),
         # Eski ustunlarni tozalash (SQLite ALTER DROP yo'q, shuning uchun shunchaki o'tkazib yuboramiz)

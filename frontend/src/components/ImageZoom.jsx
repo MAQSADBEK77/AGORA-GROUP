@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { X, ZoomIn, ZoomOut, RotateCcw, Contrast, SunMedium, FlipHorizontal2 } from 'lucide-react'
+import { X, ZoomIn, ZoomOut, RotateCcw, Contrast, SunMedium, FlipHorizontal2, Ruler } from 'lucide-react'
 
-export default function ImageZoom({ src, alt, onClose }) {
+export default function ImageZoom({ src, alt, onClose, pixelSpacing }) {
   const [scale, setScale]     = useState(1)
   const [pos, setPos]         = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
@@ -9,13 +9,45 @@ export default function ImageZoom({ src, alt, onClose }) {
   const [brightness, setBrightness] = useState(100)
   const [inverted, setInverted]     = useState(false)
   const [adjustOpen, setAdjustOpen] = useState(false)
+  const [rulerMode, setRulerMode]   = useState(false)
+  const [rulerPoints, setRulerPoints] = useState([])
   const dragStart = useRef(null)
   const imgRef    = useRef(null)
+  const pictureRef = useRef(null)
 
   const zoom   = (delta) => setScale(s => Math.min(Math.max(s + delta, 0.5), 8))
   const reset  = () => {
     setScale(1); setPos({ x: 0, y: 0 })
     setContrast(100); setBrightness(100); setInverted(false)
+    setRulerPoints([])
+  }
+
+  function naturalToScreen(pt) {
+    const img = pictureRef.current
+    if (!img) return null
+    const rect = img.getBoundingClientRect()
+    return {
+      x: rect.left + (pt.x / img.naturalWidth) * rect.width,
+      y: rect.top + (pt.y / img.naturalHeight) * rect.height,
+    }
+  }
+
+  function onRulerClick(e) {
+    const img = pictureRef.current
+    if (!img) return
+    const rect = img.getBoundingClientRect()
+    const nx = (e.clientX - rect.left) / rect.width * img.naturalWidth
+    const ny = (e.clientY - rect.top) / rect.height * img.naturalHeight
+    setRulerPoints(prev => prev.length >= 2 ? [{ x: nx, y: ny }] : [...prev, { x: nx, y: ny }])
+  }
+
+  let rulerDistanceLabel = null
+  let rulerScreenPoints  = null
+  if (rulerPoints.length === 2) {
+    const [a, b] = rulerPoints
+    const pxDist = Math.hypot(b.x - a.x, b.y - a.y)
+    rulerDistanceLabel = pixelSpacing ? `${(pxDist * pixelSpacing).toFixed(1)} mm` : `${Math.round(pxDist)} px`
+    rulerScreenPoints = [naturalToScreen(a), naturalToScreen(b)]
   }
 
   const onWheel = useCallback(e => {
@@ -30,6 +62,7 @@ export default function ImageZoom({ src, alt, onClose }) {
   }, [onWheel])
 
   const onMouseDown = e => {
+    if (rulerMode) { onRulerClick(e); return }
     setDragging(true)
     dragStart.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }
   }
@@ -85,6 +118,11 @@ export default function ImageZoom({ src, alt, onClose }) {
             className={`p-2 rounded-lg transition-colors ${inverted ? 'bg-blue-500/30 text-blue-300' : 'hover:bg-white/10 text-white'}`}>
             <FlipHorizontal2 size={18} />
           </button>
+          <button onClick={() => { setRulerMode(v => !v); setRulerPoints([]) }}
+            title="O'lchov asbobi (ruler)"
+            className={`p-2 rounded-lg transition-colors ${rulerMode ? 'bg-blue-500/30 text-blue-300' : 'hover:bg-white/10 text-white'}`}>
+            <Ruler size={18} />
+          </button>
           <div className="w-px h-5 bg-white/20 mx-1" />
           <button onClick={onClose}
             className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-white">
@@ -120,8 +158,8 @@ export default function ImageZoom({ src, alt, onClose }) {
       {/* Image */}
       <div ref={imgRef}
         className="flex-1 overflow-hidden flex items-center justify-center"
-        style={{ cursor: scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'default' }}>
-        <img src={src} alt={alt}
+        style={{ cursor: rulerMode ? 'crosshair' : (scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'default') }}>
+        <img ref={pictureRef} src={src} alt={alt}
           onMouseDown={onMouseDown}
           draggable={false}
           style={{
@@ -137,9 +175,32 @@ export default function ImageZoom({ src, alt, onClose }) {
         />
       </div>
 
+      {/* Ruler (o'lchov) chizig'i va masofa yorlig'i */}
+      {rulerScreenPoints && rulerScreenPoints[0] && rulerScreenPoints[1] && (
+        <svg className="fixed inset-0 pointer-events-none z-10" width="100%" height="100%">
+          <line x1={rulerScreenPoints[0].x} y1={rulerScreenPoints[0].y}
+            x2={rulerScreenPoints[1].x} y2={rulerScreenPoints[1].y}
+            stroke="#22d3ee" strokeWidth={2} strokeDasharray="6 4" />
+          {rulerScreenPoints.map((p, i) => (
+            <circle key={i} cx={p.x} cy={p.y} r={5} fill="#22d3ee" />
+          ))}
+          <text
+            x={(rulerScreenPoints[0].x + rulerScreenPoints[1].x) / 2}
+            y={(rulerScreenPoints[0].y + rulerScreenPoints[1].y) / 2 - 10}
+            fill="#22d3ee" fontSize="14" fontWeight="600" textAnchor="middle">
+            {rulerDistanceLabel}
+          </text>
+        </svg>
+      )}
+      {rulerMode && (
+        <div className="text-center py-1 text-xs text-cyan-400 bg-black/60">
+          O'lchov rejimi: rasmda ikkita nuqtani belgilang{!pixelSpacing && ' (piksel spacing noma\'lum — natija pikselda ko\'rsatiladi)'}
+        </div>
+      )}
+
       {/* Hints */}
       <div className="text-center py-2 text-xs text-gray-600">
-        Scroll — zoom • Drag — siljitish • Kontrast — <Contrast size={11} className="inline -mt-0.5" /> tugmasi • 0 — reset • Esc — yopish
+        Scroll — zoom • Drag — siljitish • Kontrast — <Contrast size={11} className="inline -mt-0.5" /> • O'lchov — <Ruler size={11} className="inline -mt-0.5" /> • 0 — reset • Esc — yopish
       </div>
     </div>
   )

@@ -60,6 +60,9 @@ def extract_patient_info(ds) -> dict:
         # (Row\Col) deyarli har doim bor va CAD SR hisobotidagi rasm bilan aniq
         # moslashtirish (view_key) uchun ishonchli belgi bo'lib xizmat qiladi
         "orientation": "\\".join(str(x) for x in orientation) if orientation else None,
+        # Piksel oralig'i (mm) — rasmdagi masofani piksel emas, millimetrda
+        # o'lchash (ruler asbobi) uchun. DICOM odatda [qator, ustun] mm/piksel beradi.
+        "pixel_spacing": float(ds.PixelSpacing[0]) if getattr(ds, "PixelSpacing", None) else None,
     }
 
 
