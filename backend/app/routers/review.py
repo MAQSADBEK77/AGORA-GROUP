@@ -1,6 +1,6 @@
-import json, os, shutil
+import csv, io, json, os, shutil
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 from .. import models, schemas
@@ -249,6 +249,45 @@ def get_reviewed(skip: int = 0, limit: int = 200,
     for img in images:
         img.patient_name = img.patient.full_name if img.patient else None
     return images
+
+
+# ─── Statistikani CSV qilib eksport qilish ───
+
+@router.get("/export/reviews.csv")
+def export_reviews_csv(db: Session = Depends(get_db),
+                       current_user: models.User = Depends(get_current_user)):
+    """Barcha radiolog diagnozlarini CSV (Excel'da ochiladigan) formatda qaytaradi."""
+    if current_user.role not in (models.UserRole.admin, models.UserRole.radiolog):
+        raise HTTPException(status_code=403, detail="Ruxsat yo'q")
+
+    rows = (db.query(models.DoctorReview, models.MammographyImage, models.Patient, models.User)
+            .join(models.MammographyImage, models.DoctorReview.image_id == models.MammographyImage.id)
+            .join(models.Patient, models.MammographyImage.patient_id == models.Patient.id)
+            .join(models.User, models.DoctorReview.doctor_id == models.User.id)
+            .order_by(models.DoctorReview.reviewed_at.desc())
+            .all())
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow([
+        "review_id", "reviewed_at", "patient_id", "patient_name", "birth_year",
+        "image_id", "filename", "laterality", "diagnosis", "birads", "description", "doctor",
+    ])
+    for review, image, patient, doctor in rows:
+        writer.writerow([
+            review.id, review.reviewed_at.strftime("%Y-%m-%d %H:%M") if review.reviewed_at else "",
+            patient.id, patient.full_name, patient.birth_year or "",
+            image.id, image.filename, image.laterality or "",
+            review.label.value, review.birads if review.birads is not None else "",
+            (review.description or "").replace("\n", " "), doctor.full_name,
+        ])
+
+    buf.seek(0)
+    return StreamingResponse(
+        iter([buf.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=mammoai_diagnozlar.csv"},
+    )
 
 
 # ─── Admin: audit-log ───

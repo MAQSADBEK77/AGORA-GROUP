@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save, ImageOff, AlertTriangle, ScrollText, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save, ImageOff, AlertTriangle, ScrollText, ChevronDown, ChevronUp, FileDown } from 'lucide-react'
 import api from '../api/axios'
 
 const ROLE_LABELS = { admin: 'Administrator', hamshira: 'Hamshira', radiolog: 'Radiolog' }
@@ -49,6 +49,22 @@ export default function AdminPanel() {
     const next = !logsOpen
     setLogsOpen(next)
     if (next && logs.length === 0) loadLogs()
+  }
+
+  async function exportCsv() {
+    try {
+      const res = await api.get('/export/reviews.csv', { responseType: 'blob' })
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'text/csv' }))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'mammoai_diagnozlar.csv'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      toast.error('CSV eksport qilishda xatolik')
+    }
   }
 
   async function loadUsers() {
@@ -131,9 +147,14 @@ export default function AdminPanel() {
           </h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Foydalanuvchilar boshqaruvi</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-          <Plus size={16} /> Yangi foydalanuvchi
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={exportCsv} className="btn-secondary">
+            <FileDown size={16} /> CSV eksport
+          </button>
+          <button onClick={() => setShowForm(!showForm)} className="btn-primary">
+            <Plus size={16} /> Yangi foydalanuvchi
+          </button>
+        </div>
       </div>
 
       {showForm && (
