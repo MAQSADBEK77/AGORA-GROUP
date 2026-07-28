@@ -8,8 +8,9 @@ def read_dicom(dcm_path: str):
     return pydicom.dcmread(dcm_path)
 
 
-def render_png(ds, out_path: str) -> None:
-    """DICOM pixel array'ni brauzerda ko'rsatsa bo'ladigan PNG'ga aylantiradi."""
+def render_png(ds, out_path: str) -> np.ndarray:
+    """DICOM pixel array'ni brauzerda ko'rsatsa bo'ladigan PNG'ga aylantiradi.
+    Sifat tekshiruvida qayta ishlatish uchun natijaviy 8-bitli массивни qaytaradi."""
     arr = ds.pixel_array.astype(np.float32)
 
     slope = float(getattr(ds, "RescaleSlope", 1))
@@ -22,11 +23,40 @@ def render_png(ds, out_path: str) -> None:
     if getattr(ds, "PhotometricInterpretation", "") == "MONOCHROME1":
         arr = 255.0 - arr
 
-    Image.fromarray(arr.astype(np.uint8), mode="L").save(out_path, format="PNG")
+    arr8 = arr.astype(np.uint8)
+    Image.fromarray(arr8, mode="L").save(out_path, format="PNG")
+    return arr8
 
 
 def dicom_to_png(dcm_path: str, out_path: str) -> None:
     render_png(read_dicom(dcm_path), out_path)
+
+
+def check_image_quality(arr8: np.ndarray) -> list[str]:
+    """Yuklangan rasmda aniq muammolarni (kesilgan/juda kichik, deyarli bo'sh,
+    xira) tekshiradi. Yuklashni to'xtatmaydi — faqat ogohlantirish qaytaradi."""
+    warnings = []
+    h, w = arr8.shape
+
+    if h < 500 or w < 500:
+        warnings.append(f"Rasm o'lchami juda kichik ({w}x{h}) — kesilgan yoki noto'g'ri bo'lishi mumkin")
+
+    dark_ratio = float(np.mean(arr8 < 10))
+    if dark_ratio > 0.97:
+        warnings.append("Rasm deyarli butunlay qora — noto'g'ri ekspozitsiya bo'lishi mumkin")
+
+    if float(np.std(arr8)) < 8:
+        warnings.append("Rasm kontrastsiz — sifat past bo'lishi mumkin")
+
+    try:
+        import cv2
+        lap_var = cv2.Laplacian(arr8, cv2.CV_64F).var()
+        if lap_var < 15:
+            warnings.append("Rasm xira (blur) ko'rinishga ega bo'lishi mumkin")
+    except Exception:
+        pass
+
+    return warnings
 
 
 def _format_dicom_name(raw) -> str:

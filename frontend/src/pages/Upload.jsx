@@ -190,13 +190,20 @@ export default function Upload() {
               </div>
               <div className="max-h-40 overflow-y-auto space-y-1">
                 {batchResult.results.map((r, i) => (
-                  <div key={i} className={`text-xs px-2 py-1 rounded ${
-                    r.status === 'ok' ? 'bg-green-50 text-green-700'
-                    : r.status === 'skipped' ? 'bg-gray-100 text-gray-500'
-                    : 'bg-red-50 text-red-700'}`}>
-                    {r.status === 'ok' ? `✓ ${r.patient_name} — ${r.filename}`
-                      : r.status === 'skipped' ? `– ${r.filename}: ${r.detail}`
-                      : `✕ ${r.filename}: ${r.detail}`}
+                  <div key={i}>
+                    <div className={`text-xs px-2 py-1 rounded ${
+                      r.status === 'ok' ? 'bg-green-50 text-green-700'
+                      : r.status === 'skipped' ? 'bg-gray-100 text-gray-500'
+                      : 'bg-red-50 text-red-700'}`}>
+                      {r.status === 'ok' ? `✓ ${r.patient_name} — ${r.filename}`
+                        : r.status === 'skipped' ? `– ${r.filename}: ${r.detail}`
+                        : `✕ ${r.filename}: ${r.detail}`}
+                    </div>
+                    {r.quality_warnings?.map((w, wi) => (
+                      <div key={wi} className="text-xs px-2 py-1 rounded bg-yellow-50 text-yellow-700 mt-0.5">
+                        ⚠ {w}
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>

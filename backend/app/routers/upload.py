@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user
-from ..dicom_utils import dicom_to_png, read_dicom, render_png, extract_patient_info, is_cad_sr, parse_cad_sr
+from ..dicom_utils import dicom_to_png, read_dicom, render_png, extract_patient_info, is_cad_sr, parse_cad_sr, check_image_quality
 import json, os, shutil, uuid
 
 router = APIRouter(prefix="/api", tags=["Upload"])
@@ -164,14 +164,15 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
 
         try:
             png_path = os.path.join(UPLOAD_DIR, f"{uid}.png")
-            render_png(ds, png_path)
+            arr8 = render_png(ds, png_path)
+            quality_warnings = check_image_quality(arr8)
         except Exception as e:
             os.remove(dcm_path)
             results.append(schemas.DicomBatchResult(
                 filename=file.filename, status="error", detail=str(e)))
             continue
 
-        processed.append((file.filename, png_path, info["laterality"], info["view_position"], info["orientation"], info["pixel_spacing"]))
+        processed.append((file.filename, png_path, info["laterality"], info["view_position"], info["orientation"], info["pixel_spacing"], quality_warnings))
 
     # --- Bitta bemorni aniqlash/yaratish (butun papka uchun bir marta) ---
     patient = None
@@ -198,7 +199,7 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
             patients_created = 1
 
     uploaded = 0
-    for filename, png_path, laterality, view_position, orientation, pixel_spacing in processed:
+    for filename, png_path, laterality, view_position, orientation, pixel_spacing, quality_warnings in processed:
         image = models.MammographyImage(
             patient_id=patient.id,
             uploaded_by=current_user.id,
@@ -218,7 +219,8 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
         uploaded += 1
         results.append(schemas.DicomBatchResult(
             filename=filename, status="ok",
-            patient_name=patient.full_name, image_id=image.id))
+            patient_name=patient.full_name, image_id=image.id,
+            quality_warnings=quality_warnings or None))
 
     db.add(models.Log(user_id=current_user.id, action="upload_dicom_folder",
                       details=f"{uploaded} rasm, bemor: {patient.full_name if patient else '-'}"))

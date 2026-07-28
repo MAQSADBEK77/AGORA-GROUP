@@ -62,10 +62,11 @@ class PatientOut(BaseModel):
 
 class DicomBatchResult(BaseModel):
     filename: str
-    status: str  # "ok" | "error"
+    status: str  # "ok" | "error" | "skipped"
     patient_name: Optional[str] = None
     image_id: Optional[int] = None
     detail: Optional[str] = None
+    quality_warnings: Optional[List[str]] = None
 
 
 class DicomBatchResponse(BaseModel):
