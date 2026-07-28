@@ -173,6 +173,7 @@ def submit_review(image_id: int,
     review = image.review
     if review:
         review.label       = body.label
+        review.birads      = body.birads
         review.description = body.description
         review.doctor_id   = current_user.id
     else:
@@ -180,6 +181,7 @@ def submit_review(image_id: int,
             image_id=image_id,
             doctor_id=current_user.id,
             label=body.label,
+            birads=body.birads,
             description=body.description,
         )
         db.add(review)

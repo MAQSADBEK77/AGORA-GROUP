@@ -9,6 +9,20 @@ import CadMarkers from '../components/CadMarkers'
 
 const LABELS = ['Normal', 'Benign', 'Malignant', 'Very Malignant']
 
+// BI-RADS — Breast Imaging Reporting and Data System, xalqaro standart tasnif.
+// Bizning asosiy Normal/Benign/Malignant tizimi bilan BIRGA, qo'shimcha
+// (ixtiyoriy) standart tasnif sifatida saqlanadi.
+const BIRADS_OPTIONS = [
+  { value: '', label: 'BI-RADS (ixtiyoriy)' },
+  { value: '0', label: '0 — Qo\'shimcha tasvirlash kerak' },
+  { value: '1', label: '1 — Negativ (o\'zgarish yo\'q)' },
+  { value: '2', label: '2 — Yaxshi sifatli topilma' },
+  { value: '3', label: '3 — Ehtimol yaxshi sifatli' },
+  { value: '4', label: '4 — Shubhali' },
+  { value: '5', label: '5 — Yomon sifatli ehtimoli yuqori' },
+  { value: '6', label: '6 — Biopsiya bilan tasdiqlangan yomon sifatli' },
+]
+
 const LABEL_STYLE = {
   'Normal':        { color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   icon: CheckCircle,  hex: '#16a34a' },
   'Benign':        { color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', icon: AlertTriangle, hex: '#ca8a04' },
@@ -110,7 +124,7 @@ export default function ReviewDetail() {
   const [siblings, setSiblings] = useState([])
   const [error, setError]       = useState(null)
   const [aiPred, setAiPred]     = useState(null)
-  const [form, setForm]         = useState({ label: '', description: '' })
+  const [form, setForm]         = useState({ label: '', birads: '', description: '' })
   const [submitting, setSubmitting] = useState(false)
   const [aiLoading, setAiLoading]   = useState(false)
   const [zoomImage, setZoomImage]   = useState(null)
@@ -195,6 +209,7 @@ export default function ReviewDetail() {
         if (r.data.review) {
           setForm({
             label: r.data.review.label || '',
+            birads: r.data.review.birads != null ? String(r.data.review.birads) : '',
             description: r.data.review.description || '',
           })
         }
@@ -233,6 +248,7 @@ export default function ReviewDetail() {
       const targetIds = siblings.length ? siblings.map(s => s.id) : [id]
       await Promise.all(targetIds.map(imgId => api.post(`/review/${imgId}`, {
         label: form.label,
+        birads: form.birads !== '' ? Number(form.birads) : null,
         description: form.description || null,
       })))
       toast.success(
@@ -587,6 +603,11 @@ export default function ReviewDetail() {
                   })}
                 </div>
 
+                <select value={form.birads} onChange={e => setForm(f => ({ ...f, birads: e.target.value }))}
+                  className="input text-xs py-2 flex-shrink-0 w-auto max-w-[220px]">
+                  {BIRADS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+
                 <div className="flex-1 flex flex-col gap-1 min-w-[200px]">
                   <textarea className="input resize-y min-h-[2.5rem] text-sm" rows={1}
                     placeholder="Izoh / Tavsif..."
@@ -620,7 +641,12 @@ export default function ReviewDetail() {
                     <div className={`flex items-center gap-3 p-3 rounded-lg border ${s.bg} mb-2`}>
                       <Icon size={20} className={s.color} />
                       <div>
-                        <p className={`font-bold ${s.color}`}>{image.review.label}</p>
+                        <p className={`font-bold ${s.color}`}>
+                          {image.review.label}
+                          {image.review.birads != null && (
+                            <span className="ml-2 text-xs font-medium text-gray-500">BI-RADS {image.review.birads}</span>
+                          )}
+                        </p>
                         <p className="text-xs text-gray-500">
                           {new Date(image.review.reviewed_at).toLocaleString('uz-UZ')}
                         </p>

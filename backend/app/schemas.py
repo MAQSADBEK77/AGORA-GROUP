@@ -78,6 +78,7 @@ class DicomBatchResponse(BaseModel):
 
 class DoctorReviewCreate(BaseModel):
     label: ReviewLabel
+    birads: Optional[int] = None  # BI-RADS (0-6), ixtiyoriy
     description: Optional[str] = None
 
 
@@ -85,6 +86,7 @@ class DoctorReviewOut(BaseModel):
     id: int
     image_id: int
     label: ReviewLabel
+    birads: Optional[int] = None
     description: Optional[str]
     reviewed_at: datetime
     doctor: Optional[UserOut]

@@ -96,8 +96,9 @@ def generate_diagnosis_pdf(image: models.MammographyImage, resolved_image_path: 
     review = image.review
     if review:
         color = LABEL_HEX.get(review.label.value, "#000000")
+        birads_txt = f" — BI-RADS {review.birads}" if review.birads is not None else ""
         elements.append(Paragraph(
-            f"Yakuniy diagnoz: <font color='{color}'><b>{review.label.value}</b></font>", normal))
+            f"Yakuniy diagnoz: <font color='{color}'><b>{review.label.value}</b></font>{birads_txt}", normal))
         elements.append(Paragraph(f"Shifokor: {review.doctor.full_name if review.doctor else '—'}", normal))
         if review.reviewed_at:
             elements.append(Paragraph(f"Sana: {review.reviewed_at.strftime('%Y-%m-%d %H:%M')}", normal))
