@@ -116,6 +116,7 @@ class ImageOut(BaseModel):
     file_format: Optional[str]
     laterality: Optional[str] = None
     view_position: Optional[str] = None
+    cad_summary: Optional[str] = None
     status: ImageStatus
     uploaded_at: datetime
     review: Optional[DoctorReviewOut]

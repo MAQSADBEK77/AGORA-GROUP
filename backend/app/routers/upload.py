@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_user
-from ..dicom_utils import dicom_to_png, read_dicom, render_png, extract_patient_info
-import os, shutil, uuid
+from ..dicom_utils import dicom_to_png, read_dicom, render_png, extract_patient_info, is_cad_sr, parse_cad_sr
+import json, os, shutil, uuid
 
 router = APIRouter(prefix="/api", tags=["Upload"])
 UPLOAD_DIR    = os.getenv("UPLOAD_DIR", "./uploads")
@@ -119,6 +119,7 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
     results: list[schemas.DicomBatchResult] = []
     processed = []  # (filename, png_path)
     patient_info = None
+    cad_summary_json = None
 
     for file in files:
         ext = os.path.splitext(file.filename)[1].lower()
@@ -148,9 +149,17 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
         if "PixelData" not in ds:
             os.remove(dcm_path)
             modality = getattr(ds, "Modality", "?")
+            detail = f"Rasm emas ({modality} — hisobot/metama'lumot fayli)"
+            if is_cad_sr(ds):
+                try:
+                    cad = parse_cad_sr(ds)
+                    if cad:
+                        cad_summary_json = json.dumps(cad, ensure_ascii=False)
+                        detail = f"Apparat CAD hisoboti ({cad['algorithm']}) — topilmalar rasmlarga qo'shildi"
+                except Exception:
+                    pass
             results.append(schemas.DicomBatchResult(
-                filename=file.filename, status="skipped",
-                detail=f"Rasm emas ({modality} — hisobot/metama'lumot fayli)"))
+                filename=file.filename, status="skipped", detail=detail))
             continue
 
         try:
@@ -198,6 +207,7 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
             file_format="DCM",
             laterality=laterality,
             view_position=view_position,
+            cad_summary=cad_summary_json,
             status=models.ImageStatus.pending,
         )
         db.add(image)

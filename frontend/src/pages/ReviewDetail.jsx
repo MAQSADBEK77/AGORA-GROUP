@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown } from 'lucide-react'
+import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown, GripHorizontal } from 'lucide-react'
 import api, { API_BASE_URL } from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
 import LesionOverlay from '../components/LesionOverlay'
@@ -47,6 +47,21 @@ function parseSimilarCases(raw) {
   try { return JSON.parse(raw) } catch { return [] }
 }
 
+const SIDE_LABEL = { L: 'Chap ko\'krak', R: 'O\'ng ko\'krak' }
+
+function findCadSummary(panels) {
+  for (const p of panels) {
+    if (p.cad_summary) {
+      try { return JSON.parse(p.cad_summary) } catch { /* noqit */ }
+    }
+  }
+  return null
+}
+
+const FOOTER_MIN_H = 110
+const FOOTER_MAX_RATIO = 0.85
+const FOOTER_H_KEY = 'reviewFooterHeight'
+
 export default function ReviewDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -59,9 +74,54 @@ export default function ReviewDetail() {
   const [aiLoading, setAiLoading]   = useState(false)
   const [zoomImage, setZoomImage]   = useState(null)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [footerHeight, setFooterHeight] = useState(() => {
+    const saved = Number(localStorage.getItem(FOOTER_H_KEY))
+    return saved > 0 ? saved : 320
+  })
   const imgRefs = useRef({})
+  const dragRef = useRef(null)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
+
+  useEffect(() => {
+    localStorage.setItem(FOOTER_H_KEY, String(footerHeight))
+  }, [footerHeight])
+
+  useEffect(() => {
+    function clampHeight(h) {
+      const maxH = window.innerHeight * FOOTER_MAX_RATIO
+      return Math.min(maxH, Math.max(FOOTER_MIN_H, h))
+    }
+    function onMove(e) {
+      if (!dragRef.current) return
+      e.preventDefault()
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY
+      const { startY, startHeight } = dragRef.current
+      setFooterHeight(clampHeight(startHeight + (startY - clientY)))
+    }
+    function onUp() {
+      if (!dragRef.current) return
+      dragRef.current = null
+      document.body.style.userSelect = ''
+      document.body.style.cursor = ''
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    window.addEventListener('touchmove', onMove, { passive: false })
+    window.addEventListener('touchend', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      window.removeEventListener('touchmove', onMove)
+      window.removeEventListener('touchend', onUp)
+    }
+  }, [])
+
+  function startFooterDrag(clientY) {
+    dragRef.current = { startY: clientY, startHeight: footerHeight }
+    document.body.style.userSelect = 'none'
+    document.body.style.cursor = 'row-resize'
+  }
 
   useEffect(() => {
     api.get(`/images/${id}`)
@@ -168,10 +228,11 @@ export default function ReviewDetail() {
 
   const similarCases = parseSimilarCases(aiPred?.similar_cases)
   const panels = siblings.length ? siblings : [image]
+  const cadSummary = findCadSummary(panels)
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
         <button onClick={() => navigate('/review')}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
           <ArrowLeft size={16} /> Ko'rib chiqish navbati
@@ -187,17 +248,19 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div className="pb-64 lg:pb-56">
+      {/* -mx-6 asosiy <main>ning p-6 to'ldirishini bekor qiladi, px-[10px] esa ekran/navbar
+          chetidan atigi 10px oraliq qoldiradi — rasmlar iloji boricha keng joyni egallashi uchun */}
+      <div className="-mx-6 px-[10px]" style={{ paddingBottom: footerHeight + 24 }}>
 
         {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada, to'liq kenglikda */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-3">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-3 animate-fade-in">
+          <div className="flex items-center justify-between mb-3 px-1">
             <h3 className="font-semibold text-gray-800 dark:text-white">
               Mammografiya Rasmlari {panels.length > 1 && <span className="text-gray-400 font-normal text-sm">({panels.length} ta ko'rinish)</span>}
             </h3>
           </div>
 
-          <div className={`grid w-fit max-w-full bg-black rounded-lg overflow-hidden mx-auto ${panels.length > 1 ? 'grid-cols-[repeat(2,auto)] gap-px' : 'grid-cols-1'}`}>
+          <div className={`grid w-full bg-black rounded-lg overflow-hidden ${panels.length > 1 ? 'grid-cols-1 sm:grid-cols-2 gap-px' : 'grid-cols-1'}`}>
             {panels.map(p => {
               const pLesion = (p.ai_prediction?.lesion_x != null && p.ai_prediction?.lesion_width)
                 ? { x: p.ai_prediction.lesion_x, y: p.ai_prediction.lesion_y,
@@ -206,7 +269,7 @@ export default function ReviewDetail() {
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
 
               return (
-                <div key={p.id} className="relative group cursor-zoom-in bg-black"
+                <div key={p.id} className="relative group cursor-zoom-in bg-black flex items-center justify-center"
                   onClick={() => setZoomImage(p)}>
                   <span className="absolute top-1.5 left-1.5 z-10 text-[10px] font-bold bg-black/70 text-white px-1.5 py-0.5 rounded">
                     {panelLabel(p)}
@@ -218,7 +281,7 @@ export default function ReviewDetail() {
                     ref={setImgRef(p.id)}
                     src={getImageUrl(p)}
                     alt={panelLabel(p)}
-                    className="block object-contain bg-black max-h-[520px] hover:opacity-95 transition-opacity"
+                    className="block w-full h-auto object-contain bg-black hover:opacity-95 transition-opacity"
                     onError={e => { e.target.style.opacity = 0.15 }}
                   />
                   {pLesion && (
@@ -234,7 +297,7 @@ export default function ReviewDetail() {
             })}
           </div>
 
-          <div className="mt-3 text-xs text-gray-500 space-y-1">
+          <div className="mt-3 text-xs text-gray-500 space-y-1 px-1">
             <p>Bemor: {image.patient_id ? `#${image.patient_id}` : '—'} • Fayllar: {panels.length}</p>
             <p>Yuklangan: {new Date(image.uploaded_at).toLocaleString('uz-UZ')}</p>
             <p>Status:
@@ -249,7 +312,18 @@ export default function ReviewDetail() {
       {/* AI Tahlil + Doktor Xulosasi — pastda doim ko'rinib turadigan (sticky footer) panel */}
       <div className="fixed bottom-0 left-0 right-0 lg:left-16 z-30 bg-white dark:bg-slate-800
                       border-t border-gray-200 dark:border-slate-700 shadow-[0_-8px_30px_rgba(0,0,0,0.15)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 max-h-[45vh] overflow-y-auto">
+        {/* Sudrab kattalashtirish/kichraytirish tutqichi */}
+        <div
+          onMouseDown={e => { e.preventDefault(); startFooterDrag(e.clientY) }}
+          onTouchStart={e => startFooterDrag(e.touches[0].clientY)}
+          title="Sudrab kattalashtirish/kichraytirish"
+          className="absolute -top-4 left-1/2 -translate-x-1/2 w-16 h-4 rounded-t-md bg-gray-200 dark:bg-slate-700
+                    flex items-center justify-center cursor-row-resize touch-none group/handle
+                    hover:bg-blue-100 dark:hover:bg-slate-600 transition-colors"
+        >
+          <GripHorizontal size={14} className="text-gray-500 group-hover/handle:text-blue-600" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 overflow-y-auto" style={{ height: footerHeight }}>
 
           {/* AI tahlil */}
           <div className="mb-3">
@@ -314,6 +388,37 @@ export default function ReviewDetail() {
               </p>
             )}
           </div>
+
+          {/* Apparatning o'z ichki CAD hisoboti (masalan FUJIFILM M-CAD) — DICOM
+              papkadagi SR faylidan o'qilgan, bizning AI'dan mustaqil natija */}
+          {cadSummary && (
+            <div className="mb-3 border-t border-gray-100 dark:border-slate-700 pt-3">
+              <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm mb-2">
+                <AlertTriangle size={16} className="text-orange-500" /> Apparat CAD hisoboti
+                <span className="text-[11px] font-normal text-gray-400">({cadSummary.algorithm})</span>
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {['L', 'R'].map(side => {
+                  const s = cadSummary.by_side?.[side]
+                  if (!s) return null
+                  const hasFindings = s.clusters > 0
+                  return (
+                    <div key={side}
+                      className={`text-xs px-3 py-2 rounded-lg border ${
+                        hasFindings ? 'bg-orange-50 border-orange-300 text-orange-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
+                      <span className="font-semibold">{SIDE_LABEL[side]}:</span>{' '}
+                      {hasFindings
+                        ? `${s.clusters} ta kaltsifikatsiya to'plami (${s.calcifications} ta)`
+                        : 'topilma yo\'q'}
+                    </div>
+                  )
+                })}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">
+                Bu — mammografiya apparatining o'z tahlili, bizning AI natijasidan mustaqil. Yakuniy tashxis radiolog tomonidan tasdiqlanadi.
+              </p>
+            </div>
+          )}
 
           {/* Radiolog forma */}
           {canReview ? (
