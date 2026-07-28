@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown, GripHorizontal } from 'lucide-react'
+import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown, GripHorizontal, Printer } from 'lucide-react'
 import api, { API_BASE_URL } from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
 import LesionOverlay from '../components/LesionOverlay'
@@ -340,7 +340,7 @@ export default function ReviewDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto flex items-center justify-between no-print">
         <button onClick={() => navigate('/review')}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
           <ArrowLeft size={16} /> Ko'rib chiqish navbati
@@ -363,18 +363,23 @@ export default function ReviewDetail() {
         )}
 
         {image.review && (
-          <button onClick={downloadPdf} disabled={pdfLoading}
-            className="btn-secondary text-sm flex items-center gap-1.5">
-            {pdfLoading
-              ? <><div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />Tayyorlanmoqda...</>
-              : <><FileDown size={14} /> Tashxis hisoboti (PDF)</>}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => window.print()} className="btn-secondary text-sm flex items-center gap-1.5">
+              <Printer size={14} /> Chop etish
+            </button>
+            <button onClick={downloadPdf} disabled={pdfLoading}
+              className="btn-secondary text-sm flex items-center gap-1.5">
+              {pdfLoading
+                ? <><div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />Tayyorlanmoqda...</>
+                : <><FileDown size={14} /> Tashxis hisoboti (PDF)</>}
+            </button>
+          </div>
         )}
       </div>
 
       {/* -mx-6 asosiy <main>ning p-6 to'ldirishini bekor qiladi, px-[10px] esa ekran/navbar
           chetidan atigi 10px oraliq qoldiradi — rasmlar iloji boricha keng joyni egallashi uchun */}
-      <div className="-mx-6 px-[10px]" style={{ paddingBottom: footerHeight + 24 }}>
+      <div className="-mx-6 px-[10px] print-area" style={{ paddingBottom: footerHeight + 24 }}>
 
         {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada, to'liq kenglikda */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-3 animate-fade-in">
@@ -434,12 +439,27 @@ export default function ReviewDetail() {
               </span>
             </p>
           </div>
+
+          {/* Faqat chop etishda ko'rinadigan yakuniy xulosa (footer no-print bo'lgani uchun) */}
+          {image.review && (
+            <div className="hidden print:block mt-4 pt-4 border-t px-1">
+              <h3 className="font-semibold text-gray-800 mb-1">Radiolog xulosasi</h3>
+              <p className="text-sm">
+                <b>{image.review.label}</b>
+                {image.review.birads != null && <span> — BI-RADS {image.review.birads}</span>}
+              </p>
+              {image.review.description && <p className="text-sm mt-1">{image.review.description}</p>}
+              <p className="text-xs text-gray-500 mt-1">
+                Shifokor: {image.review.doctor?.full_name || '—'} • {new Date(image.review.reviewed_at).toLocaleString('uz-UZ')}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* AI Tahlil + Doktor Xulosasi — pastda doim ko'rinib turadigan (sticky footer) panel */}
       <div className="fixed bottom-0 left-0 right-0 lg:left-16 z-30 bg-white dark:bg-slate-800
-                      border-t border-gray-200 dark:border-slate-700 shadow-[0_-8px_30px_rgba(0,0,0,0.15)]">
+                      border-t border-gray-200 dark:border-slate-700 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] no-print">
         {/* Sudrab kattalashtirish/kichraytirish tutqichi */}
         <div
           onMouseDown={e => { e.preventDefault(); startFooterDrag(e.clientY) }}

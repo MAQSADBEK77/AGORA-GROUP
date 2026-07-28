@@ -77,3 +77,12 @@
 ::-webkit-scrollbar-track { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-slate-600 rounded-full; }
 ::-webkit-scrollbar-thumb:hover { @apply bg-gray-400 dark:bg-slate-500; }
+
+/* Chop etish (print) — faqat .print-area ko'rinadi, qolgan hammasi (menyu,
+   tugmalar, footer forma) yashiriladi */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; top: 0; left: 0; width: 100%; }
+  .no-print { display: none !important; }
+}
