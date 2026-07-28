@@ -103,3 +103,11 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Yechim: sahifa tuzilishi o'zgartirildi — rasmlar endi butun kenglikni egallaydi (o'ng ustun olib tashlandi). AI/Diagnoz paneli endi ekranning chap chetiga **fixed** qilib biriktirilgan, standart holatda faqat ingichka (30px) ko'k tasma ko'rinadi ("Diagnoz" yozuvi bilan). Sichqoncha o'sha tasma ustiga kelganda (`group-hover`), panel 0.3s animatsiya bilan to'liq (320px) chapdan chiqib, rasm ustiga overlay bo'lib yozadi.
 - Amalga oshirish: ikkita `position:absolute` element (ingichka tasma + to'liq panel) umumiy `fixed` ota-konteyner ichida, panel `-translate-x-full` (butunlay yashirin) dan `group-hover:translate-x-0` ga o'tadi.
 - Statik HTML orqali (asl loyihaning compiled Tailwind CSS fayli bilan) ikkala holatni — yopiq va hover qilingan — skrinshot qilib tekshirdim, ikkalasi ham to'g'ri ishladi.
+
+### 8.2. Tuzatish: "chap panel" aslida ilova navigatsiyasi ekan
+
+- Foydalanuvchi tushuntirdi: "chap tomondagi panel" deganda AI/Diagnoz emas, **ilovaning o'zi chap tomonidagi asosiy menyu** (Dashboard/Yuklash/Ko'rib chiqish/...) nazarda tutilgan edi. AI/Diagnoz paneli esa ASL o'ng joyida qolishi kerak edi — uni chapga ko'chirganim noqulay bo'lib chiqdi (ilova menyusi ustiga tushib qolgan).
+- Tuzatildi: `ReviewDetail.jsx` — AI/Diagnoz paneli asl ikki ustunli joylashuvga (`grid-cols-[1.6fr_1fr]`, rasmlar chapda, panel statik holda o'ngda) qaytarildi.
+- `Sidebar.jsx` — o'rniga ANA SHU asosiy navigatsiya menyu yig'iladigan qilindi: standart holatda ingichka (faqat ikonkalar, `w-16`), sichqoncha olib borilganda to'liq kengayadi (`w-64`, matnlar bilan), `fixed` + bo'sh joy egallovchi spacer div orqali asosiy kontent joylashuviga ta'sir qilmaydi.
+- Shu bilan birga: rasmlar orasidagi ortiqcha qora bo'shliq ham tuzatildi — grid ustunlari endi `auto` (rasmning tabiiy o'lchamiga moslashadi), oldingi `w-full` majburiy cho'zish o'rniga.
+- Test: haqiqiy DICOM rasmlar bilan statik mockup orqali qayta tekshirildi — natija to'g'ri (rasmlar tekis tegib turadi, qo'shimcha bo'shliq yo'q).
