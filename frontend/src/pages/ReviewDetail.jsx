@@ -95,6 +95,14 @@ const FOOTER_MIN_H = 110
 const FOOTER_MAX_RATIO = 0.85
 const FOOTER_H_KEY = 'reviewFooterHeight'
 
+const QUICK_PHRASES = [
+  'O\'zgarish yo\'q, o\'tgan yildagi bilan taqqoslandi',
+  'Qo\'shimcha tekshiruv (USG) tavsiya etiladi',
+  'Zichlik yuqori, mikrokaltsifikatsiyalar aniqlanmadi',
+  'Shubhali soya aniqlandi, biopsiya tavsiya etiladi',
+  '6 oydan keyin nazorat tekshiruvi tavsiya etiladi',
+]
+
 export default function ReviewDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -111,10 +119,34 @@ export default function ReviewDetail() {
     const saved = Number(localStorage.getItem(FOOTER_H_KEY))
     return saved > 0 ? saved : 320
   })
+  const [queue, setQueue]       = useState([])
   const imgRefs = useRef({})
   const dragRef = useRef(null)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
+
+  // Navbatda oldingi/keyingi BEMORga o'tish uchun — bitta bemorning barcha
+  // rasmlari bitta "yozuv" sifatida hisoblanadi (birinchi rasm ID'si bilan)
+  useEffect(() => {
+    if (!canReview) return
+    api.get('/pending').then(r => {
+      const seen = new Set()
+      const list = []
+      for (const img of r.data) {
+        if (seen.has(img.patient_id)) continue
+        seen.add(img.patient_id)
+        list.push(img.id)
+      }
+      setQueue(list)
+    }).catch(() => {})
+  }, [canReview])
+
+  const queueIndex = queue.indexOf(Number(id))
+  const goToOffset = useCallback((offset) => {
+    if (queueIndex === -1) return
+    const target = queue[queueIndex + offset]
+    if (target) navigate(`/review/${target}`)
+  }, [queue, queueIndex, navigate])
 
   useEffect(() => {
     localStorage.setItem(FOOTER_H_KEY, String(footerHeight))
@@ -216,6 +248,33 @@ export default function ReviewDetail() {
     }
   }
 
+  // Klaviatura tezkor tugmalari: 1-4 — diagnoz tanlash, Ctrl/Cmd+Enter — saqlash,
+  // ←/→ — navbatda oldingi/keyingi bemor, Esc — navbatga qaytish. Matn
+  // maydonlariga yozayotganda (input/textarea) ishlamaydi — faqat 1-4 dan
+  // tashqarisi, chunki raqamlar izohga yozilayotganda halaqit bermasligi kerak.
+  useEffect(() => {
+    function onKey(e) {
+      const tag = e.target.tagName
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA'
+
+      if (e.key === 'Escape') { navigate('/review'); return }
+      if (typing) return
+
+      if (canReview && ['1', '2', '3', '4'].includes(e.key)) {
+        setForm(f => ({ ...f, label: LABELS[Number(e.key) - 1] }))
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && canReview) {
+        e.preventDefault()
+        document.getElementById('review-submit-btn')?.click()
+      } else if (e.key === 'ArrowLeft' || e.key === '[') {
+        goToOffset(-1)
+      } else if (e.key === 'ArrowRight' || e.key === ']') {
+        goToOffset(1)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [canReview, navigate, goToOffset])
+
   function getImageUrl(img) {
     if (!img) return null
     return `${API_BASE_URL}/img/${img.id}`
@@ -270,6 +329,22 @@ export default function ReviewDetail() {
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
           <ArrowLeft size={16} /> Ko'rib chiqish navbati
         </button>
+
+        {canReview && queueIndex !== -1 && queue.length > 1 && (
+          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
+            <button onClick={() => goToOffset(-1)} disabled={queueIndex <= 0}
+              title="Oldingi bemor (←)"
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-transparent">
+              <ArrowLeft size={16} />
+            </button>
+            <span className="text-xs">{queueIndex + 1} / {queue.length}</span>
+            <button onClick={() => goToOffset(1)} disabled={queueIndex >= queue.length - 1}
+              title="Keyingi bemor (→)"
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-transparent rotate-180">
+              <ArrowLeft size={16} />
+            </button>
+          </div>
+        )}
 
         {image.review && (
           <button onClick={downloadPdf} disabled={pdfLoading}
@@ -481,6 +556,9 @@ export default function ReviewDetail() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm">
                   <User size={16} /> Doktor Xulosasi
+                  <span className="text-[10px] font-normal text-gray-400" title="1-4: diagnoz, Ctrl/Cmd+Enter: saqlash, ←/→: navbat">
+                    (1-4, Ctrl+Enter, ←/→)
+                  </span>
                 </h3>
                 {panels.length > 1 && (
                   <p className="text-[11px] text-blue-600 dark:text-blue-400">
@@ -509,13 +587,23 @@ export default function ReviewDetail() {
                   })}
                 </div>
 
-                <textarea className="input resize-y min-h-[2.5rem] flex-1 text-sm" rows={1}
-                  placeholder="Izoh / Tavsif..."
-                  value={form.description}
-                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                />
+                <div className="flex-1 flex flex-col gap-1 min-w-[200px]">
+                  <textarea className="input resize-y min-h-[2.5rem] text-sm" rows={1}
+                    placeholder="Izoh / Tavsif..."
+                    value={form.description}
+                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  />
+                  <select value="" onChange={e => {
+                      if (!e.target.value) return
+                      setForm(f => ({ ...f, description: f.description ? `${f.description} ${e.target.value}` : e.target.value }))
+                    }}
+                    className="text-[11px] text-gray-400 bg-transparent border-none py-0 pl-0 cursor-pointer focus:outline-none">
+                    <option value="">+ Tezkor shablon iborani qo'shish...</option>
+                    {QUICK_PHRASES.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
 
-                <button type="submit" disabled={submitting || !form.label}
+                <button id="review-submit-btn" type="submit" disabled={submitting || !form.label}
                   className="btn-primary px-6 py-2 flex-shrink-0 whitespace-nowrap">
                   {submitting ? 'Saqlanmoqda...' : image.review ? 'Yangilash' : 'Tasdiqlash'}
                 </button>
