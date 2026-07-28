@@ -117,3 +117,8 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Radiolog o'simta/shubhali to'qimani topishda foydalanishi uchun `ImageZoom.jsx`ga qo'shildi: kontrast slayderi (50-300%), yorqinlik slayderi (50-200%), ranglarni teskari qilish (invert) tugmasi — barchasi CSS `filter` orqali (`contrast()`, `brightness()`, `invert()`), qo'shimcha server so'rovi kerak emas.
 - "Standart" tugmasi va umumiy "reset" (0 tugmasi/RotateCcw) ikkalasi ham kontrast/yorqinlik/invertni asl holatga qaytaradi.
 - Test: haqiqiy mammografiya rasmida standart, yuqori kontrast va invert holatlarini solishtirib skrinshot qildim — to'qima chegaralari sezilarli aniqroq chiqishi tasdiqlandi.
+
+## 10. Sidebar matn tuzatish + sudraladigan rasm/panel chegarasi
+
+- Yig'ilgan (`w-16`) holatdagi asosiy navigatsiyada matnlar qisman ko'rinib (kesilib) xунук turgan edi — endi `opacity-0 group-hover:opacity-100` orqali to'liq yashiringan, faqat sichqoncha kelganda tekis chiqadi.
+- `ReviewDetail.jsx`: rasm kartochkasi va AI/Doktor panel orasiga sudrab kattalashtirish/kichraytirish uchun chegara (divider) qo'shildi — foydalanuvchi xohlagancha rasm tomonini kengaytirib, panelni torайтиши (yoki aksincha) mumkin. Tanlangan nisbat `localStorage`da saqlanadi, keyingi safar ham eslab qoladi. Faqat katta ekranlarda (`lg:`) ishlaydi, mobil/tor ekranda ustma-ust (stacked) qolaveradi.
