@@ -187,9 +187,9 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div className="relative">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
 
-        {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada, to'liq kenglikda */}
+        {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada */}
         <div className="card">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-800 dark:text-white">
@@ -197,7 +197,7 @@ export default function ReviewDetail() {
             </h3>
           </div>
 
-          <div className={`grid bg-black rounded-lg overflow-hidden ${panels.length > 1 ? 'grid-cols-2 gap-px' : 'grid-cols-1'}`}>
+          <div className={`grid w-fit max-w-full bg-black rounded-lg overflow-hidden mx-auto ${panels.length > 1 ? 'grid-cols-[repeat(2,auto)] gap-px' : 'grid-cols-1'}`}>
             {panels.map(p => {
               const pLesion = (p.ai_prediction?.lesion_x != null && p.ai_prediction?.lesion_width)
                 ? { x: p.ai_prediction.lesion_x, y: p.ai_prediction.lesion_y,
@@ -218,7 +218,7 @@ export default function ReviewDetail() {
                     ref={setImgRef(p.id)}
                     src={getImageUrl(p)}
                     alt={panelLabel(p)}
-                    className="w-full object-contain bg-black max-h-[520px] hover:opacity-95 transition-opacity"
+                    className="block object-contain bg-black max-h-[520px] hover:opacity-95 transition-opacity"
                     onError={e => { e.target.style.opacity = 0.15 }}
                   />
                   {pLesion && (
@@ -245,18 +245,7 @@ export default function ReviewDetail() {
           </div>
         </div>
 
-        {/* AI Tahlil / Doktor Xulosasi — kerak bo'lmagunча yon tomonda yashiringan,
-            sichqoncha olib borilganda chapdan animatsiya bilan chiqadigan panel */}
-        <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 group/drawer print:hidden h-[85vh]">
-          <div className="absolute inset-y-0 left-0 w-[30px] bg-blue-600 rounded-r-lg shadow-lg
-                          flex flex-col items-center justify-center gap-1">
-            <Brain size={16} className="text-white" />
-            <span className="text-white text-[10px] font-semibold [writing-mode:vertical-rl]">Diagnoz</span>
-          </div>
-          <div className="absolute inset-y-0 left-0 w-80 -translate-x-full group-hover/drawer:translate-x-0
-                          transition-transform duration-300 ease-out overflow-y-auto bg-white dark:bg-slate-800
-                          rounded-r-2xl shadow-2xl border border-l-0 border-gray-200 dark:border-slate-700
-                          p-4 space-y-4">
+        <div className="space-y-4">
           {/* AI tahlil */}
           <div className="card">
             <div className="flex items-center justify-between mb-3">
@@ -406,7 +395,6 @@ export default function ReviewDetail() {
               </div>
             )
           )}
-          </div>
         </div>
       </div>
 
