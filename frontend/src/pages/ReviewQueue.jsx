@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Clock, CheckCircle, ImageIcon, Brain, ChevronRight, Search, Users } from 'lucide-react'
+import { Clock, CheckCircle, ImageIcon, Brain, ChevronRight, Search, Users, UserCog } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api, { API_BASE_URL } from '../api/axios'
 
 const LABEL_BADGE = {
@@ -56,13 +57,21 @@ function groupHasDraft(group) {
   return group.images.some(img => img.review?.is_draft)
 }
 
+function groupAssignedTo(group) {
+  const withAssign = group.images.find(img => img.assigned_to)
+  return withAssign ? { id: withAssign.assigned_to, name: withAssign.assigned_to_name } : null
+}
+
 export default function ReviewQueue() {
   const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const isAdmin = user.role === 'admin'
   const [tab, setTab]         = useState('pending')
   const [dateFilter, setDateFilter] = useState('all')
   const [search, setSearch]   = useState('')
   const [items, setItems]     = useState([])
   const [loading, setLoading] = useState(true)
+  const [radiologs, setRadiologs] = useState([])
 
   useEffect(() => {
     setLoading(true)
@@ -70,6 +79,30 @@ export default function ReviewQueue() {
       .then(r => setItems(r.data))
       .finally(() => setLoading(false))
   }, [tab])
+
+  useEffect(() => {
+    if (!isAdmin) return
+    api.get('/auth/users').then(r => setRadiologs(r.data.filter(u => ['radiolog', 'admin'].includes(u.role)))).catch(() => {})
+  }, [isAdmin])
+
+  async function assignGroup(group, radiologId, e) {
+    e.stopPropagation()
+    try {
+      await api.put('/images/assign', {
+        image_ids: group.images.map(i => i.id),
+        radiolog_id: radiologId ? Number(radiologId) : null,
+      })
+      setItems(prev => prev.map(img =>
+        img.patient_id === group.patientId
+          ? { ...img, assigned_to: radiologId ? Number(radiologId) : null,
+              assigned_to_name: radiologId ? radiologs.find(r => r.id === Number(radiologId))?.full_name : null }
+          : img
+      ))
+      toast.success(radiologId ? 'Biriktirildi' : 'Biriktirish bekor qilindi')
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Xato')
+    }
+  }
 
   const groups = useMemo(() => {
     let filtered = items
@@ -164,9 +197,10 @@ export default function ReviewQueue() {
             const cover = group.images[0]
             const worstLabel = groupWorstLabel(group)
             const hasDraft = groupHasDraft(group)
+            const assigned = groupAssignedTo(group)
             return (
-              <button key={group.patientId} onClick={() => navigate(`/review/${cover.id}`)}
-                className="card-hover text-left group">
+              <div key={group.patientId} onClick={() => navigate(`/review/${cover.id}`)}
+                className="card-hover text-left group cursor-pointer">
                 <div className="h-32 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800
                                 rounded-xl mb-4 flex items-center justify-center overflow-hidden relative">
                   <img src={`${API_BASE_URL}/img/${cover.id}`} alt={cover.filename}
@@ -203,7 +237,19 @@ export default function ReviewQueue() {
                   </span>
                   <ChevronRight size={14} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
                 </div>
-              </button>
+
+                {isAdmin && tab === 'pending' && (
+                  <div onClick={e => e.stopPropagation()}
+                    className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-50 dark:border-slate-700/50">
+                    <UserCog size={13} className="text-gray-400 flex-shrink-0" />
+                    <select value={assigned?.id || ''} onChange={e => assignGroup(group, e.target.value, e)}
+                      className="flex-1 text-xs bg-transparent border-none py-0 pl-0 cursor-pointer focus:outline-none text-gray-500 dark:text-slate-400">
+                      <option value="">Biriktirilmagan</option>
+                      {radiologs.map(r => <option key={r.id} value={r.id}>{r.full_name}</option>)}
+                    </select>
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>

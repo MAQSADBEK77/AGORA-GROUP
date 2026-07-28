@@ -131,6 +131,8 @@ class ImageOut(BaseModel):
     pixel_spacing: Optional[float] = None
     cad_summary: Optional[str] = None
     quality_warnings: Optional[str] = None
+    assigned_to: Optional[int] = None
+    assigned_to_name: Optional[str] = None
     status: ImageStatus
     uploaded_at: datetime
     review: Optional[DoctorReviewOut]
@@ -138,6 +140,11 @@ class ImageOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class AssignRequest(BaseModel):
+    image_ids: List[int]
+    radiolog_id: Optional[int] = None  # None = biriktirishni bekor qilish
 
 
 class NotificationOut(BaseModel):

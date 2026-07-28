@@ -39,7 +39,8 @@ class User(Base):
     signature_path  = Column(String(500), nullable=True)  # Shaxsiy imzo rasmi — PDF hisobotlarda ko'rsatiladi
     created_at      = Column(DateTime(timezone=True), server_default=func.now())
 
-    images  = relationship("MammographyImage", back_populates="uploaded_by_user")
+    images  = relationship("MammographyImage", back_populates="uploaded_by_user",
+                            foreign_keys="MammographyImage.uploaded_by")
     reviews = relationship("DoctorReview", back_populates="doctor")
 
 
@@ -73,11 +74,13 @@ class MammographyImage(Base):
     pixel_spacing       = Column(Float, nullable=True)        # mm/piksel — ruler asbobi uchun
     cad_summary   = Column(Text, nullable=True)         # Apparat CAD hisoboti (SR) — JSON, mavjud bo'lsa
     quality_warnings = Column(Text, nullable=True)      # Rasm sifati ogohlantirishlari — JSON list, mavjud bo'lsa
+    assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)  # Ish yukini taqsimlash uchun — biriktirilgan radiolog (ixtiyoriy, ko'rish huquqini cheklamaydi)
     status      = Column(Enum(ImageStatus, values_callable=_by_value), default=ImageStatus.pending, nullable=False)
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
 
     patient            = relationship("Patient", back_populates="images")
-    uploaded_by_user   = relationship("User", back_populates="images")
+    uploaded_by_user   = relationship("User", back_populates="images", foreign_keys=[uploaded_by])
+    assigned_to_user   = relationship("User", foreign_keys=[assigned_to])
     review             = relationship("DoctorReview", back_populates="image", uselist=False)
     ai_prediction      = relationship("AIPrediction", back_populates="image", uselist=False)
 

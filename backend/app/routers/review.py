@@ -78,7 +78,41 @@ def get_pending_images(db: Session = Depends(get_db),
               .all())
     for img in images:
         img.patient_name = img.patient.full_name if img.patient else None
+        img.assigned_to_name = img.assigned_to_user.full_name if img.assigned_to_user else None
     return images
+
+
+@router.put("/images/assign")
+def assign_images(body: schemas.AssignRequest,
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(get_current_user)):
+    """Bir nechta rasmni (odatda bitta bemorning barcha ko'rinishlarini) bitta radiologga
+    biriktiradi — bu faqat ish yukini taqsimlash uchun yordamchi belgi, boshqa radiologlar
+    ham xohlasa shu holatni ko'rib chiqishi/tekshirishi mumkin (qattiq cheklov emas)."""
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+    if not body.image_ids:
+        raise HTTPException(status_code=400, detail="Rasm tanlanmagan")
+
+    if body.radiolog_id is not None:
+        radiolog = db.query(models.User).filter(
+            models.User.id == body.radiolog_id,
+            models.User.role.in_([models.UserRole.radiolog, models.UserRole.admin])
+        ).first()
+        if not radiolog:
+            raise HTTPException(status_code=404, detail="Radiolog topilmadi")
+
+    images = db.query(models.MammographyImage).filter(
+        models.MammographyImage.id.in_(body.image_ids)).all()
+    for img in images:
+        img.assigned_to = body.radiolog_id
+    db.commit()
+
+    log = models.Log(user_id=current_user.id, action="assign_images",
+                     details=f"image_ids={body.image_ids}, radiolog_id={body.radiolog_id}")
+    db.add(log)
+    db.commit()
+    return {"success": True, "updated": len(images)}
 
 
 # ─── Bildirishnomalar (yangi/shoshilinch kutayotgan holatlar) ───
@@ -421,6 +455,7 @@ def get_reviewed(skip: int = 0, limit: int = 200,
               .offset(skip).limit(limit).all())
     for img in images:
         img.patient_name = img.patient.full_name if img.patient else None
+        img.assigned_to_name = img.assigned_to_user.full_name if img.assigned_to_user else None
     return images
 
 

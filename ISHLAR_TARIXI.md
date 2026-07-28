@@ -455,3 +455,18 @@ xavfli. Qolganlarini xavfsizlik darajasiga qarab davom ettirilmoqda:
   qanday funksiyani buzmaydi. Test: headless Chrome'da tugma bosilganda ilova
   qulamasligi va mikrofon ruxsati yo'qligida to'g'ri holatga qaytishi tekshirildi
   (haqiqiy ovoz-matn konversiyasi haqiqiy brauzer+mikrofon bilan sinovdan o'tkazilishi kerak).
+
+- **Ishlarni radiologlarga biriktirish (case assignment)** — `mammography_images.assigned_to`
+  ustuni (ixtiyoriy, FK users.id). Bu KO'RISH HUQUQINI CHEKLAMAYDI — istalgan radiolog
+  istalgan holatni hali ham ko'rib chiqishi mumkin; bu faqat ish yukini taqsimlash uchun
+  yordamchi belgi (masalan, "bu bemor Aliyevga biriktirilgan" degan eslatma), qattiq
+  ruxsat tizimi emas — shunday qilib mavjud "istalgan radiolog istalgan holatni ochishi
+  mumkin" ishlash tartibini buzmaydi.
+  `PUT /api/images/assign` (faqat admin) — bir nechta rasm ID (odatda bir bemorning barcha
+  ko'rinishlari) birdaniga bitta radiologga biriktiriladi yoki `radiolog_id: null` bilan
+  bekor qilinadi. `ReviewQueue.jsx`da har bir "Kutmoqda" kartasi ostida (faqat admin uchun)
+  kichik `<select>` — joriy biriktirilgan radiologni ko'rsatadi va bir amalda o'zgartirish
+  imkonini beradi.
+  Test: alohida test-bemor yaratilib, biriktirish/bekor qilish/ro'yxatda to'g'ri
+  ko'rsatilishi (`assigned_to_name`) va admin bo'lmagan foydalanuvchida 403 qaytishi
+  tekshirildi; UI skrinshot orqali ham tasdiqlandi. Keyin test ma'lumotlari o'chirildi.
