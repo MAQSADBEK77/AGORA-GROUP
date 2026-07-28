@@ -28,7 +28,7 @@ export default function Sidebar() {
                             flex items-center justify-center shadow-md">
               <Activity size={18} className="text-white" />
             </div>
-            <div className="whitespace-nowrap">
+            <div className="whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
               <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-none">MammoAI</h1>
               <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">v2.0 — AI Diagnostika</p>
             </div>
@@ -37,25 +37,28 @@ export default function Sidebar() {
 
         {/* Nav */}
         <nav className="flex-1 p-4 space-y-1">
-          <p className="section-title px-3 pt-2 whitespace-nowrap">Menyu</p>
+          <p className="section-title px-3 pt-2 whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">Menyu</p>
           {links
             .filter(l => l.roles.includes(user.role))
             .map(({ to, icon: Icon, label }) => (
               <NavLink key={to} to={to}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 shadow-sm'
                       : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-slate-200'
                   }`}>
                 <Icon size={18} className="flex-shrink-0" />
-                {label}
+                <span className="whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
+                  {label}
+                </span>
               </NavLink>
             ))}
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-100 dark:border-slate-700 whitespace-nowrap">
+        <div className="p-4 border-t border-gray-100 dark:border-slate-700 whitespace-nowrap
+                        opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20
                           rounded-xl p-3 text-center">
             <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">MammoAI</p>

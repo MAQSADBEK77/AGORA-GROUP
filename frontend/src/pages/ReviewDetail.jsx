@@ -59,9 +59,51 @@ export default function ReviewDetail() {
   const [aiLoading, setAiLoading]   = useState(false)
   const [zoomImage, setZoomImage]   = useState(null)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [splitPct, setSplitPct]     = useState(() => {
+    const saved = Number(localStorage.getItem('reviewSplitPct'))
+    return saved >= 30 && saved <= 80 ? saved : 65
+  })
+  const [resizing, setResizing]     = useState(false)
+  const [isDesktop, setIsDesktop]   = useState(() => window.innerWidth >= 1024)
   const imgRefs = useRef({})
+  const splitContainerRef = useRef(null)
+  const splitPctRef = useRef(splitPct)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => setIsDesktop(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  const onDividerMouseDown = useCallback((e) => {
+    e.preventDefault()
+    setResizing(true)
+  }, [])
+
+  useEffect(() => {
+    if (!resizing) return
+    function onMove(e) {
+      const rect = splitContainerRef.current?.getBoundingClientRect()
+      if (!rect) return
+      let pct = ((e.clientX - rect.left) / rect.width) * 100
+      pct = Math.min(80, Math.max(30, pct))
+      splitPctRef.current = pct
+      setSplitPct(pct)
+    }
+    function onUp() {
+      setResizing(false)
+      localStorage.setItem('reviewSplitPct', String(splitPctRef.current))
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [resizing])
 
   useEffect(() => {
     api.get(`/images/${id}`)
@@ -187,10 +229,12 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
+      <div ref={splitContainerRef} className="flex flex-col lg:flex-row gap-6"
+        style={resizing ? { cursor: 'col-resize', userSelect: 'none' } : undefined}>
 
         {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada */}
-        <div className="card">
+        <div className="card w-full"
+          style={isDesktop ? { width: `calc(${splitPct}% - 12px)`, flexShrink: 0 } : undefined}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-800 dark:text-white">
               Mammografiya Rasmlari {panels.length > 1 && <span className="text-gray-400 font-normal text-sm">({panels.length} ta ko'rinish)</span>}
@@ -245,7 +289,16 @@ export default function ReviewDetail() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* Kattalashtirish/kichraytirish uchun sudralib ko'chiriladigan chegara */}
+        {isDesktop && (
+          <div onMouseDown={onDividerMouseDown}
+            className="hidden lg:flex items-center justify-center w-4 -mx-2 flex-shrink-0 cursor-col-resize group/divider z-10">
+            <div className={`w-1 h-20 rounded-full transition-colors ${
+              resizing ? 'bg-blue-500' : 'bg-gray-300 dark:bg-slate-600 group-hover/divider:bg-blue-400'}`} />
+          </div>
+        )}
+
+        <div className="space-y-4 flex-1 min-w-0">
           {/* AI tahlil */}
           <div className="card">
             <div className="flex items-center justify-between mb-3">
