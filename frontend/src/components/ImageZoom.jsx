@@ -1,15 +1,22 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { X, ZoomIn, ZoomOut, RotateCcw, Maximize2 } from 'lucide-react'
+import { X, ZoomIn, ZoomOut, RotateCcw, Contrast, SunMedium, FlipHorizontal2 } from 'lucide-react'
 
 export default function ImageZoom({ src, alt, onClose }) {
   const [scale, setScale]     = useState(1)
   const [pos, setPos]         = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
+  const [contrast, setContrast]     = useState(100)
+  const [brightness, setBrightness] = useState(100)
+  const [inverted, setInverted]     = useState(false)
+  const [adjustOpen, setAdjustOpen] = useState(false)
   const dragStart = useRef(null)
   const imgRef    = useRef(null)
 
   const zoom   = (delta) => setScale(s => Math.min(Math.max(s + delta, 0.5), 8))
-  const reset  = () => { setScale(1); setPos({ x: 0, y: 0 }) }
+  const reset  = () => {
+    setScale(1); setPos({ x: 0, y: 0 })
+    setContrast(100); setBrightness(100); setInverted(false)
+  }
 
   const onWheel = useCallback(e => {
     e.preventDefault()
@@ -68,12 +75,47 @@ export default function ImageZoom({ src, alt, onClose }) {
             <RotateCcw size={16} />
           </button>
           <div className="w-px h-5 bg-white/20 mx-1" />
+          <button onClick={() => setAdjustOpen(o => !o)}
+            title="Kontrast / yorqinlik"
+            className={`p-2 rounded-lg transition-colors ${adjustOpen ? 'bg-blue-500/30 text-blue-300' : 'hover:bg-white/10 text-white'}`}>
+            <Contrast size={18} />
+          </button>
+          <button onClick={() => setInverted(v => !v)}
+            title="Ranglarni teskari qilish"
+            className={`p-2 rounded-lg transition-colors ${inverted ? 'bg-blue-500/30 text-blue-300' : 'hover:bg-white/10 text-white'}`}>
+            <FlipHorizontal2 size={18} />
+          </button>
+          <div className="w-px h-5 bg-white/20 mx-1" />
           <button onClick={onClose}
             className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-white">
             <X size={18} />
           </button>
         </div>
       </div>
+
+      {/* Kontrast / yorqinlik paneli */}
+      {adjustOpen && (
+        <div className="flex items-center justify-center gap-8 px-6 py-3 bg-black/80 border-b border-white/10">
+          <div className="flex items-center gap-3 w-64">
+            <Contrast size={15} className="text-gray-400 flex-shrink-0" />
+            <input type="range" min="50" max="300" value={contrast}
+              onChange={e => setContrast(Number(e.target.value))}
+              className="w-full accent-blue-500" />
+            <span className="text-xs text-gray-400 w-10 text-right flex-shrink-0">{contrast}%</span>
+          </div>
+          <div className="flex items-center gap-3 w-64">
+            <SunMedium size={15} className="text-gray-400 flex-shrink-0" />
+            <input type="range" min="50" max="200" value={brightness}
+              onChange={e => setBrightness(Number(e.target.value))}
+              className="w-full accent-blue-500" />
+            <span className="text-xs text-gray-400 w-10 text-right flex-shrink-0">{brightness}%</span>
+          </div>
+          <button onClick={() => { setContrast(100); setBrightness(100) }}
+            className="text-xs text-gray-400 hover:text-white transition-colors">
+            Standart
+          </button>
+        </div>
+      )}
 
       {/* Image */}
       <div ref={imgRef}
@@ -86,6 +128,7 @@ export default function ImageZoom({ src, alt, onClose }) {
             transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
             transformOrigin: 'center',
             transition: dragging ? 'none' : 'transform 0.15s ease',
+            filter: `contrast(${contrast}%) brightness(${brightness}%)${inverted ? ' invert(1)' : ''}`,
             maxWidth: '90vw',
             maxHeight: '85vh',
             userSelect: 'none',
@@ -96,7 +139,7 @@ export default function ImageZoom({ src, alt, onClose }) {
 
       {/* Hints */}
       <div className="text-center py-2 text-xs text-gray-600">
-        Scroll — zoom • Drag — siljitish • +/- — klaviatura • 0 — reset • Esc — yopish
+        Scroll — zoom • Drag — siljitish • Kontrast — <Contrast size={11} className="inline -mt-0.5" /> tugmasi • 0 — reset • Esc — yopish
       </div>
     </div>
   )
