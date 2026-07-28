@@ -229,7 +229,7 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div ref={splitContainerRef} className="flex flex-col lg:flex-row gap-6"
+      <div ref={splitContainerRef} className="flex flex-col lg:flex-row lg:items-start gap-6"
         style={resizing ? { cursor: 'col-resize', userSelect: 'none' } : undefined}>
 
         {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada */}
@@ -298,7 +298,7 @@ export default function ReviewDetail() {
           </div>
         )}
 
-        <div className="space-y-4 flex-1 min-w-0">
+        <div className="space-y-4 flex-1 min-w-0 lg:sticky lg:top-6 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
           {/* AI tahlil */}
           <div className="card">
             <div className="flex items-center justify-between mb-3">
@@ -404,7 +404,7 @@ export default function ReviewDetail() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Izoh / Tavsif
                   </label>
-                  <textarea className="input resize-none" rows={3}
+                  <textarea className="input resize-y min-h-[4.5rem]" rows={3}
                     placeholder="Diagnoz haqida batafsil izoh..."
                     value={form.description}
                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
