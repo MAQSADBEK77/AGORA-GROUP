@@ -146,6 +146,17 @@ class LogOut(BaseModel):
         from_attributes = True
 
 
+class PersonalStatsOut(BaseModel):
+    total_reviewed: int
+    today_count: int
+    week_count: int
+    month_count: int
+    avg_per_day: float
+    label_counts: dict
+    birads_counts: dict
+    daily_counts: List[dict]
+
+
 class DashboardStats(BaseModel):
     total_patients: int
     total_images: int

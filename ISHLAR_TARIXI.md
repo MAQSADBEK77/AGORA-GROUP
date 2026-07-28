@@ -313,3 +313,22 @@ navbatda, autonom davom etilmoqda.
      alohida test-bemor (`upload/dicom-folder` orqali yaratilgan, sun'iy DICOM) ustida
      qoralama→yakunlash oqimi to'liq tekshirildi (status, embedding fayli, PDF 400/200,
      CSV filtri) — keyin barcha test yozuvlar va fayllar to'liq tozalandi.
+
+## 16. Shaxsiy statistika paneli (har bir radiolog uchun) (2026-07-29, avtonom rejimda)
+
+- `GET /api/stats/personal` (`backend/app/routers/review.py`) — faqat radiolog/admin, faqat
+  `current_user.id`ga tegishli va `is_draft=False` (yakunlangan) tashxislarni hisoblaydi:
+  jami son, bugun/shu hafta/shu oy soni, kunlik o'rtacha (birinchi tashxisdan buyon o'tgan
+  kunlarga bo'lib), diagnoz-turlari bo'yicha taqsimot, BI-RADS taqsimoti, va so'nggi 14 kunlik
+  kunlik son qatori (bo'sh kunlar ham 0 bilan — grafikda uzilib qolmasligi uchun).
+- Yangi schema: `schemas.PersonalStatsOut`.
+- Yangi sahifa `frontend/src/pages/PersonalStats.jsx` ("Statistikam", `/stats` yo'li,
+  faqat radiolog/admin sidebar'da ko'radi) — mavjud Dashboard'dagi StatCard/recharts
+  andozasidan foydalanilgan: 4 ta statistik karta, 14 kunlik ustunli diagramma, diagnoz
+  taqsimoti pie-chart, BI-RADS soni bo'yicha kichik badge'lar qatori.
+- **Muhim dizayn qarori**: qoralamalar (`is_draft=True`) statistikaga UMUMAN kirmaydi — aks
+  holda hali yakunlanmagan, o'zgarishi mumkin bo'lgan tashxis radiologning "ishlab chiqarish"
+  ko'rsatkichiga soxta ta'sir qilgan bo'lardi.
+- Test: ikkita alohida test-bemor (`upload/dicom-folder`) yaratilib, ularga turli diagnoz/BI-RADS
+  bilan yakuniy review yozildi, `/api/stats/personal` javobi (son, taqsimot, kunlik qator) qo'lda
+  tekshirilgan qiymatlar bilan solishtirilib tasdiqlandi — so'ng barcha test yozuv/fayllar o'chirildi.

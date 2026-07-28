@@ -1,4 +1,5 @@
 import csv, io, json, os, shutil
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
@@ -239,6 +240,64 @@ def dashboard_stats(db: Session = Depends(get_db),
         benign_count=counts.get(models.ReviewLabel.benign, 0),
         malignant_count=counts.get(models.ReviewLabel.malignant, 0),
         very_malignant_count=counts.get(models.ReviewLabel.very_malignant, 0),
+    )
+
+
+# ─── Shaxsiy statistika (har bir radiolog uchun o'zi bajargan ishlar) ───
+
+@router.get("/stats/personal", response_model=schemas.PersonalStatsOut)
+def personal_stats(db: Session = Depends(get_db),
+                   current_user: models.User = Depends(get_current_user)):
+    _require_radiolog(current_user)
+
+    reviews = (db.query(models.DoctorReview)
+               .filter(models.DoctorReview.doctor_id == current_user.id,
+                       models.DoctorReview.is_draft == False)
+               .order_by(models.DoctorReview.reviewed_at.asc())
+               .all())
+
+    now = datetime.utcnow()
+    today_start = datetime(now.year, now.month, now.day)
+    week_start  = today_start - timedelta(days=today_start.weekday())
+    month_start = datetime(now.year, now.month, 1)
+
+    label_counts, birads_counts, daily = {}, {}, {}
+    today_count = week_count = month_count = 0
+
+    for r in reviews:
+        label_counts[r.label.value] = label_counts.get(r.label.value, 0) + 1
+        if r.birads is not None:
+            key = str(r.birads)
+            birads_counts[key] = birads_counts.get(key, 0) + 1
+        if r.reviewed_at:
+            if r.reviewed_at >= today_start:
+                today_count += 1
+            if r.reviewed_at >= week_start:
+                week_count += 1
+            if r.reviewed_at >= month_start:
+                month_count += 1
+            d = r.reviewed_at.strftime("%Y-%m-%d")
+            daily[d] = daily.get(d, 0) + 1
+
+    # So'nggi 14 kunlik qator — bo'sh kunlar ham 0 bilan ko'rsatiladi (grafik uchun)
+    daily_counts = []
+    for i in range(13, -1, -1):
+        d = (today_start - timedelta(days=i)).strftime("%Y-%m-%d")
+        daily_counts.append({"date": d, "count": daily.get(d, 0)})
+
+    total = len(reviews)
+    days_active = max((now - reviews[0].reviewed_at).days, 1) if reviews else 1
+    avg_per_day = round(total / days_active, 2) if total else 0.0
+
+    return schemas.PersonalStatsOut(
+        total_reviewed=total,
+        today_count=today_count,
+        week_count=week_count,
+        month_count=month_count,
+        avg_per_day=avg_per_day,
+        label_counts=label_counts,
+        birads_counts=birads_counts,
+        daily_counts=daily_counts,
     )
 
 

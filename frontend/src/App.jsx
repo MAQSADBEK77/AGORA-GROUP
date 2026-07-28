@@ -6,6 +6,7 @@ import Upload from './pages/Upload'
 import ReviewQueue from './pages/ReviewQueue'
 import ReviewDetail from './pages/ReviewDetail'
 import PatientHistory from './pages/PatientHistory'
+import PersonalStats from './pages/PersonalStats'
 import AdminPanel from './pages/AdminPanel'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="review"          element={<ReviewQueue />} />
           <Route path="review/:id"      element={<ReviewDetail />} />
           <Route path="history"         element={<PatientHistory />} />
+          <Route path="stats"           element={<PersonalStats />} />
           <Route path="admin"           element={<AdminPanel />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
