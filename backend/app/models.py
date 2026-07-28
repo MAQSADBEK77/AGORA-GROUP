@@ -36,6 +36,7 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     role            = Column(Enum(UserRole, values_callable=_by_value), default=UserRole.hamshira, nullable=False)
     is_active       = Column(Integer, default=1)
+    signature_path  = Column(String(500), nullable=True)  # Shaxsiy imzo rasmi — PDF hisobotlarda ko'rsatiladi
     created_at      = Column(DateTime(timezone=True), server_default=func.now())
 
     images  = relationship("MammographyImage", back_populates="uploaded_by_user")

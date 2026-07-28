@@ -411,3 +411,30 @@ navbatda, autonom davom etilmoqda.
   2 ta rasm tanlanishi, modal ochilishi (yonma-yon holatda ikkalasi to'g'ri ko'rinishi) va
   Flicker rejimiga o'tish (bitta rasm, label almashinishi) barchasi to'g'ri ishlashi
   tasdiqlandi; keyin test yozuv/fayllar o'chirildi.
+
+## 21. PDF hisobotga klinika logotipi va shifokor imzo muhri (2026-07-29, avtonom rejimda)
+
+Foydalanuvchi backlog'idagi so'nggi (20-) band — shu bilan asl 29 bandlik ro'yxatning
+xavfsiz/tezkor qismi (1-20) to'liq yakunlandi.
+
+- **Klinika logotipi**: `users.signature_path` kabi alohida jadval kerak emas — logotip
+  bitta umumiy fayl (`uploads/clinic_logo.png`) sifatida saqlanadi. `POST/GET/DELETE
+  /api/admin/clinic-logo` (faqat admin yozadi/o'chiradi, o'qish ochiq — `<img>` tegi uchun).
+  Yuklanganda PIL orqali PNG'ga aylantiriladi (kirish formatidan qat'iy nazar bitta format).
+  `AdminPanel.jsx`da "Klinika logotipi" kartasi (boshqa admin kartalar bilan bir xil uslubda).
+- **Shifokor imzosi**: `User.signature_path` ustuni qo'shildi (faqat radiolog/admin
+  yuklashi mumkin — `POST/DELETE /api/auth/me/signature`, ko'rish uchun ochiq
+  `GET /api/auth/signature/{user_id}`). `ProfileModal.jsx`da imzo yuklash/o'chirish
+  bo'limi (faqat radiolog/admin rolida ko'rinadi).
+- `backend/app/reports.py` — PDF sarlavhasida logotip (bo'lsa) sarlavha yonida chiqadi;
+  "Radiolog xulosasi" bo'limi oxirida ko'k ramkali tasdiq muhri: agar shifokor imzo rasmi
+  yuklagan bo'lsa o'sha rasm, aks holda matnli "TASDIQLANDI" muhri — ikkalasida ham
+  shifokor ismi, sana va **tekshirish kodi** (review id+sana+diagnozdan SHA-256 xesh,
+  8 belgi) ko'rsatiladi — hisobotning keyinchalik o'zgartirilmaganini tekshirish uchun
+  oddiy, kriptografik bo'lmagan lekin foydali yordamchi vosita.
+- Test: sun'iy klinika logotipi va imzo rasmlari yuklab, PDF hisobot generatsiya qilindi;
+  headless Chrome orqali (Chrome'ning ichki PDF ko'rish vositasi bilan file:// orqali
+  ochilib) skrinshot olinib TASDIQLANDI: (1) logotip bilan + haqiqiy imzo rasmi bilan,
+  (2) imzo o'chirilgandan keyin matnli "TASDIQLANDI" muhriga to'g'ri qaytishi. AdminPanel
+  va ProfileModal UI qismlari ham skrinshot orqali tekshirildi. So'ng barcha test
+  yozuv/fayl/logotip/imzo o'chirildi.

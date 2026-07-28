@@ -1,6 +1,6 @@
 import csv, io, json, os, shutil
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
@@ -484,6 +484,44 @@ def get_audit_logs(skip: int = 0, limit: int = 100, action: str = "",
     for l in logs:
         l.user_name = users.get(l.user_id)
     return logs
+
+
+# ─── Admin: klinika logotipi (PDF hisobotlar uchun) ───
+
+CLINIC_LOGO_PATH = os.path.join(os.getenv("UPLOAD_DIR", "./uploads"), "clinic_logo.png")
+
+@router.post("/admin/clinic-logo")
+def upload_clinic_logo(file: UploadFile = File(...),
+                       current_user: models.User = Depends(get_current_user)):
+    """Klinika logotipini yuklaydi — barcha PDF tashxis hisobotlarining sarlavhasida ko'rinadi."""
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in (".png", ".jpg", ".jpeg"):
+        raise HTTPException(status_code=400, detail="Faqat PNG yoki JPG rasm qabul qilinadi")
+
+    from PIL import Image as PILImage
+    os.makedirs(os.path.dirname(CLINIC_LOGO_PATH), exist_ok=True)
+    img = PILImage.open(file.file).convert("RGBA")
+    img.save(CLINIC_LOGO_PATH, format="PNG")
+    return {"success": True}
+
+
+@router.get("/admin/clinic-logo")
+def get_clinic_logo():
+    if not os.path.exists(CLINIC_LOGO_PATH):
+        raise HTTPException(status_code=404, detail="Logotip yuklanmagan")
+    return FileResponse(CLINIC_LOGO_PATH, media_type="image/png")
+
+
+@router.delete("/admin/clinic-logo")
+def delete_clinic_logo(current_user: models.User = Depends(get_current_user)):
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+    if os.path.exists(CLINIC_LOGO_PATH):
+        os.remove(CLINIC_LOGO_PATH)
+    return {"success": True}
 
 
 # ─── Admin: yuklangan bemorlar rasmlarini tozalash ───

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save, ImageOff, AlertTriangle, ScrollText, ChevronDown, ChevronUp, FileDown } from 'lucide-react'
-import api from '../api/axios'
+import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save, ImageOff, AlertTriangle, ScrollText, ChevronDown, ChevronUp, FileDown, Image as ImageIcon, Upload } from 'lucide-react'
+import api, { API_BASE_URL } from '../api/axios'
 
 const ROLE_LABELS = { admin: 'Administrator', hamshira: 'Hamshira', radiolog: 'Radiolog' }
 const ROLE_COLORS = {
@@ -27,11 +27,52 @@ export default function AdminPanel() {
   const [logs, setLogs]           = useState([])
   const [logsOpen, setLogsOpen]   = useState(false)
   const [logsLoading, setLogsLoading] = useState(false)
+  const [hasLogo, setHasLogo]         = useState(false)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoVersion, setLogoVersion]     = useState(0)
 
   useEffect(() => {
     if (user.role !== 'admin') navigate('/dashboard')
-    else { loadUsers(); loadUploadStats() }
+    else { loadUsers(); loadUploadStats(); checkLogo() }
   }, [])
+
+  async function checkLogo() {
+    try {
+      await api.get('/admin/clinic-logo')
+      setHasLogo(true)
+    } catch {
+      setHasLogo(false)
+    }
+  }
+
+  async function uploadLogo(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    setLogoUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      await api.post('/admin/clinic-logo', fd)
+      setHasLogo(true)
+      setLogoVersion(v => v + 1)
+      toast.success('Logotip yuklandi!')
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Yuklashda xatolik')
+    } finally {
+      setLogoUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  async function removeLogo() {
+    try {
+      await api.delete('/admin/clinic-logo')
+      setHasLogo(false)
+      toast.success("Logotip o'chirildi")
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Xato')
+    }
+  }
 
   async function loadLogs() {
     setLogsLoading(true)
@@ -200,6 +241,42 @@ export default function AdminPanel() {
           </form>
         </div>
       )}
+
+      {/* Klinika logotipi (PDF hisobotlar uchun) */}
+      <div className="card border border-blue-100 dark:border-blue-900/30">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-xl flex items-center justify-center flex-shrink-0">
+              <ImageIcon size={18} className="text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 dark:text-white">Klinika logotipi</h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+                PDF tashxis hisobotlarining sarlavhasida ko'rsatiladi
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {hasLogo && (
+              <>
+                <img key={logoVersion} src={`${API_BASE_URL}/admin/clinic-logo?v=${logoVersion}`}
+                  alt="Logotip" className="h-12 w-12 object-contain bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600" />
+                <button onClick={removeLogo}
+                  className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                  <Trash2 size={16} />
+                </button>
+              </>
+            )}
+            <label className="btn-secondary text-sm cursor-pointer">
+              {logoUploading
+                ? <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                : <><Upload size={14} /> {hasLogo ? 'Almashtirish' : 'Yuklash'}</>}
+              <input type="file" accept=".png,.jpg,.jpeg" className="hidden"
+                disabled={logoUploading} onChange={uploadLogo} />
+            </label>
+          </div>
+        </div>
+      </div>
 
       {/* Yuklangan bemorlar rasmlarini tozalash */}
       <div className="card border border-orange-100 dark:border-orange-900/30">

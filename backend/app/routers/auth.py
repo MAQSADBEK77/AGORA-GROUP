@@ -1,11 +1,15 @@
-import time
-from fastapi import APIRouter, Depends, HTTPException, status
+import os, time, uuid
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
+SIGNATURES_DIR = os.path.join(UPLOAD_DIR, "signatures")
+ALLOWED_IMAGE_EXTS = {".png", ".jpg", ".jpeg"}
 
 # Login uchun oddiy xotiradagi rate-limiting (brute-force himoyasi).
 # Ko'p foydalanuvchili/ko'p jarayonli joylashtirishda bu Redis kabi umumiy
@@ -53,6 +57,18 @@ def login(request: schemas.LoginRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+
+@router.get("/signature/{user_id}")
+def serve_signature(user_id: int, db: Session = Depends(get_db)):
+    """Foydalanuvchi imzo rasmini qaytaradi — <img> tag uchun auth kerak emas."""
+    from fastapi.responses import FileResponse
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user or not user.signature_path or not os.path.exists(user.signature_path):
+        raise HTTPException(status_code=404, detail="Imzo topilmadi")
+    ext = os.path.splitext(user.signature_path)[1].lower()
+    mtype = "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png"
+    return FileResponse(user.signature_path, media_type=mtype)
 
 
 @router.post("/register", response_model=schemas.UserOut)
@@ -116,6 +132,54 @@ def update_profile(data: schemas.ProfileUpdate,
         if len(data.password) < 6:
             raise HTTPException(status_code=400, detail="Parol kamida 6 belgi bo'lishi kerak")
         current_user.hashed_password = hash_password(data.password)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.post("/me/signature", response_model=schemas.UserOut)
+def upload_signature(file: UploadFile = File(...),
+                     db: Session = Depends(get_db),
+                     current_user: models.User = Depends(get_current_user)):
+    """Shaxsiy imzo rasmini yuklaydi — PDF tashxis hisobotlarida ko'rsatiladi.
+    Faqat radiolog/admin uchun (ular hisobotlarni tasdiqlaydi)."""
+    if current_user.role not in (models.UserRole.radiolog, models.UserRole.admin):
+        raise HTTPException(status_code=403, detail="Faqat radiolog yoki admin")
+
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_IMAGE_EXTS:
+        raise HTTPException(status_code=400, detail="Faqat PNG yoki JPG rasm qabul qilinadi")
+
+    os.makedirs(SIGNATURES_DIR, exist_ok=True)
+    path = os.path.join(SIGNATURES_DIR, f"{current_user.id}_{uuid.uuid4().hex[:8]}{ext}")
+
+    old_path = current_user.signature_path
+    with open(path, "wb") as f:
+        f.write(file.file.read())
+
+    user = db.query(models.User).filter(models.User.id == current_user.id).first()
+    user.signature_path = path
+    db.commit()
+    db.refresh(user)
+
+    if old_path and os.path.exists(old_path):
+        try:
+            os.remove(old_path)
+        except Exception:
+            pass
+
+    return user
+
+
+@router.delete("/me/signature", response_model=schemas.UserOut)
+def delete_signature(db: Session = Depends(get_db),
+                     current_user: models.User = Depends(get_current_user)):
+    if current_user.signature_path and os.path.exists(current_user.signature_path):
+        try:
+            os.remove(current_user.signature_path)
+        except Exception:
+            pass
+    current_user.signature_path = None
     db.commit()
     db.refresh(current_user)
     return current_user

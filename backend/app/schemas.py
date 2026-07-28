@@ -17,6 +17,7 @@ class UserOut(BaseModel):
     email: str
     role: UserRole
     is_active: int
+    signature_path: Optional[str] = None
     created_at: datetime
 
     class Config:
