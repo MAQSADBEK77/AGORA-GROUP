@@ -154,6 +154,15 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - **Cheklov**: SR hisobot rasmlarga **SOPInstanceUID** orqali bog'langan, lekin bu real namunada SR "For Processing" versiyaga ishora qiladi — bizda saqlangan fayllar boshqa UID'ga ega. Shuningdek, bizning fayllarda `ViewPosition` (CC/MLO) ham bo'sh, shu sabab ANIQ qaysi rasm (MLO yoki CC) ekanini ajratib bo'lmaydi. Shuning uchun belgilar **shu tomonning barcha rasmlarida** ko'rsatiladi (aniq bitta rasmda emas) — bu haqda footer'da ochiq izoh bor.
 - Test: haqiqiy rasmlar bilan skrinshot orqali tekshirildi — belgilar ikkala L-ko'rinishda ham to'qima ustida, bir xil mantiqiy hududda chiqdi.
 
+### 12.2. To'liq chuqurlik: har kaltsifikatsiyaning aniq konturi + qo'shimcha metama'lumot
+
+- Foydalanuvchi: "yana qanday data bor" so'rovi asosida SR ichida yana quyidagilar topildi: har klasterdagi HAR BIR alohida kaltsifikatsiyaning o'z markazi+konturi (shakli), algoritm versiyasi, qaysi tekshiruvlar o'tkazilgani ("Mammography breast density", "Calcification Cluster"), va muhimi — **"Summary of Analyses: Not Attempted"** (xavflilik/BI-RADS baholash o'tkazilmagan, faqat joy aniqlangan).
+- Foydalanuvchi: "hammasi to'liq, konturigacha, yuqori aniqlikda chiqsin" deb so'radi.
+- `parse_cad_sr` butunlay qayta yozildi — endi to'liq ierarxik struktura qaytaradi: `by_side.{L,R}.clusters[].calcifications[].{center,outline}`, plus `algorithm_version`, `detections_performed`, `analyses_attempted`.
+- `CadMarkers.jsx` — oldingi taxminiy doiralar o'rniga, endi SVG + `viewBox` orqali DICOM piksel koordinatalarini TO'G'RIDAN-TO'G'RI (hech qanday JS hisob-kitobsiz) chizadi — har bir kaltsifikatsiyaning haqiqiy mikro-shakli (ko'pburchak konturi) piksel-aniqlikda ko'rinadi.
+- Footer'da qo'shildi: algoritm versiyasi, o'tkazilgan tekshiruvlar ro'yxati, va agar `analyses_attempted=false` bo'lsa — qizil ogohlantirish ("apparat faqat joyni aniqladi, xavfni baholamadi").
+- Test: skrinshot + yaqinlashtirib (crop) tekshirdim — har bir mikroskopik kaltsifikatsiyaning konturi to'qima ustida to'g'ri joyda chiqdi.
+
 ### 10.2. Sticky footer'ni sudrab kattalashtirish/kichraytirish + rasmlarni maksimal kattalashtirish
 
 - Foydalanuvchi so'radi: pastki sticky footer'ning tepa chegarasida sudrab (tepaga/pastga) kichraytirib-kattalashtirish mumkin bo'lsin, va 4 ta rasm ham maksimal katta ko'rinsin.
