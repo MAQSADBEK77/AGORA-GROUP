@@ -46,10 +46,14 @@ function groupByPatient(images) {
 function groupWorstLabel(group) {
   let worst = null
   for (const img of group.images) {
-    if (!img.review) continue
+    if (!img.review || img.review.is_draft) continue
     if (!worst || LABEL_SEVERITY[img.review.label] > LABEL_SEVERITY[worst]) worst = img.review.label
   }
   return worst
+}
+
+function groupHasDraft(group) {
+  return group.images.some(img => img.review?.is_draft)
 }
 
 export default function ReviewQueue() {
@@ -159,6 +163,7 @@ export default function ReviewQueue() {
           {groups.map(group => {
             const cover = group.images[0]
             const worstLabel = groupWorstLabel(group)
+            const hasDraft = groupHasDraft(group)
             return (
               <button key={group.patientId} onClick={() => navigate(`/review/${cover.id}`)}
                 className="card-hover text-left group">
@@ -187,7 +192,9 @@ export default function ReviewQueue() {
                   </div>
                   {worstLabel
                     ? <span className={`${LABEL_BADGE[worstLabel] || 'badge-normal'} flex-shrink-0`}>{worstLabel}</span>
-                    : <span className="badge-pending flex-shrink-0">Kutmoqda</span>}
+                    : hasDraft
+                      ? <span className="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Qoralama</span>
+                      : <span className="badge-pending flex-shrink-0">Kutmoqda</span>}
                 </div>
 
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">

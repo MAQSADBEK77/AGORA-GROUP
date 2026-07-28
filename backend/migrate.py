@@ -7,6 +7,13 @@ import os
 
 DB_PATH = os.getenv("DB_PATH", "./mammoai.db")
 
+def table_exists(cursor, table):
+    cursor.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,)
+    )
+    return cursor.fetchone() is not None
+
+
 def column_exists(cursor, table, column):
     cursor.execute(f"PRAGMA table_info({table})")
     return any(row[1] == column for row in cursor.fetchall())
@@ -28,12 +35,16 @@ def migrate():
         ("mammography_images", "patient_orientation", "ALTER TABLE mammography_images ADD COLUMN patient_orientation TEXT"),
         ("doctor_reviews", "birads", "ALTER TABLE doctor_reviews ADD COLUMN birads INTEGER"),
         ("mammography_images", "pixel_spacing", "ALTER TABLE mammography_images ADD COLUMN pixel_spacing REAL"),
+        ("doctor_reviews", "is_draft", "ALTER TABLE doctor_reviews ADD COLUMN is_draft BOOLEAN DEFAULT 0"),
         ("mammography_images", "laterality",    "ALTER TABLE mammography_images ADD COLUMN laterality TEXT"),
         ("mammography_images", "view_position", "ALTER TABLE mammography_images ADD COLUMN view_position TEXT"),
         # Eski ustunlarni tozalash (SQLite ALTER DROP yo'q, shuning uchun shunchaki o'tkazib yuboramiz)
     ]
 
     for table, col, sql in migrations:
+        if not table_exists(cur, table):
+            print(f"  - {table} jadvali mavjud emas, o'tkazib yuborildi")
+            continue
         if not column_exists(cur, table, col):
             print(f"  + {table}.{col} ustuni qo'shilmoqda...")
             cur.execute(sql)

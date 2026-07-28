@@ -240,7 +240,7 @@ export default function ReviewDetail() {
     }
   }
 
-  async function submitReview(e) {
+  async function submitReview(e, isDraft = false) {
     e.preventDefault()
     if (!form.label) return toast.error('Diagnoz tanlang')
     setSubmitting(true)
@@ -250,13 +250,19 @@ export default function ReviewDetail() {
         label: form.label,
         birads: form.birads !== '' ? Number(form.birads) : null,
         description: form.description || null,
+        is_draft: isDraft,
       })))
-      toast.success(
-        targetIds.length > 1
-          ? `Diagnoz ${targetIds.length} ta rasmga saqlandi! AI yangilandi.`
-          : 'Diagnoz saqlandi! AI yangilandi.'
-      )
-      navigate('/review')
+      if (isDraft) {
+        toast.success('Qoralama sifatida saqlandi')
+        setImage(img => ({ ...img, review: { ...img.review, label: form.label, birads: form.birads, description: form.description, is_draft: true } }))
+      } else {
+        toast.success(
+          targetIds.length > 1
+            ? `Diagnoz ${targetIds.length} ta rasmga saqlandi! AI yangilandi.`
+            : 'Diagnoz saqlandi! AI yangilandi.'
+        )
+        navigate('/review')
+      }
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Saqlash xatosi')
     } finally {
@@ -362,7 +368,7 @@ export default function ReviewDetail() {
           </div>
         )}
 
-        {image.review && (
+        {image.review && !image.review.is_draft && (
           <div className="flex items-center gap-2">
             <button onClick={() => window.print()} className="btn-secondary text-sm flex items-center gap-1.5">
               <Printer size={14} /> Chop etish
@@ -443,7 +449,7 @@ export default function ReviewDetail() {
           {/* Faqat chop etishda ko'rinadigan yakuniy xulosa (footer no-print bo'lgani uchun) */}
           {image.review && (
             <div className="hidden print:block mt-4 pt-4 border-t px-1">
-              <h3 className="font-semibold text-gray-800 mb-1">Radiolog xulosasi</h3>
+              <h3 className="font-semibold text-gray-800 mb-1">Radiolog xulosasi{image.review.is_draft ? ' (Qoralama)' : ''}</h3>
               <p className="text-sm">
                 <b>{image.review.label}</b>
                 {image.review.birads != null && <span> — BI-RADS {image.review.birads}</span>}
@@ -644,16 +650,28 @@ export default function ReviewDetail() {
                   </select>
                 </div>
 
+                <button type="button" onClick={e => submitReview(e, true)} disabled={submitting || !form.label}
+                  title="Fikringizni qoralama sifatida saqlab, keyinroq davom ettirishingiz mumkin"
+                  className="btn-secondary px-4 py-2 flex-shrink-0 whitespace-nowrap text-sm">
+                  Qoralama saqlash
+                </button>
                 <button id="review-submit-btn" type="submit" disabled={submitting || !form.label}
                   className="btn-primary px-6 py-2 flex-shrink-0 whitespace-nowrap">
-                  {submitting ? 'Saqlanmoqda...' : image.review ? 'Yangilash' : 'Tasdiqlash'}
+                  {submitting ? 'Saqlanmoqda...' : image.review && !image.review.is_draft ? 'Yangilash' : 'Tasdiqlash (yakunlash)'}
                 </button>
               </form>
             </div>
           ) : (
             image.review && (
               <div className="border-t border-gray-100 dark:border-slate-700 pt-3">
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2 text-sm">Doktor Xulosasi</h3>
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2 text-sm flex items-center gap-2">
+                  Doktor Xulosasi
+                  {image.review.is_draft && (
+                    <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                      Qoralama
+                    </span>
+                  )}
+                </h3>
                 {(() => {
                   const s = LABEL_STYLE[image.review.label] || LABEL_STYLE['Normal']
                   const Icon = s.icon

@@ -81,6 +81,7 @@ class DoctorReviewCreate(BaseModel):
     label: ReviewLabel
     birads: Optional[int] = None  # BI-RADS (0-6), ixtiyoriy
     description: Optional[str] = None
+    is_draft: bool = False  # True = qoralama sifatida saqlash, hali yakunlanmagan
 
 
 class DoctorReviewOut(BaseModel):
@@ -88,6 +89,7 @@ class DoctorReviewOut(BaseModel):
     image_id: int
     label: ReviewLabel
     birads: Optional[int] = None
+    is_draft: bool = False
     description: Optional[str]
     reviewed_at: datetime
     doctor: Optional[UserOut]

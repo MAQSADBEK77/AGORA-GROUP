@@ -48,6 +48,8 @@ def download_report_pdf(image_id: int, db: Session = Depends(get_db),
         models.MammographyImage.id == image_id).first()
     if not image:
         raise HTTPException(status_code=404, detail="Rasm topilmadi")
+    if image.review and image.review.is_draft:
+        raise HTTPException(status_code=400, detail="Qoralama uchun hisobot yaratib bo'lmaydi — avval yakunlang")
 
     pdf_bytes = generate_diagnosis_pdf(image, _resolve_image_path(image))
     return Response(
@@ -175,6 +177,7 @@ def submit_review(image_id: int,
         review.label       = body.label
         review.birads      = body.birads
         review.description = body.description
+        review.is_draft    = body.is_draft
         review.doctor_id   = current_user.id
     else:
         review = models.DoctorReview(
@@ -183,23 +186,25 @@ def submit_review(image_id: int,
             label=body.label,
             birads=body.birads,
             description=body.description,
+            is_draft=body.is_draft,
         )
         db.add(review)
 
-    # Rasm statusini "reviewed" ga o'zgartirish
-    image.status = models.ImageStatus.reviewed
-
-    # Eski AI taxminni o'chirish (yangi label bo'lgani uchun)
-    if image.ai_prediction:
-        db.delete(image.ai_prediction)
+    # Qoralama — rasm holati "kutmoqda"da qoladi, AI o'qitish uchun ishlatilmaydi.
+    # Faqat yakunlanganda (is_draft=False) "reviewed" bo'ladi va AI embedding yangilanadi.
+    if not body.is_draft:
+        image.status = models.ImageStatus.reviewed
+        if image.ai_prediction:
+            db.delete(image.ai_prediction)
 
     db.commit()
     db.refresh(review)
 
-    # Embedding indekslash (AI uchun)
-    index_labeled_image(image_id, image.file_path)
+    if not body.is_draft:
+        index_labeled_image(image_id, image.file_path)
 
-    log = models.Log(user_id=current_user.id, action="doctor_review",
+    log = models.Log(user_id=current_user.id,
+                     action="doctor_review_draft" if body.is_draft else "doctor_review",
                      details=f"image_id={image_id}, label={body.label}")
     db.add(log)
     db.commit()
@@ -221,6 +226,7 @@ def dashboard_stats(db: Session = Depends(get_db),
         models.MammographyImage.status == models.ImageStatus.reviewed).count()
 
     label_counts = (db.query(models.DoctorReview.label, func.count(models.DoctorReview.id))
+                    .filter(models.DoctorReview.is_draft == False)
                     .group_by(models.DoctorReview.label).all())
     counts = {lbl: cnt for lbl, cnt in label_counts}
 
@@ -264,6 +270,7 @@ def export_reviews_csv(db: Session = Depends(get_db),
             .join(models.MammographyImage, models.DoctorReview.image_id == models.MammographyImage.id)
             .join(models.Patient, models.MammographyImage.patient_id == models.Patient.id)
             .join(models.User, models.DoctorReview.doctor_id == models.User.id)
+            .filter(models.DoctorReview.is_draft == False)
             .order_by(models.DoctorReview.reviewed_at.desc())
             .all())
 

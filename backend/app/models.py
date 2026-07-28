@@ -89,6 +89,7 @@ class DoctorReview(Base):
     doctor_id   = Column(Integer, ForeignKey("users.id"), nullable=False)
     label       = Column(Enum(ReviewLabel, values_callable=_by_value), nullable=False)
     birads      = Column(Integer, nullable=True)  # BI-RADS xalqaro tasnifi (0-6), ixtiyoriy — asosiy `label` bilan birga
+    is_draft    = Column(Boolean, default=False, nullable=False)  # True = qoralama, hali yakunlanmagan
     description = Column(Text)
     reviewed_at = Column(DateTime(timezone=True), server_default=func.now())
 

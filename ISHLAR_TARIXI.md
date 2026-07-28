@@ -275,3 +275,41 @@ test-bemor yaratish kerak (upload orqali) — mavjud ID'lardan HECH QACHON foyda
 Davom etayotgan ishlar: ruler asbobi, rasm sifat tekshiruvi, Draft/Final oqimi, shaxsiy
 statistika, bulk select, bildirishnoma, QA dashboard, sinxron zoom/pan+flicker, PDF logotip —
 navbatda, autonom davom etilmoqda.
+
+## 15. Ruler, sifat tekshiruvi va Draft/Final oqimi (2026-07-29, avtonom rejimda)
+
+1. **O'lchov (ruler) asbobi** — `ImageZoom.jsx`ga qo'shildi: ikki nuqta bosilsa, orasidagi
+   masofa DICOM `PixelSpacing` (mm/piksel) mavjud bo'lsa millimetrda, aks holda pikselda
+   ko'rsatiladi. `getBoundingClientRect()`ga asoslangan koordinata xaritalash CSS
+   scale/translate transformlarni hisobga oladi (mavjud `LesionOverlay` andozasidan foydalanildi).
+   Backend: `extract_patient_info()` `PixelSpacing`ni o'qiydi,
+   `mammography_images.pixel_spacing` ustunida saqlanadi.
+2. **Rasm sifatini avtomatik tekshirish** — `dicom_utils.check_image_quality()`: juda kichik
+   o'lcham (<500px), juda qorong'i (qora piksel nisbati >0.97), past kontrast (std<8) va
+   xiralik (Laplacian variance<15, OpenCV orqali) — hammasi ogohlantirish sifatida
+   (`quality_warnings`), yuklashni TO'XTATMAYDI, faqat radiologga ko'rsatiladi.
+3. **Draft → Final ikki bosqichli diagnoz** — `DoctorReview.is_draft` (default `False`).
+   - Qoralama saqlanganda: `image.status` "pending"da qoladi, eski AI bashorati o'chirilmaydi,
+     `index_labeled_image()` (AI o'z-o'zini o'qitish) ISHGA TUSHMAYDI — chunki qoralama hali
+     yakuniy tashxis emas, uni AI trening ma'lumoti sifatida ishlatish noto'g'ri bo'lardi.
+   - Yakunlanganda (`is_draft=False`): status "reviewed"ga o'tadi, AI qayta o'qitiladi — avvalgi
+     bitta bosqichli xulq bilan bir xil.
+   - PDF hisobot (`GET /api/report/{id}/pdf`) va CSV eksport (`/api/export/reviews.csv`)
+     qoralamalarni RAD ETADI (400 xato / qatordan chiqarib tashlaydi) — chunki "Yakuniy diagnoz"
+     deb chop etilgan hujjat hali tasdiqlanmagan xulosani ko'rsatib yubormasligi kerak.
+   - Dashboard statistika (`/api/dashboard/stats`) diagnoz-soni hisobida qoralamalarni
+     hisobga OLMAYDI (faqat yakunlangan tashxislar sanaladi).
+   - Frontend: `ReviewDetail.jsx`da "Qoralama saqlash" (ikkinchi, kulrang tugma) va
+     "Tasdiqlash (yakunlash)" tugmalari alohida; qoralama holatida "Qoralama" belgisi (amber
+     badge) ko'rsatiladi (o'qish rejimida va print bo'limida). `ReviewQueue.jsx`da guruh
+     ichidagi eng og'ir diagnoz hisoblanganda qoralamalar HISOBGA OLINMAYDI (aks holda hali
+     tasdiqlanmagan tashxis "Kutmoqda" o'rniga xato ravishda yakuniy diagnoz kabi ko'rinar edi);
+     guruhda faqat qoralama bo'lsa, "Kutmoqda" o'rniga "Qoralama" belgisi ko'rsatiladi.
+   - `backend/migrate.py`dagi eski "predictions" jadvali (hozirgi sxemada mavjud emas,
+     `ai_predictions` bilan almashtirilgan) haqidagi o'lik migratsiya qatorlari endi
+     jadval mavjudligini oldindan tekshiradi va yo'q bo'lsa xatosiz o'tkazib yuboradi
+     (avval har safar `sqlite3.OperationalError` bilan yiqilar edi).
+   - Test: `FastAPI TestClient` + `get_current_user` override orqali (parolni bilmasdan)
+     alohida test-bemor (`upload/dicom-folder` orqali yaratilgan, sun'iy DICOM) ustida
+     qoralama→yakunlash oqimi to'liq tekshirildi (status, embedding fayli, PDF 400/200,
+     CSV filtri) — keyin barcha test yozuvlar va fayllar to'liq tozalandi.
