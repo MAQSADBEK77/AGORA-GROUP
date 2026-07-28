@@ -163,6 +163,14 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Footer'da qo'shildi: algoritm versiyasi, o'tkazilgan tekshiruvlar ro'yxati, va agar `analyses_attempted=false` bo'lsa — qizil ogohlantirish ("apparat faqat joyni aniqladi, xavfni baholamadi").
 - Test: skrinshot + yaqinlashtirib (crop) tekshirdim — har bir mikroskopik kaltsifikatsiyaning konturi to'qima ustida to'g'ri joyda chiqdi.
 
+### 12.3. Muhim tuzatish: MLO/CC orasida aralashib ketgan topilmalar
+
+- Foydalanuvchi: "boshqa joylarni belgilaganga o'xshayapti" — tekshirilganda, L (yoki R) tomonning HAMMA topilmalari ikkala ko'rinishga (CC ham, MLO ham) baravar chizilayotgani aniqlandi, garchi har bir topilma aslida FAQAT bitta ko'rinishga tegishli bo'lsa-da.
+- Yechim topildi: `ViewPosition` bo'sh bo'lsa-da, **`PatientOrientation`** (masalan "A\R" — CC, "A\FR" — MLO) deyarli har doim mavjud va CC/MLO'ni ishonchli ajratadi.
+- `MammographyImage.patient_orientation` ustuni qo'shildi (yuklashda saqlanadi). `parse_cad_sr` endi laterality+orientation kombinatsiyasi bo'yicha **`by_view`** xaritasini ham qaytaradi (masalan `"L|A\R"` va `"L|A\FR"` alohida-alohida).
+- Frontend endi har rasmning aynan o'z ko'rinishiga mos topilmalarni tanlab ko'rsatadi (`by_side` faqat orientatsiya yo'q eski yozuvlar uchun zaxira sifatida qoladi).
+- Test: L-CC va L-MLO rasmlari alohida-alohida tekshirildi — endi har biri FAQAT o'ziga tegishli klasterlarni (mos ravishda 2 va 3 ta) ko'rsatadi, ular endi bir-biridan farqli va to'g'ri joyda.
+
 ### 10.2. Sticky footer'ni sudrab kattalashtirish/kichraytirish + rasmlarni maksimal kattalashtirish
 
 - Foydalanuvchi so'radi: pastki sticky footer'ning tepa chegarasida sudrab (tepaga/pastga) kichraytirib-kattalashtirish mumkin bo'lsin, va 4 ta rasm ham maksimal katta ko'rinsin.
