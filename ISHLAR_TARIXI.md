@@ -128,3 +128,25 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Foydalanuvchi aniqlashtirdi: sudraladigan yon panel emas, balki AI Tahlil + Doktor Xulosasi **pastki "sticky footer"** kabi bo'lishi kerak edi.
 - Yakuniy yechim: rasmlar to'liq kenglikda oddiy sahifa oqimida; AI Tahlil (qisqartirilgan — faqat label+ishonch) va Doktor Xulosasi (diagnoz tugmalari bir qatorda + izoh + tasdiqlash tugmasi bir qatorda) — barchasi `fixed bottom-0` panelga joylashtirildi, sahifa qancha scroll qilinmasin doim ko'rinib turadi. Eski sudraladigan-chegara va o'ng-tomon-sticky yondashuvlar olib tashlandi.
 - Rasmlar kartasiga footer balandligiga mos pastki bo'shliq (`pb-64 lg:pb-56`) qo'shildi, shuning uchun footer rasm kontentini yashirmaydi.
+
+## 11. Piksel ma'lumotisiz DICOM fayllar (SR hisobot) endi xato emas
+
+- Foydalanuvchi `dcm/` papkani yangilagach, ichida bitta "begona" fayl "The dataset has no 'Pixel Data'... " xatosi bilan chiqdi. Tekshirilganda — bu **Mammography CAD SR (Structured Report)** ekan (FUJIFILM M-CAD algoritmi ishlab chiqargan matnli hisobot, Modality=SR), rasm emas — shuning uchun piksel ma'lumoti yo'q. Real DICOM eksportlarida bunday hisobot fayllar rasmlar bilan birga keladi.
+- `backend/app/routers/upload.py` (`upload_dicom_folder`) — endi har bir faylda `"PixelData" not in ds` tekshiruvi qo'shildi: agar yo'q bo'lsa, xato emas, **"skipped"** holati bilan aniq izoh ("Rasm emas — hisobot/metama'lumot fayli") qaytariladi.
+- Frontend (`Upload.jsx`) — natijalar ro'yxatida "skipped" holati endi qizil (xato) emas, kulrang rangda ko'rsatiladi.
+- Test: haqiqiy 5 faylli papka (4 rasm + 1 SR hisobot) bilan sinaldi — 4 rasm to'g'ri bitta bemorga yuklandi, SR fayli chiroyli "o'tkazib yuborildi" deb belgilandi.
+
+### 10.2. Sticky footer'ni sudrab kattalashtirish/kichraytirish + rasmlarni maksimal kattalashtirish
+
+- Foydalanuvchi so'radi: pastki sticky footer'ning tepa chegarasida sudrab (tepaga/pastga) kichraytirib-kattalashtirish mumkin bo'lsin, va 4 ta rasm ham maksimal katta ko'rinsin.
+- `ReviewDetail.jsx` — footer balandligi endi `footerHeight` state'da saqlanadi (boshlang'ich 320px, `localStorage` kaliti `reviewFooterHeight` orqali eslab qolinadi). Footer'ning tepasida `GripHorizontal` ikonkali tutqich qo'shildi — sichqoncha/barmoq bilan bosib tepaga-pastga sudralganda `mousemove`/`touchmove` orqali balandlik real vaqtda o'zgaradi (min 110px, maks ekran balandligining 85%).
+- Statik `pb-64 lg:pb-56` va `max-h-[45vh]` klasslari olib tashlanib, o'rniga `footerHeight`ga bog'liq inline `style` qo'yildi — shuning uchun rasm kartochkasining pastki bo'shlig'i va footer balandligi doim bir-biriga mos keladi.
+- Rasm elementlarining qattiq `max-h-[520px]` chegarasi olib tashlanib, `maxHeight: max(320px, calc(100vh - footerHeight - 200px))` bilan almashtirildi — footer kichraytirilganda rasmlar ekranning qolgan bo'sh joyini avtomatik to'ldirib, maksimal katta bo'lib ko'rinadi.
+- Test: `npx vite build` orqali kompilyatsiya xatosiz o'tishi tekshirildi. Brauzerda haqiqiy sichqoncha bilan sudrash vizual tasdiqlanmadi — muhitda headless brauzer vositasi (`chromium-cli`/Playwright) mavjud emas edi.
+
+### 10.3. Rasmlar hali ham kichkina va o'rtada qolib ketayotgan edi — to'liq kenglikka yoyildi
+
+- Foydalanuvchi: 4 ta rasm hamon kichkina, `max-w-7xl` markazlashtirilgan sahifa tufayli o'rtada siqilib qolgan edi; chap navbar va o'ng ekran chetidan atigi ~10px oraliq qolib, qolgan hammasi rasmlarga tegishli bo'lishi kerak edi.
+- Sabab: rasm grid konteyneri `w-fit` (kontentga moslashuvchi, cho'zilmaydigan) edi va sahifaning o'zi `max-w-7xl mx-auto` bilan 1280px'ga cheklangan, kattaroq monitorlarda ikkala tomonda katta bo'sh joy qolardi. Rasmlar balandlik bo'yicha cheklangani (`maxHeight`) uchun eni ham tabiiy nisbatga ko'ra kichik chiqardi.
+- Yechim: `ReviewDetail.jsx` — sahifaning tashqi `max-w-7xl` cheklovi rasm bo'limidan olib tashlandi (orqaga qaytish tugmasi va pastki panel ichki kontenti hali ham o'zining `max-w-7xl`sida qoladi). Rasm kartochkasiga `-mx-6 px-[10px]` qo'yildi — bu asosiy `<main>`ning `p-6` to'ldirishini bekor qilib, o'rniga atigi 10px chekka oraliq qoldiradi. Grid endi `w-full` (cho'zilib to'liq kenglikni egallaydi), rasmlar esa `w-full h-auto object-contain` bilan — balandlik emas, ENI ustuvor hisoblanadi, shuning uchun rasm ustunning butun kengligini to'ldiradi (balandlik tabiiy nisbatga ko'ra o'sadi, sahifa kerak bo'lsa pastga scroll qiladi).
+- Test: `npx vite build` xatosiz o'tdi. Vizual (brauzer) tasdiqlash muhitda headless brauzer vositasi yo'qligi sababli amalga oshirilmadi.
