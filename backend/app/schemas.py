@@ -130,6 +130,18 @@ class ImageOut(BaseModel):
         from_attributes = True
 
 
+class LogOut(BaseModel):
+    id: int
+    user_id: Optional[int]
+    action: Optional[str]
+    details: Optional[str]
+    created_at: datetime
+    user_name: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
 class DashboardStats(BaseModel):
     total_patients: int
     total_images: int

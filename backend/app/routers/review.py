@@ -251,6 +251,28 @@ def get_reviewed(skip: int = 0, limit: int = 200,
     return images
 
 
+# ─── Admin: audit-log ───
+
+@router.get("/admin/logs", response_model=list[schemas.LogOut])
+def get_audit_logs(skip: int = 0, limit: int = 100, action: str = "",
+                   db: Session = Depends(get_db),
+                   current_user: models.User = Depends(get_current_user)):
+    """Tizimdagi harakatlar tarixi (faqat admin ko'ra oladi)."""
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+
+    q = db.query(models.Log)
+    if action:
+        q = q.filter(models.Log.action == action)
+    logs = q.order_by(models.Log.created_at.desc()).offset(skip).limit(limit).all()
+
+    user_ids = {l.user_id for l in logs if l.user_id}
+    users = {u.id: u.full_name for u in db.query(models.User).filter(models.User.id.in_(user_ids)).all()} if user_ids else {}
+    for l in logs:
+        l.user_name = users.get(l.user_id)
+    return logs
+
+
 # ─── Admin: yuklangan bemorlar rasmlarini tozalash ───
 
 @router.get("/admin/uploads/stats")

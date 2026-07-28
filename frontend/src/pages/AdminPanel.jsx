@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save, ImageOff, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2, ShieldCheck, User, Mail, Lock, Edit2, X, Save, ImageOff, AlertTriangle, ScrollText, ChevronDown, ChevronUp } from 'lucide-react'
 import api from '../api/axios'
 
 const ROLE_LABELS = { admin: 'Administrator', hamshira: 'Hamshira', radiolog: 'Radiolog' }
@@ -24,11 +24,32 @@ export default function AdminPanel() {
   const [uploadStats, setUploadStats] = useState(null)
   const [clearing, setClearing]       = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [logs, setLogs]           = useState([])
+  const [logsOpen, setLogsOpen]   = useState(false)
+  const [logsLoading, setLogsLoading] = useState(false)
 
   useEffect(() => {
     if (user.role !== 'admin') navigate('/dashboard')
     else { loadUsers(); loadUploadStats() }
   }, [])
+
+  async function loadLogs() {
+    setLogsLoading(true)
+    try {
+      const { data } = await api.get('/admin/logs?limit=150')
+      setLogs(data)
+    } catch {
+      toast.error('Audit-log yuklanmadi')
+    } finally {
+      setLogsLoading(false)
+    }
+  }
+
+  function toggleLogs() {
+    const next = !logsOpen
+    setLogsOpen(next)
+    if (next && logs.length === 0) loadLogs()
+  }
 
   async function loadUsers() {
     try {
@@ -253,6 +274,50 @@ export default function AdminPanel() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Audit-log */}
+      <div className="card p-0 overflow-hidden">
+        <button onClick={toggleLogs}
+          className="w-full flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+          <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <ScrollText size={16} className="text-gray-400" /> Audit-log (tizim harakatlari)
+          </h3>
+          {logsOpen ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+        </button>
+        {logsOpen && (
+          <div className="overflow-x-auto max-h-96 overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 dark:bg-slate-900/50 sticky top-0">
+                <tr>
+                  {['Vaqt', 'Foydalanuvchi', 'Harakat', 'Tafsilot'].map(h => (
+                    <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
+                {logsLoading ? (
+                  <tr><td colSpan={4} className="text-center py-10 text-gray-400">Yuklanmoqda...</td></tr>
+                ) : logs.length === 0 ? (
+                  <tr><td colSpan={4} className="text-center py-10 text-gray-400">Yozuvlar yo'q</td></tr>
+                ) : logs.map(l => (
+                  <tr key={l.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                    <td className="px-6 py-2.5 text-xs text-gray-500 dark:text-slate-400 whitespace-nowrap">
+                      {new Date(l.created_at).toLocaleString('uz-UZ')}
+                    </td>
+                    <td className="px-6 py-2.5 text-gray-700 dark:text-slate-300">{l.user_name || '—'}</td>
+                    <td className="px-6 py-2.5">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-medium">
+                        {l.action}
+                      </span>
+                    </td>
+                    <td className="px-6 py-2.5 text-xs text-gray-500 dark:text-slate-400 truncate max-w-xs">{l.details}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Clear confirm modal */}
