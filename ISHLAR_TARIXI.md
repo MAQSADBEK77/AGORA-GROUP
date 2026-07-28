@@ -391,3 +391,23 @@ navbatda, autonom davom etilmoqda.
   har bir radiologning o'ziga xos recall rate'i (50%, 100%) va oylik trend qo'lda hisoblangan
   qiymatlar bilan mos kelishi tasdiqlandi; admin bo'lmagan foydalanuvchida 403 tekshirildi;
   so'ng barcha test yozuv/fayllar o'chirildi.
+
+## 20. Rasmlarni sinxron zoom/pan bilan solishtirish + Flicker rejimi (2026-07-29, avtonom rejimda)
+
+- Yangi komponent `frontend/src/components/CompareModal.jsx` — ikkita rasmni (masalan L va R,
+  yoki bir bemorning eski/yangi tekshiruvi — chunki bitta bemorga qayta yuklangan barcha
+  rasmlar `ReviewDetail.jsx`da allaqachon bitta oynada yig'ilib turadi) sinxron zoom/pan bilan
+  ko'rsatadi. Bitta umumiy scale/pos state ikkala rasmga BIRGA qo'llanadi — birini kattalashtirish
+  yoki surish ikkalasini ham birga harakatlantiradi (professional PACS "linked cine" kabi).
+  Ikki rejim: **Yonma-yon** (side-by-side) va **Flicker** (bitta joyga ustma-ust qo'yilib,
+  ~650ms oralig'ida avtomatik almashtiriladi — klassik radiologik "flicker" texnikasi, farqni
+  ko'rish uchun; Bo'shliq/Space bilan qo'lda ham almashtirish mumkin, Play/Pause bilan
+  avtomatik almashtirishni to'xtatish mumkin).
+- `frontend/src/pages/ReviewDetail.jsx` — "Taqqoslash" tugmasi (kamida 2 ta rasm bo'lsa
+  ko'rinadi) rejimni yoqadi; yoqilganda har bir rasm ustida checkbox chiqadi, aniq 2 tasi
+  tanlanganda "Solishtirish" tugmasi faollashadi va `CompareModal`ni ochadi.
+- Test: headless Chrome + Chrome DevTools Protocol (websockets) orqali sun'iy 2 ta rasmli
+  test-bemor bilan to'liq oqim tekshirildi (skrinshotlar orqali) — taqqoslash rejimi yoqilishi,
+  2 ta rasm tanlanishi, modal ochilishi (yonma-yon holatda ikkalasi to'g'ri ko'rinishi) va
+  Flicker rejimiga o'tish (bitta rasm, label almashinishi) barchasi to'g'ri ishlashi
+  tasdiqlandi; keyin test yozuv/fayllar o'chirildi.

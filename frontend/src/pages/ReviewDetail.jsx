@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown, GripHorizontal, Printer } from 'lucide-react'
+import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown, GripHorizontal, Printer, Columns2, CheckSquare, Square } from 'lucide-react'
 import api, { API_BASE_URL } from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
 import LesionOverlay from '../components/LesionOverlay'
 import CadMarkers from '../components/CadMarkers'
+import CompareModal from '../components/CompareModal'
 
 const LABELS = ['Normal', 'Benign', 'Malignant', 'Very Malignant']
 
@@ -128,6 +129,9 @@ export default function ReviewDetail() {
   const [submitting, setSubmitting] = useState(false)
   const [aiLoading, setAiLoading]   = useState(false)
   const [zoomImage, setZoomImage]   = useState(null)
+  const [compareMode, setCompareMode]         = useState(false)
+  const [compareSelected, setCompareSelected] = useState([])
+  const [showCompare, setShowCompare]         = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [footerHeight, setFooterHeight] = useState(() => {
     const saved = Number(localStorage.getItem(FOOTER_H_KEY))
@@ -302,6 +306,20 @@ export default function ReviewDetail() {
     return `${API_BASE_URL}/img/${img.id}`
   }
 
+  function toggleCompareMode() {
+    setCompareMode(m => !m)
+    setCompareSelected([])
+  }
+
+  function togglePanelSelected(p, e) {
+    e.stopPropagation()
+    setCompareSelected(prev => {
+      if (prev.some(x => x.id === p.id)) return prev.filter(x => x.id !== p.id)
+      if (prev.length >= 2) return [prev[1], p]
+      return [...prev, p]
+    })
+  }
+
   function getImgRefObj(imgId) {
     if (!imgRefs.current[imgId]) imgRefs.current[imgId] = { current: null }
     return imgRefs.current[imgId]
@@ -368,20 +386,49 @@ export default function ReviewDetail() {
           </div>
         )}
 
-        {image.review && !image.review.is_draft && (
-          <div className="flex items-center gap-2">
-            <button onClick={() => window.print()} className="btn-secondary text-sm flex items-center gap-1.5">
-              <Printer size={14} /> Chop etish
+        <div className="flex items-center gap-2">
+          {panels.length > 1 && (
+            <button onClick={toggleCompareMode}
+              className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition-colors ${
+                compareMode
+                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700'
+                  : 'text-gray-500 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+              }`}>
+              <Columns2 size={14} /> {compareMode ? 'Taqqoslashni bekor qilish' : 'Taqqoslash'}
             </button>
-            <button onClick={downloadPdf} disabled={pdfLoading}
-              className="btn-secondary text-sm flex items-center gap-1.5">
-              {pdfLoading
-                ? <><div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />Tayyorlanmoqda...</>
-                : <><FileDown size={14} /> Tashxis hisoboti (PDF)</>}
+          )}
+          {image.review && !image.review.is_draft && (
+            <>
+              <button onClick={() => window.print()} className="btn-secondary text-sm flex items-center gap-1.5">
+                <Printer size={14} /> Chop etish
+              </button>
+              <button onClick={downloadPdf} disabled={pdfLoading}
+                className="btn-secondary text-sm flex items-center gap-1.5">
+                {pdfLoading
+                  ? <><div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />Tayyorlanmoqda...</>
+                  : <><FileDown size={14} /> Tashxis hisoboti (PDF)</>}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Taqqoslash rejimi — tanlash paneli */}
+      {compareMode && (
+        <div className="max-w-7xl mx-auto no-print">
+          <div className="card flex items-center justify-between py-3 border border-blue-100 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-900/10">
+            <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
+              {compareSelected.length === 0 && 'Taqqoslash uchun 2 ta rasmni belgilang'}
+              {compareSelected.length === 1 && '1 ta tanlandi — yana 1 tasini belgilang'}
+              {compareSelected.length === 2 && '2 ta rasm tanlandi'}
+            </p>
+            <button onClick={() => setShowCompare(true)} disabled={compareSelected.length !== 2}
+              className="btn-primary text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+              <Columns2 size={14} /> Solishtirish
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* -mx-6 asosiy <main>ning p-6 to'ldirishini bekor qiladi, px-[10px] esa ekran/navbar
           chetidan atigi 10px oraliq qoldiradi — rasmlar iloji boricha keng joyni egallashi uchun */}
@@ -404,14 +451,22 @@ export default function ReviewDetail() {
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
               const cadShapes = cadShapesForPanel(cadSummary, p)
 
+              const isSelected = compareSelected.some(x => x.id === p.id)
+
               return (
-                <div key={p.id} className="relative group cursor-zoom-in bg-black flex items-center justify-center"
-                  onClick={() => setZoomImage(p)}>
+                <div key={p.id}
+                  className={`relative group bg-black flex items-center justify-center ${compareMode ? 'cursor-pointer' : 'cursor-zoom-in'} ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}
+                  onClick={e => compareMode ? togglePanelSelected(p, e) : setZoomImage(p)}>
                   <span className="absolute top-1.5 left-1.5 z-10 text-[10px] font-bold bg-black/70 text-white px-1.5 py-0.5 rounded">
                     {panelLabel(p)}
                   </span>
-                  {p.status === 'reviewed' && (
+                  {p.status === 'reviewed' && !compareMode && (
                     <CheckCircle size={14} className="absolute top-1.5 right-1.5 z-10 text-green-400" />
+                  )}
+                  {compareMode && (
+                    <span className="absolute top-1.5 right-1.5 z-10 text-blue-400">
+                      {isSelected ? <CheckSquare size={18} /> : <Square size={18} className="text-white/70" />}
+                    </span>
                   )}
                   <img
                     ref={setImgRef(p.id)}
@@ -709,6 +764,14 @@ export default function ReviewDetail() {
           alt={panelLabel(zoomImage)}
           onClose={() => setZoomImage(null)}
           pixelSpacing={zoomImage.pixel_spacing}
+        />
+      )}
+
+      {showCompare && compareSelected.length === 2 && (
+        <CompareModal
+          images={compareSelected.map(p => getImageUrl(p))}
+          labels={compareSelected.map(p => panelLabel(p))}
+          onClose={() => setShowCompare(false)}
         />
       )}
     </div>
