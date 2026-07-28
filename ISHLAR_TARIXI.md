@@ -122,3 +122,9 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 
 - Yig'ilgan (`w-16`) holatdagi asosiy navigatsiyada matnlar qisman ko'rinib (kesilib) xунук turgan edi — endi `opacity-0 group-hover:opacity-100` orqali to'liq yashiringan, faqat sichqoncha kelganda tekis chiqadi.
 - `ReviewDetail.jsx`: rasm kartochkasi va AI/Doktor panel orasiga sudrab kattalashtirish/kichraytirish uchun chegara (divider) qo'shildi — foydalanuvchi xohlagancha rasm tomonini kengaytirib, panelni torайтиши (yoki aksincha) mumkin. Tanlangan nisbat `localStorage`da saqlanadi, keyingi safar ham eslab qoladi. Faqat katta ekranlarda (`lg:`) ishlaydi, mobil/tor ekranda ustma-ust (stacked) qolaveradi.
+
+### 10.1. Qayta ko'rib chiqish: yon panel emas, pastki sticky footer
+
+- Foydalanuvchi aniqlashtirdi: sudraladigan yon panel emas, balki AI Tahlil + Doktor Xulosasi **pastki "sticky footer"** kabi bo'lishi kerak edi.
+- Yakuniy yechim: rasmlar to'liq kenglikda oddiy sahifa oqimida; AI Tahlil (qisqartirilgan — faqat label+ishonch) va Doktor Xulosasi (diagnoz tugmalari bir qatorda + izoh + tasdiqlash tugmasi bir qatorda) — barchasi `fixed bottom-0` panelga joylashtirildi, sahifa qancha scroll qilinmasin doim ko'rinib turadi. Eski sudraladigan-chegara va o'ng-tomon-sticky yondashuvlar olib tashlandi.
+- Rasmlar kartasiga footer balandligiga mos pastki bo'shliq (`pb-64 lg:pb-56`) qo'shildi, shuning uchun footer rasm kontentini yashirmaydi.
