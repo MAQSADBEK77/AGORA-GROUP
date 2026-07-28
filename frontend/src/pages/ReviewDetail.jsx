@@ -59,51 +59,9 @@ export default function ReviewDetail() {
   const [aiLoading, setAiLoading]   = useState(false)
   const [zoomImage, setZoomImage]   = useState(null)
   const [pdfLoading, setPdfLoading] = useState(false)
-  const [splitPct, setSplitPct]     = useState(() => {
-    const saved = Number(localStorage.getItem('reviewSplitPct'))
-    return saved >= 30 && saved <= 80 ? saved : 65
-  })
-  const [resizing, setResizing]     = useState(false)
-  const [isDesktop, setIsDesktop]   = useState(() => window.innerWidth >= 1024)
   const imgRefs = useRef({})
-  const splitContainerRef = useRef(null)
-  const splitPctRef = useRef(splitPct)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const canReview = ['radiolog', 'admin'].includes(user.role)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)')
-    const onChange = () => setIsDesktop(mq.matches)
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
-  }, [])
-
-  const onDividerMouseDown = useCallback((e) => {
-    e.preventDefault()
-    setResizing(true)
-  }, [])
-
-  useEffect(() => {
-    if (!resizing) return
-    function onMove(e) {
-      const rect = splitContainerRef.current?.getBoundingClientRect()
-      if (!rect) return
-      let pct = ((e.clientX - rect.left) / rect.width) * 100
-      pct = Math.min(80, Math.max(30, pct))
-      splitPctRef.current = pct
-      setSplitPct(pct)
-    }
-    function onUp() {
-      setResizing(false)
-      localStorage.setItem('reviewSplitPct', String(splitPctRef.current))
-    }
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup', onUp)
-    }
-  }, [resizing])
 
   useEffect(() => {
     api.get(`/images/${id}`)
@@ -229,12 +187,10 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div ref={splitContainerRef} className="flex flex-col lg:flex-row lg:items-start gap-6"
-        style={resizing ? { cursor: 'col-resize', userSelect: 'none' } : undefined}>
+      <div className="pb-64 lg:pb-56">
 
-        {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada */}
-        <div className="card w-full"
-          style={isDesktop ? { width: `calc(${splitPct}% - 12px)`, flexShrink: 0 } : undefined}>
+        {/* Rasmlar — bitta bemorning barcha ko'rinishlari (R/L, CC/MLO) bitta oynada, to'liq kenglikda */}
+        <div className="card">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-800 dark:text-white">
               Mammografiya Rasmlari {panels.length > 1 && <span className="text-gray-400 font-normal text-sm">({panels.length} ta ko'rinish)</span>}
@@ -288,22 +244,18 @@ export default function ReviewDetail() {
             </p>
           </div>
         </div>
+      </div>
 
-        {/* Kattalashtirish/kichraytirish uchun sudralib ko'chiriladigan chegara */}
-        {isDesktop && (
-          <div onMouseDown={onDividerMouseDown}
-            className="hidden lg:flex items-center justify-center w-4 -mx-2 flex-shrink-0 cursor-col-resize group/divider z-10">
-            <div className={`w-1 h-20 rounded-full transition-colors ${
-              resizing ? 'bg-blue-500' : 'bg-gray-300 dark:bg-slate-600 group-hover/divider:bg-blue-400'}`} />
-          </div>
-        )}
+      {/* AI Tahlil + Doktor Xulosasi — pastda doim ko'rinib turadigan (sticky footer) panel */}
+      <div className="fixed bottom-0 left-0 right-0 lg:left-16 z-30 bg-white dark:bg-slate-800
+                      border-t border-gray-200 dark:border-slate-700 shadow-[0_-8px_30px_rgba(0,0,0,0.15)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 max-h-[45vh] overflow-y-auto">
 
-        <div className="space-y-4 flex-1 min-w-0 lg:sticky lg:top-6 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
           {/* AI tahlil */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                <Brain size={18} className="text-purple-500" /> AI Tahlil
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm">
+                <Brain size={16} className="text-purple-500" /> AI Tahlil
               </h3>
               {!aiPred && (
                 <span className="text-xs text-gray-400 italic">AI tahlil hozircha o'chirilgan</span>
@@ -365,74 +317,62 @@ export default function ReviewDetail() {
 
           {/* Radiolog forma */}
           {canReview ? (
-            <div className="card">
-              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <User size={18} /> Doktor Xulosasi
-              </h3>
-              {panels.length > 1 && (
-                <p className="text-xs text-blue-600 bg-blue-50 rounded p-2 mb-3">
-                  Diagnoz shu bemorning barcha {panels.length} ta ko'rinishiga birgalikda saqlanadi.
-                </p>
-              )}
-              <form onSubmit={submitReview} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Diagnoz *
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {LABELS.map(lbl => {
-                      const s = LABEL_STYLE[lbl]
-                      const Icon = s.icon
-                      const selected = form.label === lbl
-                      return (
-                        <button key={lbl} type="button"
-                          onClick={() => setForm(f => ({ ...f, label: lbl }))}
-                          className={`flex items-center gap-2 p-3 rounded-lg border-2 text-sm font-medium transition-all ${
-                            selected
-                              ? `${s.bg} border-current ${s.color}`
-                              : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                          }`}>
-                          <Icon size={16} className={selected ? s.color : 'text-gray-400'} />
-                          {lbl}
-                        </button>
-                      )
-                    })}
-                  </div>
+            <div className="border-t border-gray-100 dark:border-slate-700 pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm">
+                  <User size={16} /> Doktor Xulosasi
+                </h3>
+                {panels.length > 1 && (
+                  <p className="text-[11px] text-blue-600 dark:text-blue-400">
+                    Diagnoz barcha {panels.length} ta ko'rinishga birgalikda saqlanadi
+                  </p>
+                )}
+              </div>
+              <form onSubmit={submitReview} className="flex flex-col lg:flex-row lg:items-start gap-3">
+                <div className="flex flex-wrap gap-1.5 flex-shrink-0">
+                  {LABELS.map(lbl => {
+                    const s = LABEL_STYLE[lbl]
+                    const Icon = s.icon
+                    const selected = form.label === lbl
+                    return (
+                      <button key={lbl} type="button"
+                        onClick={() => setForm(f => ({ ...f, label: lbl }))}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border-2 text-xs font-medium whitespace-nowrap transition-all ${
+                          selected
+                            ? `${s.bg} border-current ${s.color}`
+                            : 'border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:border-gray-300'
+                        }`}>
+                        <Icon size={14} className={selected ? s.color : 'text-gray-400'} />
+                        {lbl}
+                      </button>
+                    )
+                  })}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Izoh / Tavsif
-                  </label>
-                  <textarea className="input resize-y min-h-[4.5rem]" rows={3}
-                    placeholder="Diagnoz haqida batafsil izoh..."
-                    value={form.description}
-                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  />
-                </div>
+                <textarea className="input resize-y min-h-[2.5rem] flex-1 text-sm" rows={1}
+                  placeholder="Izoh / Tavsif..."
+                  value={form.description}
+                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                />
 
                 <button type="submit" disabled={submitting || !form.label}
-                  className="btn-primary w-full py-2.5">
+                  className="btn-primary px-6 py-2 flex-shrink-0 whitespace-nowrap">
                   {submitting ? 'Saqlanmoqda...' : image.review ? 'Yangilash' : 'Tasdiqlash'}
                 </button>
-
-                <p className="text-xs text-gray-400 text-center">
-                  Saqlash bilan AI bu rasm(lar)ni trening ma'lumot sifatida oladi
-                </p>
               </form>
             </div>
           ) : (
             image.review && (
-              <div className="card">
-                <h3 className="font-semibold text-gray-800 mb-3">Doktor Xulosasi</h3>
+              <div className="border-t border-gray-100 dark:border-slate-700 pt-3">
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2 text-sm">Doktor Xulosasi</h3>
                 {(() => {
                   const s = LABEL_STYLE[image.review.label] || LABEL_STYLE['Normal']
                   const Icon = s.icon
                   return (
-                    <div className={`flex items-center gap-3 p-4 rounded-lg border ${s.bg} mb-3`}>
-                      <Icon size={24} className={s.color} />
+                    <div className={`flex items-center gap-3 p-3 rounded-lg border ${s.bg} mb-2`}>
+                      <Icon size={20} className={s.color} />
                       <div>
-                        <p className={`text-lg font-bold ${s.color}`}>{image.review.label}</p>
+                        <p className={`font-bold ${s.color}`}>{image.review.label}</p>
                         <p className="text-xs text-gray-500">
                           {new Date(image.review.reviewed_at).toLocaleString('uz-UZ')}
                         </p>
