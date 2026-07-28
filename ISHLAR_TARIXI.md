@@ -438,3 +438,20 @@ xavfsiz/tezkor qismi (1-20) to'liq yakunlandi.
   (2) imzo o'chirilgandan keyin matnli "TASDIQLANDI" muhriga to'g'ri qaytishi. AdminPanel
   va ProfileModal UI qismlari ham skrinshot orqali tekshirildi. So'ng barcha test
   yozuv/fayl/logotip/imzo o'chirildi.
+
+## 22. Boshlang'ich 20 banddan keyin — qolgan backlog davom ettirilmoqda (2026-07-29)
+
+Foydalanuvchining asl 29 bandlik ro'yxatidan xavfsiz/tezkor 20 tasi tugadi. Qolganlaridan
+ba'zilari (i18n infratuzilmasi, PostgreSQL'ga o'tish + avtomatik zaxira) katta arxitektura
+o'zgarishi va/yoki jonli infratuzilmaga (haqiqiy Postgres server) muhtoj bo'lgani uchun hali
+ham ATAYLAB kechiktirilmoqda — ularni shoshilinch, tekshirib bo'lmaydigan holatda qilish
+xavfli. Qolganlarini xavfsizlik darajasiga qarab davom ettirilmoqda:
+
+- **Ovozli diktovka (tavsif maydoni uchun)** — `ReviewDetail.jsx`dagi Izoh/Tavsif
+  maydoni ichiga brauzerning o'zidagi `SpeechRecognition`/`webkitSpeechRecognition`
+  API'siga asoslangan mikrofon tugmasi qo'shildi (`uz-UZ` tili bilan). Backend o'zgarishi
+  YO'Q — butunlay frontend-only, shuning uchun xavfsiz. Qo'llab-quvvatlanmasa yoki
+  mikrofonga ruxsat berilmasa (`onerror`), tugma xatosiz oddiy holatiga qaytadi — hech
+  qanday funksiyani buzmaydi. Test: headless Chrome'da tugma bosilganda ilova
+  qulamasligi va mikrofon ruxsati yo'qligida to'g'ri holatga qaytishi tekshirildi
+  (haqiqiy ovoz-matn konversiyasi haqiqiy brauzer+mikrofon bilan sinovdan o'tkazilishi kerak).

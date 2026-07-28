@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown, GripHorizontal, Printer, Columns2, CheckSquare, Square } from 'lucide-react'
+import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, User, ImageOff, Maximize2, FileDown, GripHorizontal, Printer, Columns2, CheckSquare, Square, Mic, MicOff } from 'lucide-react'
 import api, { API_BASE_URL } from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
 import LesionOverlay from '../components/LesionOverlay'
@@ -132,6 +132,8 @@ export default function ReviewDetail() {
   const [compareMode, setCompareMode]         = useState(false)
   const [compareSelected, setCompareSelected] = useState([])
   const [showCompare, setShowCompare]         = useState(false)
+  const [listening, setListening]             = useState(false)
+  const recognitionRef = useRef(null)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [footerHeight, setFooterHeight] = useState(() => {
     const saved = Number(localStorage.getItem(FOOTER_H_KEY))
@@ -309,6 +311,40 @@ export default function ReviewDetail() {
   function toggleCompareMode() {
     setCompareMode(m => !m)
     setCompareSelected([])
+  }
+
+  useEffect(() => {
+    return () => recognitionRef.current?.stop()
+  }, [])
+
+  function toggleDictation() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      toast.error("Brauzeringiz ovozli diktovkani qo'llab-quvvatlamaydi")
+      return
+    }
+    if (listening) {
+      recognitionRef.current?.stop()
+      return
+    }
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'uz-UZ'
+    recognition.continuous = true
+    recognition.interimResults = false
+    recognition.onresult = e => {
+      let finalText = ''
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) finalText += e.results[i][0].transcript
+      }
+      if (finalText.trim()) {
+        setForm(f => ({ ...f, description: f.description ? `${f.description} ${finalText.trim()}` : finalText.trim() }))
+      }
+    }
+    recognition.onerror = () => setListening(false)
+    recognition.onend = () => setListening(false)
+    recognitionRef.current = recognition
+    recognition.start()
+    setListening(true)
   }
 
   function togglePanelSelected(p, e) {
@@ -690,11 +726,20 @@ export default function ReviewDetail() {
                 </select>
 
                 <div className="flex-1 flex flex-col gap-1 min-w-[200px]">
-                  <textarea className="input resize-y min-h-[2.5rem] text-sm" rows={1}
-                    placeholder="Izoh / Tavsif..."
-                    value={form.description}
-                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  />
+                  <div className="relative">
+                    <textarea className="input resize-y min-h-[2.5rem] text-sm pr-9" rows={1}
+                      placeholder="Izoh / Tavsif..."
+                      value={form.description}
+                      onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                    />
+                    <button type="button" onClick={toggleDictation}
+                      title={listening ? "Diktovkani to'xtatish" : "Ovozli diktovka"}
+                      className={`absolute right-1.5 top-1.5 p-1.5 rounded-lg transition-colors ${
+                        listening ? 'bg-red-500 text-white animate-pulse' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-600'
+                      }`}>
+                      {listening ? <MicOff size={14} /> : <Mic size={14} />}
+                    </button>
+                  </div>
                   <select value="" onChange={e => {
                       if (!e.target.value) return
                       setForm(f => ({ ...f, description: f.description ? `${f.description} ${e.target.value}` : e.target.value }))
