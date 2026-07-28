@@ -171,6 +171,22 @@ class PersonalStatsOut(BaseModel):
     daily_counts: List[dict]
 
 
+class DoctorStatsOut(BaseModel):
+    doctor_id: int
+    doctor_name: str
+    total_reviewed: int
+    recall_rate: float  # Normal bo'lmagan tashxislar foizi
+    avg_per_day: float
+
+
+class QAStatsOut(BaseModel):
+    total_reviewed: int
+    overall_recall_rate: float
+    label_counts: dict
+    per_doctor: List[DoctorStatsOut]
+    monthly_trend: List[dict]  # [{"month": "2026-01", "count": N}, ...]
+
+
 class DashboardStats(BaseModel):
     total_patients: int
     total_images: int

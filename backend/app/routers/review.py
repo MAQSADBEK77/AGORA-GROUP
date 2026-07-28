@@ -339,6 +339,76 @@ def personal_stats(db: Session = Depends(get_db),
     )
 
 
+# ─── QA/statistik dashboard (admin — barcha radiologlar bo'yicha) ───
+
+@router.get("/stats/qa", response_model=schemas.QAStatsOut)
+def qa_stats(months: int = 6,
+            db: Session = Depends(get_db),
+            current_user: models.User = Depends(get_current_user)):
+    if current_user.role != models.UserRole.admin:
+        raise HTTPException(status_code=403, detail="Faqat admin")
+
+    reviews = (db.query(models.DoctorReview)
+               .filter(models.DoctorReview.is_draft == False)
+               .order_by(models.DoctorReview.reviewed_at.asc())
+               .all())
+
+    total = len(reviews)
+    label_counts = {}
+    non_normal = 0
+    by_doctor = {}  # doctor_id -> {"reviews": [...], "first": dt}
+    monthly = {}
+
+    for r in reviews:
+        label_counts[r.label.value] = label_counts.get(r.label.value, 0) + 1
+        if r.label != models.ReviewLabel.normal:
+            non_normal += 1
+
+        d = by_doctor.setdefault(r.doctor_id, [])
+        d.append(r)
+
+        if r.reviewed_at:
+            key = r.reviewed_at.strftime("%Y-%m")
+            monthly[key] = monthly.get(key, 0) + 1
+
+    overall_recall_rate = round(non_normal / total * 100, 1) if total else 0.0
+
+    doctors = {u.id: u.full_name for u in db.query(models.User).all()}
+    per_doctor = []
+    for doc_id, doc_reviews in by_doctor.items():
+        doc_total = len(doc_reviews)
+        doc_non_normal = sum(1 for r in doc_reviews if r.label != models.ReviewLabel.normal)
+        first = min(r.reviewed_at for r in doc_reviews if r.reviewed_at)
+        days_active = max((datetime.utcnow() - first).days, 1)
+        per_doctor.append(schemas.DoctorStatsOut(
+            doctor_id=doc_id,
+            doctor_name=doctors.get(doc_id, f"#{doc_id}"),
+            total_reviewed=doc_total,
+            recall_rate=round(doc_non_normal / doc_total * 100, 1) if doc_total else 0.0,
+            avg_per_day=round(doc_total / days_active, 2),
+        ))
+    per_doctor.sort(key=lambda d: d.total_reviewed, reverse=True)
+
+    # So'nggi N oylik trend — bo'sh oylar ham 0 bilan
+    now = datetime.utcnow()
+    monthly_trend = []
+    for i in range(months - 1, -1, -1):
+        y, m = now.year, now.month - i
+        while m <= 0:
+            m += 12
+            y -= 1
+        key = f"{y:04d}-{m:02d}"
+        monthly_trend.append({"month": key, "count": monthly.get(key, 0)})
+
+    return schemas.QAStatsOut(
+        total_reviewed=total,
+        overall_recall_rate=overall_recall_rate,
+        label_counts=label_counts,
+        per_doctor=per_doctor,
+        monthly_trend=monthly_trend,
+    )
+
+
 # ─── Barcha reviewed rasmlar ───
 
 @router.get("/reviewed", response_model=list[schemas.ImageOut])

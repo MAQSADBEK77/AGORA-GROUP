@@ -371,3 +371,23 @@ navbatda, autonom davom etilmoqda.
 - Test: sun'iy kichik (64x64) DICOM yuklanganda `quality_warnings` ustunga saqlanishi va
   `/api/notifications` javobida `urgent: true, reason: "Sifat ogohlantirishi"` sifatida
   to'g'ri qaytishi tasdiqlandi — keyin test yozuv/fayllar o'chirildi.
+
+## 19. QA / statistik dashboard — barcha radiologlar bo'yicha (2026-07-29, avtonom rejimda)
+
+- `GET /api/stats/qa?months=N` (`backend/app/routers/review.py`) — FAQAT ADMIN (15-bo'limdagi
+  shaxsiy statistikadan farqi: bu yerda BARCHA radiologlar bo'yicha yig'ma ko'rsatkich).
+  Qaytaradi: jami yakunlangan tashxis soni, umumiy "recall rate" (Normal bo'lmagan tashxislar
+  foizi — skrining sifatini kuzatishning standart ko'rsatkichi), diagnoz taqsimoti, har bir
+  radiolog bo'yicha jadval (jami soni, o'ziga xos recall rate, kunlik o'rtacha), va so'nggi N
+  oylik trend (bo'sh oylar ham 0 bilan — standart 6 oy).
+- Yangi schemalar: `schemas.DoctorStatsOut`, `schemas.QAStatsOut`.
+- Yangi sahifa `frontend/src/pages/QADashboard.jsx` — faqat admin sidebar'da ko'radi (`/qa`):
+  3 ta statistik karta (jami, recall rate, faol radiologlar soni), radiologlar bo'yicha
+  ustunli diagramma, oylik trend chiziqli grafigi, va batafsil jadval.
+  Bu 15-bo'limdagi "Statistikam" (shaxsiy, har bir radiolog o'zinikini ko'radi) bilan
+  BIRGA ishlaydi, bir-birini almashtirmaydi — ikkalasi ham zarur, turli auditoriya uchun.
+- Test: uchta alohida test-bemor yaratilib, ikkita radiolog (radiolog + admin) har xil
+  diagnoz bilan tekshirdi (Normal, Malignant, Benign) — javobdagi umumiy recall rate (66.7%),
+  har bir radiologning o'ziga xos recall rate'i (50%, 100%) va oylik trend qo'lda hisoblangan
+  qiymatlar bilan mos kelishi tasdiqlandi; admin bo'lmagan foydalanuvchida 403 tekshirildi;
+  so'ng barcha test yozuv/fayllar o'chirildi.

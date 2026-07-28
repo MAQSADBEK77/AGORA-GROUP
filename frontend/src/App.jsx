@@ -7,6 +7,7 @@ import ReviewQueue from './pages/ReviewQueue'
 import ReviewDetail from './pages/ReviewDetail'
 import PatientHistory from './pages/PatientHistory'
 import PersonalStats from './pages/PersonalStats'
+import QADashboard from './pages/QADashboard'
 import AdminPanel from './pages/AdminPanel'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="review/:id"      element={<ReviewDetail />} />
           <Route path="history"         element={<PatientHistory />} />
           <Route path="stats"           element={<PersonalStats />} />
+          <Route path="qa"              element={<QADashboard />} />
           <Route path="admin"           element={<AdminPanel />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

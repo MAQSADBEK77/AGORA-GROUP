@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Upload, ClipboardList, History, ShieldCheck, Activity, BarChart2 } from 'lucide-react'
+import { LayoutDashboard, Upload, ClipboardList, History, ShieldCheck, Activity, BarChart2, LineChart } from 'lucide-react'
 
 const links = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard',        roles: ['admin','hamshira','radiolog'] },
@@ -7,6 +7,7 @@ const links = [
   { to: '/review',    icon: ClipboardList,   label: 'Ko\'rib Chiqish',  roles: ['admin','radiolog'] },
   { to: '/stats',     icon: BarChart2,       label: 'Statistikam',      roles: ['admin','radiolog'] },
   { to: '/history',   icon: History,         label: 'Bemor Tarixi',     roles: ['admin','hamshira','radiolog'] },
+  { to: '/qa',        icon: LineChart,       label: 'QA Dashboard',     roles: ['admin'] },
   { to: '/admin',     icon: ShieldCheck,     label: 'Admin Panel',      roles: ['admin'] },
 ]
 
