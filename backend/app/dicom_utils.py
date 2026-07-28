@@ -47,6 +47,8 @@ def extract_patient_info(ds) -> dict:
     if len(dob) == 8 and dob.isdigit():
         birth_year = int(dob[:4])
 
+    orientation = getattr(ds, "PatientOrientation", None)
+
     return {
         "patient_id": patient_id,
         "full_name": full_name,
@@ -54,7 +56,19 @@ def extract_patient_info(ds) -> dict:
         "sex": getattr(ds, "PatientSex", None),
         "laterality": getattr(ds, "ImageLaterality", None),
         "view_position": getattr(ds, "ViewPosition", None),
+        # CC/MLO ko'pincha ViewPosition orqali bo'sh keladi, lekin PatientOrientation
+        # (Row\Col) deyarli har doim bor va CAD SR hisobotidagi rasm bilan aniq
+        # moslashtirish (view_key) uchun ishonchli belgi bo'lib xizmat qiladi
+        "orientation": "\\".join(str(x) for x in orientation) if orientation else None,
     }
+
+
+def view_key(laterality, orientation) -> str | None:
+    """Laterality + PatientOrientation'dan bitta ko'rinishni (masalan L-CC yoki
+    L-MLO) boshqa joylarda ham bir xil aniqlash uchun kalit yasaydi."""
+    if not laterality or not orientation:
+        return None
+    return f"{laterality}|{orientation}"
 
 
 # Mammography CAD SR Storage — DICOM standartidagi doimiy SOP Class UID
@@ -82,9 +96,10 @@ def _scoord_points(item) -> list:
 def parse_cad_sr(ds) -> dict | None:
     """Mammography CAD SR hisobotidan (masalan FUJIFILM M-CAD) topilmalarni to'liq
     o'qiydi: har bir kaltsifikatsiya to'plami, undagi HAR BIR alohida kaltsifikatsiyaning
-    markazi va aniq konturi (outline), tomon (chap/o'ng) bo'yicha guruhlangan holda.
-    DICOM SR ichidagi "by-reference" bog'lanishlar (Referenced Content Item Identifier)
-    orqali har bir topilma qaysi rasmga (demak — qaysi tomonga) tegishli ekani aniqlanadi."""
+    markazi va aniq konturi (outline). Har bir topilma ANIQ qaysi ko'rinishga (masalan
+    L-CC yoki L-MLO — laterality+PatientOrientation orqali) tegishli ekani DICOM SR
+    ichidagi "by-reference" bog'lanishlar (Referenced Content Item Identifier) orqali
+    aniqlanadi — shu sababli MLO'dagi topilma CC'ga (yoki aksincha) aralashmaydi."""
     path_to_item: dict[tuple, object] = {}
 
     def index(item, path=()):
@@ -94,26 +109,32 @@ def parse_cad_sr(ds) -> dict | None:
 
     index(ds)
 
-    # Rasmlar ro'yxati: tree-path -> laterality
-    image_laterality = {}
+    # Rasmlar ro'yxati: tree-path -> (laterality, view_key)
+    image_view = {}
     for path, item in path_to_item.items():
         if item.get("ValueType") == "IMAGE":
-            lat = None
+            lat = row = col = None
             for c in item.get("ContentSequence", []):
-                if _code_meaning(c.get("ConceptNameCodeSequence", [])) == "Image Laterality":
+                name = _code_meaning(c.get("ConceptNameCodeSequence", []))
+                if name == "Image Laterality":
                     raw = _code_meaning(c.get("ConceptCodeSequence", [])) or ""
                     lat = "L" if "Left" in raw else ("R" if "Right" in raw else None)
-            image_laterality[path] = lat
+                elif name == "Patient Orientation Row":
+                    row = c.get("TextValue")
+                elif name == "Patient Orientation Col":
+                    col = c.get("TextValue")
+            orientation = "\\".join(x for x in (row, col) if x) or None
+            image_view[path] = (lat, view_key(lat, orientation))
 
-    def find_side(sub_item):
+    def find_view(sub_item):
         for c in sub_item.get("ContentSequence", []):
             if "ReferencedContentItemIdentifier" in c:
                 ref_path = tuple(int(x) for x in c.ReferencedContentItemIdentifier)[1:]
-                return image_laterality.get(ref_path)
-            r = find_side(c)
-            if r:
+                return image_view.get(ref_path, (None, None))
+            r = find_view(c)
+            if r != (None, None):
                 return r
-        return None
+        return (None, None)
 
     def parse_calcification(item) -> dict:
         calc = {"center": None, "outline": []}
@@ -129,6 +150,7 @@ def parse_cad_sr(ds) -> dict | None:
         return calc
 
     by_side = {"L": {"clusters": []}, "R": {"clusters": []}}
+    by_view = {}
     found_any = False
 
     for path, item in path_to_item.items():
@@ -137,7 +159,7 @@ def parse_cad_sr(ds) -> dict | None:
         if _code_meaning(item.get("ConceptCodeSequence", [])) != "Calcification Cluster":
             continue
 
-        side = find_side(item)
+        side, vkey = find_view(item)
         if not side:
             continue
         found_any = True
@@ -156,7 +178,10 @@ def parse_cad_sr(ds) -> dict | None:
                     cluster["center"] = pts[0]
             elif _code_meaning(c.get("ConceptCodeSequence", [])) == "Individual Calcification":
                 cluster["calcifications"].append(parse_calcification(c))
+
         by_side[side]["clusters"].append(cluster)
+        if vkey:
+            by_view.setdefault(vkey, {"clusters": []})["clusters"].append(cluster)
 
     if not found_any:
         return None
@@ -195,4 +220,5 @@ def parse_cad_sr(ds) -> dict | None:
         "detections_performed": detections_performed,
         "analyses_attempted": analyses_attempted,
         "by_side": by_side,
+        "by_view": by_view,
     }

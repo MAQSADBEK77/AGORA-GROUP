@@ -59,9 +59,22 @@ function findCadSummary(panels) {
   return null
 }
 
-// Har bir alohida kaltsifikatsiyaning aniq konturi (bo'lsa) yoki markazi — rasm ustida chizish uchun
-function cadShapesForSide(cadSummary, side) {
-  const clusters = cadSummary?.by_side?.[side]?.clusters || []
+// Laterality + PatientOrientation — backend'dagi view_key() bilan bir xil format
+// (masalan "L|A\R"). ViewPosition (CC/MLO) DICOM'da ko'pincha bo'sh keladi, lekin
+// PatientOrientation deyarli har doim bor va aniq ko'rinishni ajratib beradi.
+function panelViewKey(p) {
+  return p.laterality && p.patient_orientation ? `${p.laterality}|${p.patient_orientation}` : null
+}
+
+// Har bir alohida kaltsifikatsiyaning aniq konturi (bo'lsa) yoki markazi — rasm
+// ustida chizish uchun. Avval ANIQ ko'rinish (by_view) bo'yicha moslashtiramiz —
+// shunda MLO'dagi topilma CC'ga aralashib qolmaydi; agar orientatsiya ma'lumoti
+// yo'q bo'lsa (eski yozuvlar), tomon bo'yicha (by_side) taxminiy ko'rsatamiz.
+function cadShapesForPanel(cadSummary, p) {
+  const vkey = panelViewKey(p)
+  const clusters = (vkey && cadSummary?.by_view?.[vkey]?.clusters)
+    || cadSummary?.by_side?.[p.laterality]?.clusters
+    || []
   const shapes = []
   for (const cluster of clusters) {
     for (const calc of cluster.calcifications || []) {
@@ -287,7 +300,7 @@ export default function ReviewDetail() {
                     width: p.ai_prediction.lesion_width, height: p.ai_prediction.lesion_height }
                 : null
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
-              const cadShapes = cadShapesForSide(cadSummary, p.laterality)
+              const cadShapes = cadShapesForPanel(cadSummary, p)
 
               return (
                 <div key={p.id} className="relative group cursor-zoom-in bg-black flex items-center justify-center"
@@ -456,7 +469,7 @@ export default function ReviewDetail() {
 
               <p className="text-[11px] text-gray-400 mt-2">
                 Topilgan har bir kaltsifikatsiyaning aniq konturi rasmda <span className="text-orange-500 font-medium">to'q sariq chiziq</span> bilan
-                belgilangan (tegishli tomon ko'rinishlarida — aniq CC/MLO farqi DICOM'da yo'q bo'lgani uchun ikkalasida ham).
+                belgilangan — aynan shu ko'rinishga (CC yoki MLO) tegishli topilmalar, DICOM'dagi PatientOrientation orqali aniq ajratilgan.
                 Bu — mammografiya apparatining o'z tahlili, bizning AI natijasidan mustaqil. Yakuniy tashxis radiolog tomonidan tasdiqlanadi.
               </p>
             </div>

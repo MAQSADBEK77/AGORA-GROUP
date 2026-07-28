@@ -66,8 +66,9 @@ class MammographyImage(Base):
     filename    = Column(String(255), nullable=False)
     file_path   = Column(String(500), nullable=False)
     file_format = Column(String(20))
-    laterality    = Column(String(4), nullable=True)   # DICOM ImageLaterality: R / L
-    view_position = Column(String(16), nullable=True)  # DICOM ViewPosition: CC / MLO / ...
+    laterality          = Column(String(4), nullable=True)   # DICOM ImageLaterality: R / L
+    view_position       = Column(String(16), nullable=True)  # DICOM ViewPosition: CC / MLO / ...
+    patient_orientation = Column(String(16), nullable=True)  # DICOM PatientOrientation: "A\R" kabi — ViewPosition bo'sh bo'lganda CC/MLO'ni aniq ajratish uchun
     cad_summary   = Column(Text, nullable=True)         # Apparat CAD hisoboti (SR) — JSON, mavjud bo'lsa
     status      = Column(Enum(ImageStatus, values_callable=_by_value), default=ImageStatus.pending, nullable=False)
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
