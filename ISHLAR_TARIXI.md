@@ -185,3 +185,60 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Sabab: rasm grid konteyneri `w-fit` (kontentga moslashuvchi, cho'zilmaydigan) edi va sahifaning o'zi `max-w-7xl mx-auto` bilan 1280px'ga cheklangan, kattaroq monitorlarda ikkala tomonda katta bo'sh joy qolardi. Rasmlar balandlik bo'yicha cheklangani (`maxHeight`) uchun eni ham tabiiy nisbatga ko'ra kichik chiqardi.
 - Yechim: `ReviewDetail.jsx` — sahifaning tashqi `max-w-7xl` cheklovi rasm bo'limidan olib tashlandi (orqaga qaytish tugmasi va pastki panel ichki kontenti hali ham o'zining `max-w-7xl`sida qoladi). Rasm kartochkasiga `-mx-6 px-[10px]` qo'yildi — bu asosiy `<main>`ning `p-6` to'ldirishini bekor qilib, o'rniga atigi 10px chekka oraliq qoldiradi. Grid endi `w-full` (cho'zilib to'liq kenglikni egallaydi), rasmlar esa `w-full h-auto object-contain` bilan — balandlik emas, ENI ustuvor hisoblanadi, shuning uchun rasm ustunning butun kengligini to'ldiradi (balandlik tabiiy nisbatga ko'ra o'sadi, sahifa kerak bo'lsa pastga scroll qiladi).
 - Test: `npx vite build` xatosiz o'tdi. Vizual (brauzer) tasdiqlash muhitda headless brauzer vositasi yo'qligi sababli amalga oshirilmadi.
+
+## 13. Backlog / Roadmap — foydalanuvchi taklif qilgan keyingi ishlar (2026-07-28, hali BOSHLANMAGAN)
+
+Foydalanuvchi 30+ ta funksiya taklif qildi. Ko'lami juda katta (ba'zilari soatlab, ba'zilari
+(Postgres o'tish, ikkinchi radiolog tasdig'i kabi) kunlab/arxitektura darajasidagi ish talab
+qiladi), shuning uchun hammasini bittada tekshirmasdan qilish o'rniga — ro'yxat shu yerda
+saqlanadi, ustuvorlik foydalanuvchi bilan kelishilgach navbat bilan bajariladi.
+
+**Klinik ish jarayoni**
+1. BI-RADS standart tasnifi (0-6) — hozirgi Normal/Benign/Malignant o'rniga.
+2. Oldingi tekshiruv bilan taqqoslash (prior study comparison).
+3. Navbatni bemor bo'yicha guruhlash (ReviewQueue.jsx) — 4 rasm 4 qator emas, 1 karta.
+4. Ikkinchi radiolog tasdig'i (double-reading + arbitration).
+5. Ishlarni radiologlarga biriktirish (case assignment/worklist).
+
+**Rasm bilan ishlash asboblari**
+6. O'lchov (ruler) asbobi.
+7. Erkin chizish/annotatsiya (freehand).
+8. Rasm sifatini avtomatik tekshirish (kesilgan/xira/noto'g'ri pozitsiya ogohlantirishi).
+
+**Tezlik va qulaylik**
+9. Klaviatura tezkor tugmalari (navbat, diagnoz belgilash).
+10. Tezkor shablon iboralar (quick-phrase) — tavsif maydoni uchun.
+11. Qidiruv va filtr (ism/PatientID/sana/diagnoz) — navbatda.
+12. Ko'p tillilik (i18n) infratuzilmasi (hozir qattiq o'zbekcha).
+
+**Hisobot va analitika**
+13. Admin panelda audit-log ko'rish oynasi (Log jadvali yozilyapti, UI yo'q).
+14. Statistik/QA dashboard (recall rate, radiolog vaqti, oylik trend).
+15. Bildirishnoma tizimi (yangi/shoshilinch holat).
+16. CSV/Excel eksport.
+
+**Xavfsizlik va infratuzilma**
+17. Login urinishlarini cheklash (rate-limiting).
+18. PostgreSQL'ga o'tish + avtomatik zaxira — SQLite ko'p foydalanuvchida parallel yozishda
+    muammoli, Render/Railway diskining vaqtinchaligi allaqachon muammo bo'lgan (4-bo'lim).
+19. Sessiya vaqti tugashi (auto-logout).
+
+**Solishtirish va diagnoz oqimi**
+20. Rasmlarni solishtirish uchun sinxron zoom/pan (masalan oldingi/yangi tekshiruv).
+21. "Flicker" rejim — ikki rasmni tez almashtirib ko'rish.
+22. Draft → Final ikki bosqichli diagnoz (hozir bitta "tasdiqlash").
+23. Shaxsiy statistika paneli (radiolog o'zi uchun).
+24. Tezkor filtr-tablar ("Bugungi", "Mening holatlarim", "Kutilayotgan").
+
+**Admin/amaliy**
+25. Ko'p rasmni birvarakayiga tanlab amal qilish (bulk select).
+
+**Hisobot/chop etish**
+26. PDF hisobotga klinika logotipi + raqamli imzo (F.I.Sh + sana shtamp).
+27. Brauzerdan to'g'ridan-to'g'ri chop etish tugmasi.
+
+**Klinik integratsiya**
+28. Natijani DICOM SR formatida eksport (boshqa PACS tizimiga yuborish uchun).
+29. Ovozli diktovka (speech-to-text) — tavsif maydoni uchun.
+
+Keyingi safar: foydalanuvchi bilan ustuvorlikni kelishib, shu ro'yxatdan tanlab bajarish kerak.
