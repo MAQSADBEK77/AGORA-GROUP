@@ -81,6 +81,44 @@ def get_pending_images(db: Session = Depends(get_db),
     return images
 
 
+# ─── Bildirishnomalar (yangi/shoshilinch kutayotgan holatlar) ───
+
+URGENT_WAIT_HOURS = 24
+
+@router.get("/notifications", response_model=list[schemas.NotificationOut])
+def get_notifications(limit: int = 20,
+                      db: Session = Depends(get_db),
+                      current_user: models.User = Depends(get_current_user)):
+    _require_radiolog(current_user)
+
+    images = (db.query(models.MammographyImage)
+              .filter(models.MammographyImage.status == models.ImageStatus.pending)
+              .order_by(models.MammographyImage.uploaded_at.desc())
+              .limit(limit)
+              .all())
+
+    now = datetime.utcnow()
+    notifications = []
+    for img in images:
+        urgent, reason = False, None
+        if img.quality_warnings:
+            urgent, reason = True, "Sifat ogohlantirishi"
+        elif img.uploaded_at and (now - img.uploaded_at.replace(tzinfo=None)) > timedelta(hours=URGENT_WAIT_HOURS):
+            urgent, reason = True, f"{URGENT_WAIT_HOURS} soatdan ko'p kutmoqda"
+
+        notifications.append(schemas.NotificationOut(
+            image_id=img.id,
+            patient_id=img.patient_id,
+            patient_name=img.patient.full_name if img.patient else None,
+            uploaded_at=img.uploaded_at,
+            urgent=urgent,
+            reason=reason,
+        ))
+
+    notifications.sort(key=lambda n: (not n.urgent, ))
+    return notifications
+
+
 # ─── AI taxmin (labeled rasmlar bilan solishtirish) ───
 
 @router.get("/ai-predict/{image_id}", response_model=schemas.AIPredictionOut)

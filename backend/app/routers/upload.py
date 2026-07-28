@@ -211,6 +211,7 @@ async def upload_dicom_folder(files: list[UploadFile] = File(...),
             patient_orientation=orientation,
             pixel_spacing=pixel_spacing,
             cad_summary=cad_summary_json,
+            quality_warnings=json.dumps(quality_warnings, ensure_ascii=False) if quality_warnings else None,
             status=models.ImageStatus.pending,
         )
         db.add(image)

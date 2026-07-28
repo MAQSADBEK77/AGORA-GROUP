@@ -351,3 +351,23 @@ navbatda, autonom davom etilmoqda.
   birgalikda o'chirildi — fayllar diskdan o'chgani, DB qatorlari tozalangani va bemor
   yozuvlari o'chgani tasdiqlandi; alohida, admin bo'lmagan foydalanuvchi (hamshira) bilan
   chaqirilganda 403 qaytishi ham tekshirildi.
+
+## 18. Bildirishnoma tizimi (yangi/shoshilinch holatlar) (2026-07-29, avtonom rejimda)
+
+- Avval mavjud bo'lgan bell-belgisi faqat umumiy son (badge) ko'rsatib, bosilganda to'g'ridan-to'g'ri
+  `/review`ga o'tkazardi — endi haqiqiy bildirishnoma ro'yxati bilan pastga tushadigan panel bo'ldi.
+- `mammography_images.quality_warnings` ustuni qo'shildi — avval sifat ogohlantirishlari faqat
+  yuklash javobida (ephemeral) qaytardi, endi rasmga biriktirilib DOIMIY saqlanadi
+  (`backend/app/routers/upload.py`, JSON qatorlar ro'yxati sifatida).
+- `GET /api/notifications` (`backend/app/routers/review.py`) — radiolog/admin uchun so'nggi
+  kutayotgan rasmlar ro'yxati (standart 20 ta), har biri "shoshilinch" deb belgilanadi agar:
+  (a) sifat ogohlantirishi mavjud bo'lsa, YOKI (b) 24 soatdan ko'proq javobsiz kutgan bo'lsa.
+  Shoshilinch bo'lganlar ro'yxat boshida ko'rsatiladi.
+- `frontend/src/components/Navbar.jsx` — qo'ng'iroq belgisi bosilganda dropdown panel ochiladi:
+  har bir bildirishnoma bemor ismi, sabab (shoshilinch bo'lsa qizil, oddiy bo'lsa ko'k) va
+  "necha vaqt oldin" bilan ko'rsatiladi; bosilsa to'g'ridan-to'g'ri o'sha rasmning
+  ko'rib chiqish sahifasiga o'tadi. Panel tashqarisiga bosilganda avtomatik yopiladi.
+  Mavjud 20 soniyalik polling va "yangi rasm yuklandi" toast xabari saqlanib qoldi.
+- Test: sun'iy kichik (64x64) DICOM yuklanganda `quality_warnings` ustunga saqlanishi va
+  `/api/notifications` javobida `urgent: true, reason: "Sifat ogohlantirishi"` sifatida
+  to'g'ri qaytishi tasdiqlandi — keyin test yozuv/fayllar o'chirildi.

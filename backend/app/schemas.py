@@ -129,6 +129,7 @@ class ImageOut(BaseModel):
     patient_orientation: Optional[str] = None
     pixel_spacing: Optional[float] = None
     cad_summary: Optional[str] = None
+    quality_warnings: Optional[str] = None
     status: ImageStatus
     uploaded_at: datetime
     review: Optional[DoctorReviewOut]
@@ -136,6 +137,15 @@ class ImageOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class NotificationOut(BaseModel):
+    image_id: int
+    patient_id: int
+    patient_name: Optional[str] = None
+    uploaded_at: datetime
+    urgent: bool = False
+    reason: Optional[str] = None  # nima uchun "urgent" (masalan sifat ogohlantirishi yoki uzoq kutgan)
 
 
 class LogOut(BaseModel):
