@@ -136,6 +136,16 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Frontend (`Upload.jsx`) — natijalar ro'yxatida "skipped" holati endi qizil (xato) emas, kulrang rangda ko'rsatiladi.
 - Test: haqiqiy 5 faylli papka (4 rasm + 1 SR hisobot) bilan sinaldi — 4 rasm to'g'ri bitta bemorga yuklandi, SR fayli chiroyli "o'tkazib yuborildi" deb belgilandi.
 
+## 12. Apparatning ichki CAD hisobotini o'qish (Mammography SR)
+
+- Foydalanuvchi so'radi: "skip qilingan" SR fayl aslida nima ekanini tahlil qilib, ichidagi natijalarni ham ko'rsatib berish.
+- Tahlil natijasi: bu fayl — **FUJIFILM M-CAD** (apparatning o'z ichki AI'si) tomonidan yaratilgan **Mammography CAD SR** hisoboti, bizning tizimimizdan mustaqil. Ichida **kaltsifikatsiya to'plamlari (Calcification Cluster)** topilmalari bor — har birining aniq koordinatalari (markaz + kontur) va qaysi ko'krak tomoniga tegishli ekanligi DICOM SR daraxtidagi "by-reference" bog'lanishlar (`Referenced Content Item Identifier`) orqali aniqlanadi.
+- **Muhim texnik nozik jihat**: SR hisobot ichida rasmlarga bog'lanish narsa **SOPInstanceUID** orqali bo'ladi, lekin real hayotda (bu namunada ham) SR "For Processing" versiyadagi rasmlarga ishora qiladi, arxivlangan fayllar esa boshqa UID'ga ega bo'lishi mumkin — shu sabab **aniq rasmga** emas, faqat **tomon (chap/o'ng)** darajasida moslashtirildi (buni SR o'zining IMAGE bo'limidagi laterality ma'lumoti orqali ishonchli hisoblab bo'ladi).
+- `backend/app/dicom_utils.py`: `is_cad_sr()` (SOP Class UID `1.2.840.10008.5.1.4.1.1.88.50` orqali aniqlaydi) va `parse_cad_sr()` (SR daraxtini path-based indexlab, har bir "Calcification Cluster" topilmasini tegishli tomonga bog'laydi, tomon bo'yicha klaster/kaltsifikatsiya sonini yig'adi).
+- `MammographyImage.cad_summary` (JSON, TEXT) — papka yuklanganda SR fayl topilsa, natija o'sha bemorning barcha rasmlariga yoziladi.
+- `ReviewDetail.jsx` — footer'da yangi "Apparat CAD hisoboti" bo'limi: har tomon uchun topilma bor/yo'qligi va soni, "bizning AI'dan mustaqil" degan aniq izoh bilan.
+- Test: haqiqiy SR fayl bilan sinaldi — natija to'g'ri chiqdi (chap: 5 klaster/12 kaltsifikatsiya, o'ng: topilma yo'q), keyin test ma'lumotlari tozalandi.
+
 ### 10.2. Sticky footer'ni sudrab kattalashtirish/kichraytirish + rasmlarni maksimal kattalashtirish
 
 - Foydalanuvchi so'radi: pastki sticky footer'ning tepa chegarasida sudrab (tepaga/pastga) kichraytirib-kattalashtirish mumkin bo'lsin, va 4 ta rasm ham maksimal katta ko'rinsin.
