@@ -5,6 +5,7 @@ import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, Use
 import api, { API_BASE_URL } from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
 import LesionOverlay from '../components/LesionOverlay'
+import CadMarkers from '../components/CadMarkers'
 
 const LABELS = ['Normal', 'Benign', 'Malignant', 'Very Malignant']
 
@@ -267,6 +268,7 @@ export default function ReviewDetail() {
                     width: p.ai_prediction.lesion_width, height: p.ai_prediction.lesion_height }
                 : null
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
+              const cadPoints = cadSummary?.by_side?.[p.laterality]?.points || []
 
               return (
                 <div key={p.id} className="relative group cursor-zoom-in bg-black flex items-center justify-center"
@@ -286,6 +288,9 @@ export default function ReviewDetail() {
                   />
                   {pLesion && (
                     <LesionOverlay box={pLesion} color={pColor} label="Shubhali mintaqa" imgRef={getImgRefObj(p.id)} />
+                  )}
+                  {cadPoints.length > 0 && (
+                    <CadMarkers points={cadPoints} title="Apparat CAD: kaltsifikatsiya to'plami" imgRef={getImgRefObj(p.id)} />
                   )}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="bg-black/60 text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
@@ -415,6 +420,8 @@ export default function ReviewDetail() {
                 })}
               </div>
               <p className="text-[11px] text-gray-400 mt-1">
+                Topilgan joylar rasmda <span className="text-orange-500 font-medium">to'q sariq halqa</span> bilan belgilangan
+                (tegishli tomon ko'rinishlarida — aniq CC/MLO farqi DICOM'da yo'q bo'lgani uchun ikkalasida ham).
                 Bu — mammografiya apparatining o'z tahlili, bizning AI natijasidan mustaqil. Yakuniy tashxis radiolog tomonidan tasdiqlanadi.
               </p>
             </div>

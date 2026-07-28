@@ -101,7 +101,10 @@ def parse_cad_sr(ds) -> dict | None:
                     lat = "L" if "Left" in raw else ("R" if "Right" in raw else None)
             image_laterality[path] = lat
 
-    by_side = {"L": {"clusters": 0, "calcifications": 0}, "R": {"clusters": 0, "calcifications": 0}}
+    by_side = {
+        "L": {"clusters": 0, "calcifications": 0, "points": []},
+        "R": {"clusters": 0, "calcifications": 0, "points": []},
+    }
     found_any = False
 
     for path, item in path_to_item.items():
@@ -129,11 +132,16 @@ def parse_cad_sr(ds) -> dict | None:
             found_any = True
             by_side[side]["clusters"] += 1
             for c in item.get("ContentSequence", []):
-                if _code_meaning(c.get("ConceptNameCodeSequence", [])) == "Number of calcifications":
+                name = _code_meaning(c.get("ConceptNameCodeSequence", []))
+                if name == "Number of calcifications":
                     try:
                         by_side[side]["calcifications"] += int(c.MeasuredValueSequence[0].NumericValue)
                     except Exception:
                         pass
+                elif (name == "Center" and c.get("ValueType") == "SCOORD"
+                      and c.get("GraphicType") == "POINT" and "GraphicData" in c):
+                    x, y = c.GraphicData[0], c.GraphicData[1]
+                    by_side[side]["points"].append([round(float(x)), round(float(y))])
 
     if not found_any:
         return None
