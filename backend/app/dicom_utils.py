@@ -182,6 +182,18 @@ def parse_cad_sr(ds) -> dict | None:
                 calc["outline"] = pts
         return calc
 
+    # DICOM CID 6059 (Mammography CAD Non-Lesion/Lesion Finding turlari) — faqat
+    # "Calcification Cluster"ni emas, boshqa TURDAGI topilmalarni ham ("Mass" — ya'ni
+    # o'simta/soya, shuningdek assimetrik zichlik va arxitektura buzilishi) o'qiymiz.
+    # Ilgari faqat kaltsifikatsiya to'plami o'qilar edi — shu sabab apparat "Mass" deb
+    # belgilagan haqiqiy o'simta/soya joylari HECH QACHON rasmga chiqmas edi (garchi
+    # SR faylida mavjud bo'lsa ham). Endi har ikkalasi ham qamrab olinadi.
+    CLUSTER_FINDING_TYPES = {"Calcification Cluster"}
+    SINGLE_REGION_FINDING_TYPES = {
+        "Mass", "Focal Asymmetric Density", "Architectural Distortion",
+        "Solitary Calcification", "Skin Lesion", "Intramammary Lymph Node",
+    }
+
     by_side = {"L": {"clusters": []}, "R": {"clusters": []}}
     by_view = {}
     found_any = False
@@ -189,7 +201,8 @@ def parse_cad_sr(ds) -> dict | None:
     for path, item in path_to_item.items():
         if _code_meaning(item.get("ConceptNameCodeSequence", [])) != "Single Image Finding":
             continue
-        if _code_meaning(item.get("ConceptCodeSequence", [])) != "Calcification Cluster":
+        finding_type = _code_meaning(item.get("ConceptCodeSequence", []))
+        if finding_type not in CLUSTER_FINDING_TYPES and finding_type not in SINGLE_REGION_FINDING_TYPES:
             continue
 
         side, vkey = find_view(item)
@@ -197,20 +210,32 @@ def parse_cad_sr(ds) -> dict | None:
             continue
         found_any = True
 
-        cluster = {"center": None, "count": 0, "calcifications": []}
-        for c in item.get("ContentSequence", []):
-            name = _code_meaning(c.get("ConceptNameCodeSequence", []))
-            if name == "Number of calcifications":
-                try:
-                    cluster["count"] = int(c.MeasuredValueSequence[0].NumericValue)
-                except Exception:
-                    pass
-            elif name == "Center" and c.get("ValueType") == "SCOORD":
-                pts = _scoord_points(c)
-                if pts:
-                    cluster["center"] = pts[0]
-            elif _code_meaning(c.get("ConceptCodeSequence", [])) == "Individual Calcification":
-                cluster["calcifications"].append(parse_calcification(c))
+        if finding_type in CLUSTER_FINDING_TYPES:
+            cluster = {"type": finding_type, "center": None, "count": 0, "calcifications": []}
+            for c in item.get("ContentSequence", []):
+                name = _code_meaning(c.get("ConceptNameCodeSequence", []))
+                if name == "Number of calcifications":
+                    try:
+                        cluster["count"] = int(c.MeasuredValueSequence[0].NumericValue)
+                    except Exception:
+                        pass
+                elif name == "Center" and c.get("ValueType") == "SCOORD":
+                    pts = _scoord_points(c)
+                    if pts:
+                        cluster["center"] = pts[0]
+                elif _code_meaning(c.get("ConceptCodeSequence", [])) == "Individual Calcification":
+                    cluster["calcifications"].append(parse_calcification(c))
+        else:
+            # Bitta mintaqali topilma (Mass va h.k.) — o'ziga xos kaltsifikatsiyalar
+            # klasteri yo'q, faqat bitta markaz/kontur. Frontend'dagi mavjud
+            # renderlashdan foydalanish uchun bitta "calcification" sifatida o'raymiz.
+            region = parse_calcification(item)
+            cluster = {
+                "type": finding_type,
+                "center": region["center"],
+                "count": 1,
+                "calcifications": [region],
+            }
 
         by_side[side]["clusters"].append(cluster)
         if vkey:
@@ -236,7 +261,7 @@ def parse_cad_sr(ds) -> dict | None:
             break
 
     detections_performed = []
-    analyses_attempted = None
+    analyses_attempted_flags = []  # HAR BIR "Summary of Analyses" yozuvi — oldin faqat OXIRGISI saqlanardi (xato)
     for item in path_to_item.values():
         cname = _code_meaning(item.get("ConceptNameCodeSequence", []))
         if cname == "Detection Performed":
@@ -244,7 +269,19 @@ def parse_cad_sr(ds) -> dict | None:
             if val and val not in detections_performed:
                 detections_performed.append(val)
         elif cname == "Summary of Analyses":
-            analyses_attempted = _code_meaning(item.get("ConceptCodeSequence", [])) != "Not Attempted"
+            analyses_attempted_flags.append(
+                _code_meaning(item.get("ConceptCodeSequence", [])) != "Not Attempted")
+
+    # Barcha toifalar bo'yicha tahlil o'tkazilgan bo'lsagina True; birortasi bo'lmasa False —
+    # avvalgi versiya faqat DARAXTDA OXIRGI uchragan yozuvni saqlar edi (boshqalarini yo'qotardi).
+    analyses_attempted = all(analyses_attempted_flags) if analyses_attempted_flags else None
+
+    # O'simta/soya turidagi (Mass va h.k.) tahlil UMUMAN o'tkazilganmi — bu "Calcification
+    # Cluster" tahlilidan MUTLAQO BOSHQA, alohida CAD modul. Yo'q bo'lsa, CAD hech narsa
+    # belgilamagani "o'simta yo'q" degani EMAS — apparat buni umuman qidirmagan, xolos.
+    mass_detection_performed = any(
+        d in detections_performed for d in ("Mass", "Focal Asymmetric Density", "Architectural Distortion")
+    )
 
     return {
         "algorithm": algorithm_name or str(getattr(ds, "Manufacturer", "")),
@@ -252,6 +289,7 @@ def parse_cad_sr(ds) -> dict | None:
         "summary": summary_text,
         "detections_performed": detections_performed,
         "analyses_attempted": analyses_attempted,
+        "mass_detection_performed": mass_detection_performed,
         "by_side": by_side,
         "by_view": by_view,
     }

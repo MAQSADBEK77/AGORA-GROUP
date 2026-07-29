@@ -103,7 +103,8 @@ function cadShapesForPanel(cadSummary, p) {
 function cadCounts(cadSummary, side) {
   const clusters = cadSummary?.by_side?.[side]?.clusters || []
   const calcifications = clusters.reduce((sum, c) => sum + (c.calcifications?.length || c.count || 0), 0)
-  return { clusters: clusters.length, calcifications }
+  const massLike = clusters.filter(c => c.type && c.type !== 'Calcification Cluster')
+  return { clusters: clusters.length, calcifications, massLike: massLike.length }
 }
 
 const FOOTER_MIN_H = 110
@@ -699,20 +700,33 @@ export default function ReviewDetail() {
 
               <div className="flex flex-wrap gap-2">
                 {['L', 'R'].map(side => {
-                  const { clusters, calcifications } = cadCounts(cadSummary, side)
+                  const { clusters, calcifications, massLike } = cadCounts(cadSummary, side)
                   const hasFindings = clusters > 0
+                  const calcClusters = clusters - massLike
                   return (
                     <div key={side}
                       className={`text-xs px-3 py-2 rounded-lg border ${
                         hasFindings ? 'bg-orange-50 border-orange-300 text-orange-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
                       <span className="font-semibold">{SIDE_LABEL[side]}:</span>{' '}
                       {hasFindings
-                        ? `${clusters} ta kaltsifikatsiya to'plami (${calcifications} ta alohida)`
+                        ? [
+                            calcClusters > 0 && `${calcClusters} ta kaltsifikatsiya to'plami (${calcifications} ta alohida)`,
+                            massLike > 0 && `${massLike} ta shubhali soya/o'simta (Mass) topilmasi`,
+                          ].filter(Boolean).join(' • ')
                         : 'topilma yo\'q'}
                     </div>
                   )
                 })}
               </div>
+
+              {cadSummary.mass_detection_performed === false && (
+                <p className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded p-2 mt-2 font-medium">
+                  ⚠ MUHIM: bu CAD hisobotida FAQAT kaltsifikatsiya va to'qima zichligi tahlil qilingan
+                  ({cadSummary.detections_performed?.join(', ')}) — <b>shubhali soya/o'simta (mass) qidiruvi
+                  UMUMAN o'tkazilmagan</b>. Apparat hech narsa belgilamasa ham, bu tasvirda o'simta yo'q
+                  degani EMAS — rasmni albatta o'zingiz to'liq ko'zdan kechiring.
+                </p>
+              )}
 
               {cadSummary.analyses_attempted === false && (
                 <p className="text-[11px] text-red-500 bg-red-50 rounded p-2 mt-2">

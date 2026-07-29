@@ -481,6 +481,45 @@ xavfli. Qolganlarini xavfsizlik darajasiga qarab davom ettirilmoqda:
   bilan qo'shimcha himoyalangan). Koordinata matematikasi mavjud ruler asbobi bilan bir
   xil pattern (`naturalToScreen`/rect-asosli) — zoom/pan bilan chizilgan chiziqlar
   har doim rasmga to'g'ri "yopishib" turadi.
+
+## 23. MUHIM TUZATISH: CAD hisobotida "Mass" (o'simta/soya) topilmalari umuman o'qilmayotgan edi (2026-07-29)
+
+Foydalanuvchi shikoyat qildi: "CAD hisobotiga ishonqim kelmayapti, o'simta bor joyni
+belgilamayapti". Tekshirish natijasida IKKITA muammo topildi:
+
+1. **Asosiy sabab (haqiqiy CAD cheklovi, dasturiy xato emas)**: foydalanuvchining
+   real yuklagan bemori (patient_id=29, image_id 1-4, FUJIFILM M-CAD 6.8.6) uchun
+   saqlangan `cad_summary.detections_performed` FAQAT `["Mammography breast density",
+   "Calcification Cluster"]` — apparat SR faylining O'ZIDA yozilgan meta-ma'lumot shuni
+   ko'rsatadiki, bu aniq tekshiruv uchun CAD algoritmi UMUMAN "Mass" (o'simta/soya)
+   qidiruvini o'tkazmagan, faqat kaltsifikatsiya to'plami va to'qima zichligini tahlil
+   qilgan. Ya'ni CAD hech narsa belgilamagani — dasturiy xato emas, balki apparat shu
+   turdagi tahlilni umuman ishga tushirmagani.
+2. **Haqiqiy dasturiy xato (tuzatildi)**: `backend/app/dicom_utils.py::parse_cad_sr()`
+   FAQAT `ConceptCodeSequence == "Calcification Cluster"` bo'lgan topilmalarni o'qir
+   edi — agar SR faylida "Mass", "Focal Asymmetric Density", "Architectural
+   Distortion", "Solitary Calcification" kabi BOSHQA turdagi topilma (aynan shular —
+   o'simta/shubhali soya kabi topilmalar shu kodlar bilan yoziladi) mavjud bo'lsa ham,
+   kod ularni ko'rmasdan o'tkazib yuborardi. Endi bu turlar ham o'qiladi (bitta
+   mintaqali topilma sifatida — markaz+kontur, mavjud kaltsifikatsiya renderlash
+   pattern'idan foydalanib).
+   Qo'shimcha xato: `analyses_attempted` daraxtda OXIRGI uchragan "Summary of
+   Analyses" yozuvini saqlar edi (oldingilarini yo'qotib) — endi barcha
+   yozuvlar hisobga olinadi (`all(...)`).
+   Yangi aniq maydon: `mass_detection_performed` — agar False bo'lsa, frontend
+   (`ReviewDetail.jsx`) qizil, aniq ogohlantirish ko'rsatadi: "bu hisobotda FAQAT
+   kaltsifikatsiya tahlil qilingan, o'simta qidiruvi umuman o'tkazilmagan — hech
+   narsa belgilanmagani o'simta yo'q degani emas".
+   Test: pydicom bilan qo'lda qurilgan sun'iy SR daraxtlari orqali ikkala holat ham
+   tekshirildi — (a) "Mass" topilmasi to'g'ri o'qilishi va markaz/kontur bilan
+   qaytishi, (b) mavjud "Calcification Cluster" yo'li o'zgarishsiz ishlashi
+   (regressiya yo'q).
+   **MUHIM CHEKLOV**: bu tuzatish faqat KEYINGI yuklashlarga ta'sir qiladi — chunki
+   xom SR `.dcm` fayli parse qilingandan keyin diskdan o'chirib yuboriladi (piksel
+   ma'lumoti yo'qligi sababli), foydalanuvchining ALLAQACHON yuklangan 4 ta rasmi
+   (id 1-4) eski (noto'g'ri/kam) `cad_summary` bilan qolgan. To'g'ri natijani ko'rish
+   uchun O'SHA PAPKANI QAYTA YUKLASH kerak — bu yangi rasm qatorlari qo'shadi (eski
+   4 tasi o'chmaydi, xohlasa admin bulk-delete orqali keyin tozalashi mumkin).
   Test: headless Chrome + CDP `Input.dispatchMouseEvent` orqali haqiqiy sichqoncha
   drag simulyatsiya qilindi — chizilgan chiziq ekranda to'g'ri joyda ko'rinishi VA
   backend'da (`GET /api/pending` javobida) to'g'ri saqlangani tasdiqlandi (draw+reload
