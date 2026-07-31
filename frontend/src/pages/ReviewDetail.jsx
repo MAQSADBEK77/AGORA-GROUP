@@ -5,7 +5,6 @@ import { ArrowLeft, Brain, CheckCircle, AlertTriangle, AlertCircle, XCircle, Use
 import api, { API_BASE_URL } from '../api/axios'
 import ImageZoom from '../components/ImageZoom'
 import LesionOverlay from '../components/LesionOverlay'
-import CadMarkers from '../components/CadMarkers'
 import CompareModal from '../components/CompareModal'
 
 const LABELS = ['Normal', 'Benign', 'Malignant', 'Very Malignant']
@@ -64,48 +63,6 @@ function parseSimilarCases(raw) {
 }
 
 const SIDE_LABEL = { L: 'Chap ko\'krak', R: 'O\'ng ko\'krak' }
-
-function findCadSummary(panels) {
-  for (const p of panels) {
-    if (p.cad_summary) {
-      try { return JSON.parse(p.cad_summary) } catch { /* noqit */ }
-    }
-  }
-  return null
-}
-
-// Laterality + PatientOrientation — backend'dagi view_key() bilan bir xil format
-// (masalan "L|A\R"). ViewPosition (CC/MLO) DICOM'da ko'pincha bo'sh keladi, lekin
-// PatientOrientation deyarli har doim bor va aniq ko'rinishni ajratib beradi.
-function panelViewKey(p) {
-  return p.laterality && p.patient_orientation ? `${p.laterality}|${p.patient_orientation}` : null
-}
-
-// Har bir alohida kaltsifikatsiyaning aniq konturi (bo'lsa) yoki markazi — rasm
-// ustida chizish uchun. Avval ANIQ ko'rinish (by_view) bo'yicha moslashtiramiz —
-// shunda MLO'dagi topilma CC'ga aralashib qolmaydi; agar orientatsiya ma'lumoti
-// yo'q bo'lsa (eski yozuvlar), tomon bo'yicha (by_side) taxminiy ko'rsatamiz.
-function cadShapesForPanel(cadSummary, p) {
-  const vkey = panelViewKey(p)
-  const clusters = (vkey && cadSummary?.by_view?.[vkey]?.clusters)
-    || cadSummary?.by_side?.[p.laterality]?.clusters
-    || []
-  const shapes = []
-  for (const cluster of clusters) {
-    for (const calc of cluster.calcifications || []) {
-      if (calc.outline?.length >= 3) shapes.push({ type: 'polygon', points: calc.outline })
-      else if (calc.center) shapes.push({ type: 'point', point: calc.center })
-    }
-  }
-  return shapes
-}
-
-function cadCounts(cadSummary, side) {
-  const clusters = cadSummary?.by_side?.[side]?.clusters || []
-  const calcifications = clusters.reduce((sum, c) => sum + (c.calcifications?.length || c.count || 0), 0)
-  const massLike = clusters.filter(c => c.type && c.type !== 'Calcification Cluster')
-  return { clusters: clusters.length, calcifications, massLike: massLike.length }
-}
 
 const FOOTER_MIN_H = 110
 const FOOTER_MAX_RATIO = 0.85
@@ -443,7 +400,6 @@ export default function ReviewDetail() {
 
   const similarCases = parseSimilarCases(aiPred?.similar_cases)
   const panels = siblings.length ? siblings : [image]
-  const cadSummary = findCadSummary(panels)
 
   return (
     <div className="space-y-6">
@@ -532,7 +488,6 @@ export default function ReviewDetail() {
                     width: p.ai_prediction.lesion_width, height: p.ai_prediction.lesion_height }
                 : null
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
-              const cadShapes = cadShapesForPanel(cadSummary, p)
 
               const isSelected = compareSelected.some(x => x.id === p.id)
 
@@ -560,9 +515,6 @@ export default function ReviewDetail() {
                   />
                   {pLesion && (
                     <LesionOverlay box={pLesion} color={pColor} label="Shubhali mintaqa" imgRef={getImgRefObj(p.id)} />
-                  )}
-                  {cadShapes.length > 0 && (
-                    <CadMarkers shapes={cadShapes} imgRef={getImgRefObj(p.id)} />
                   )}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="bg-black/60 text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
@@ -680,68 +632,6 @@ export default function ReviewDetail() {
               </p>
             )}
           </div>
-
-          {/* Apparatning o'z ichki CAD hisoboti (masalan FUJIFILM M-CAD) — DICOM
-              papkadagi SR faylidan o'qilgan, bizning AI'dan mustaqil natija */}
-          {cadSummary && (
-            <div className="mb-3 border-t border-gray-100 dark:border-slate-700 pt-3">
-              <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm mb-2">
-                <AlertTriangle size={16} className="text-orange-500" /> Apparat CAD hisoboti
-                <span className="text-[11px] font-normal text-gray-400">
-                  ({cadSummary.algorithm}{cadSummary.algorithm_version ? ` v${cadSummary.algorithm_version}` : ''})
-                </span>
-              </h3>
-
-              {cadSummary.detections_performed?.length > 0 && (
-                <p className="text-[11px] text-gray-500 mb-2">
-                  O'tkazilgan tekshiruvlar: {cadSummary.detections_performed.join(', ')}
-                </p>
-              )}
-
-              <div className="flex flex-wrap gap-2">
-                {['L', 'R'].map(side => {
-                  const { clusters, calcifications, massLike } = cadCounts(cadSummary, side)
-                  const hasFindings = clusters > 0
-                  const calcClusters = clusters - massLike
-                  return (
-                    <div key={side}
-                      className={`text-xs px-3 py-2 rounded-lg border ${
-                        hasFindings ? 'bg-orange-50 border-orange-300 text-orange-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
-                      <span className="font-semibold">{SIDE_LABEL[side]}:</span>{' '}
-                      {hasFindings
-                        ? [
-                            calcClusters > 0 && `${calcClusters} ta kaltsifikatsiya to'plami (${calcifications} ta alohida)`,
-                            massLike > 0 && `${massLike} ta shubhali soya/o'simta (Mass) topilmasi`,
-                          ].filter(Boolean).join(' • ')
-                        : 'topilma yo\'q'}
-                    </div>
-                  )
-                })}
-              </div>
-
-              {cadSummary.mass_detection_performed === false && (
-                <p className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded p-2 mt-2 font-medium">
-                  ⚠ MUHIM: bu CAD hisobotida FAQAT kaltsifikatsiya va to'qima zichligi tahlil qilingan
-                  ({cadSummary.detections_performed?.join(', ')}) — <b>shubhali soya/o'simta (mass) qidiruvi
-                  UMUMAN o'tkazilmagan</b>. Apparat hech narsa belgilamasa ham, bu tasvirda o'simta yo'q
-                  degani EMAS — rasmni albatta o'zingiz to'liq ko'zdan kechiring.
-                </p>
-              )}
-
-              {cadSummary.analyses_attempted === false && (
-                <p className="text-[11px] text-red-500 bg-red-50 rounded p-2 mt-2">
-                  ⚠ Apparat faqat joylarni <b>aniqladi</b> (detection) — xavflilik darajasini baholovchi
-                  tahlil (malignancy/BI-RADS scoring) <b>o'tkazilmagan</b>. Yakuniy baho butunlay radiologga bog'liq.
-                </p>
-              )}
-
-              <p className="text-[11px] text-gray-400 mt-2">
-                Topilgan har bir kaltsifikatsiyaning aniq konturi rasmda <span className="text-orange-500 font-medium">to'q sariq chiziq</span> bilan
-                belgilangan — aynan shu ko'rinishga (CC yoki MLO) tegishli topilmalar, DICOM'dagi PatientOrientation orqali aniq ajratilgan.
-                Bu — mammografiya apparatining o'z tahlili, bizning AI natijasidan mustaqil. Yakuniy tashxis radiolog tomonidan tasdiqlanadi.
-              </p>
-            </div>
-          )}
 
           {/* Radiolog forma */}
           {canReview ? (

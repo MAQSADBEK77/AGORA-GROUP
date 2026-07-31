@@ -171,21 +171,6 @@ Bu fayl loyiha ustida qilingan ishlarni eslab qolish uchun yuritiladi. Yangi ish
 - Frontend endi har rasmning aynan o'z ko'rinishiga mos topilmalarni tanlab ko'rsatadi (`by_side` faqat orientatsiya yo'q eski yozuvlar uchun zaxira sifatida qoladi).
 - Test: L-CC va L-MLO rasmlari alohida-alohida tekshirildi — endi har biri FAQAT o'ziga tegishli klasterlarni (mos ravishda 2 va 3 ta) ko'rsatadi, ular endi bir-biridan farqli va to'g'ri joyda.
 
-### 10.2. Sticky footer'ni sudrab kattalashtirish/kichraytirish + rasmlarni maksimal kattalashtirish
-
-- Foydalanuvchi so'radi: pastki sticky footer'ning tepa chegarasida sudrab (tepaga/pastga) kichraytirib-kattalashtirish mumkin bo'lsin, va 4 ta rasm ham maksimal katta ko'rinsin.
-- `ReviewDetail.jsx` — footer balandligi endi `footerHeight` state'da saqlanadi (boshlang'ich 320px, `localStorage` kaliti `reviewFooterHeight` orqali eslab qolinadi). Footer'ning tepasida `GripHorizontal` ikonkali tutqich qo'shildi — sichqoncha/barmoq bilan bosib tepaga-pastga sudralganda `mousemove`/`touchmove` orqali balandlik real vaqtda o'zgaradi (min 110px, maks ekran balandligining 85%).
-- Statik `pb-64 lg:pb-56` va `max-h-[45vh]` klasslari olib tashlanib, o'rniga `footerHeight`ga bog'liq inline `style` qo'yildi — shuning uchun rasm kartochkasining pastki bo'shlig'i va footer balandligi doim bir-biriga mos keladi.
-- Rasm elementlarining qattiq `max-h-[520px]` chegarasi olib tashlanib, `maxHeight: max(320px, calc(100vh - footerHeight - 200px))` bilan almashtirildi — footer kichraytirilganda rasmlar ekranning qolgan bo'sh joyini avtomatik to'ldirib, maksimal katta bo'lib ko'rinadi.
-- Test: `npx vite build` orqali kompilyatsiya xatosiz o'tishi tekshirildi. Brauzerda haqiqiy sichqoncha bilan sudrash vizual tasdiqlanmadi — muhitda headless brauzer vositasi (`chromium-cli`/Playwright) mavjud emas edi.
-
-### 10.3. Rasmlar hali ham kichkina va o'rtada qolib ketayotgan edi — to'liq kenglikka yoyildi
-
-- Foydalanuvchi: 4 ta rasm hamon kichkina, `max-w-7xl` markazlashtirilgan sahifa tufayli o'rtada siqilib qolgan edi; chap navbar va o'ng ekran chetidan atigi ~10px oraliq qolib, qolgan hammasi rasmlarga tegishli bo'lishi kerak edi.
-- Sabab: rasm grid konteyneri `w-fit` (kontentga moslashuvchi, cho'zilmaydigan) edi va sahifaning o'zi `max-w-7xl mx-auto` bilan 1280px'ga cheklangan, kattaroq monitorlarda ikkala tomonda katta bo'sh joy qolardi. Rasmlar balandlik bo'yicha cheklangani (`maxHeight`) uchun eni ham tabiiy nisbatga ko'ra kichik chiqardi.
-- Yechim: `ReviewDetail.jsx` — sahifaning tashqi `max-w-7xl` cheklovi rasm bo'limidan olib tashlandi (orqaga qaytish tugmasi va pastki panel ichki kontenti hali ham o'zining `max-w-7xl`sida qoladi). Rasm kartochkasiga `-mx-6 px-[10px]` qo'yildi — bu asosiy `<main>`ning `p-6` to'ldirishini bekor qilib, o'rniga atigi 10px chekka oraliq qoldiradi. Grid endi `w-full` (cho'zilib to'liq kenglikni egallaydi), rasmlar esa `w-full h-auto object-contain` bilan — balandlik emas, ENI ustuvor hisoblanadi, shuning uchun rasm ustunning butun kengligini to'ldiradi (balandlik tabiiy nisbatga ko'ra o'sadi, sahifa kerak bo'lsa pastga scroll qiladi).
-- Test: `npx vite build` xatosiz o'tdi. Vizual (brauzer) tasdiqlash muhitda headless brauzer vositasi yo'qligi sababli amalga oshirilmadi.
-
 ## 13. Backlog / Roadmap — foydalanuvchi taklif qilgan keyingi ishlar (2026-07-28, hali BOSHLANMAGAN)
 
 Foydalanuvchi 30+ ta funksiya taklif qildi. Ko'lami juda katta (ba'zilari soatlab, ba'zilari
@@ -520,6 +505,37 @@ belgilamayapti". Tekshirish natijasida IKKITA muammo topildi:
    (id 1-4) eski (noto'g'ri/kam) `cad_summary` bilan qolgan. To'g'ri natijani ko'rish
    uchun O'SHA PAPKANI QAYTA YUKLASH kerak — bu yangi rasm qatorlari qo'shadi (eski
    4 tasi o'chmaydi, xohlasa admin bulk-delete orqali keyin tozalashi mumkin).
+
+## 24. Foydalanuvchi so'rovi bilan: Apparat CAD hisoboti butunlay o'chirildi (2026-07-31)
+
+Foydalanuvchi to'g'ridan-to'g'ri so'radi: "CAD hisobotni o'chirib tashla, uni tahlilini
+ko'rishni hohlamayman, shunchaki qoldirib ketsin yuklaganimda" — ya'ni CAD SR fayli
+yuklanganda hech qanday tahlil qilinmasin, faqat oddiy "rasm emas" fayl sifatida
+o'tkazib yuborilsin (12-bo'limdagi to'liq parsing ishidan OLDINGI, 11-bo'limdagi asl
+xulq-atvorga qaytarildi).
+
+- `backend/app/routers/upload.py` — `is_cad_sr`/`parse_cad_sr` chaqiruvi olib
+  tashlandi; SR/metama'lumot fayllari endi hech qanday tahlilsiz, oddiy "skipped"
+  natija bilan o'tkazib yuboriladi. Yangi rasmlarga `cad_summary` ENDI UMUMAN
+  yozilmaydi.
+- `frontend/src/pages/ReviewDetail.jsx` — "Apparat CAD hisoboti" bo'limi (algoritm
+  nomi, topilgan to'plamlar soni, "Mass topilmasi umuman o'tkazilmagan" ogohlantirishi
+  va h.k.) BUTUNLAY olib tashlandi; rasm ustidagi to'q sariq kaltsifikatsiya
+  konturlari (`CadMarkers`) ham endi chizilmaydi. Tegishli yordamchi funksiyalar
+  (`findCadSummary`, `panelViewKey`, `cadShapesForPanel`, `cadCounts`) va `CadMarkers`
+  import'i olib tashlandi.
+- `backend/app/dicom_utils.py`dagi `parse_cad_sr`/`is_cad_sr` funksiyalari o'zi ATAYLAB
+  o'chirilmadi (kod sifatida ishlab turgan, sinovdan o'tgan) — faqat ENDI HECH QAYERDA
+  chaqirilmaydi. Kelajakda foydalanuvchi fikrini o'zgartirsa, tezda qayta yoqish mumkin.
+- **Eski ma'lumotlar**: avval yuklangan rasmlarda (`cad_summary` ustunida) eski
+  ma'lumot DB'da SAQLANIB QOLADI (o'chirilmadi — bemor tarixi buzilmasligi uchun),
+  lekin frontend endi uni HECH QACHON ko'rsatmaydi, shu sabab amalda ko'rinmas bo'ldi.
+- Test: (1) sun'iy SR + rasm fayli birga yuklanganda SR hech qanday tahlilsiz
+  "skipped" bo'lib o'tkazib yuborilgani, yangi rasmda `cad_summary` bo'sh (`None`)
+  qolgani tasdiqlandi; (2) foydalanuvchining ALLAQACHON eski `cad_summary`ga ega
+  bo'lgan haqiqiy rasmi (`image_id=9`) headless Chrome orqali qayta ko'rildi —
+  na kontur chiziqlari, na "Apparat CAD hisoboti" bo'limi endi ko'rinmasligi
+  skrinshot bilan tasdiqlandi.
   Test: headless Chrome + CDP `Input.dispatchMouseEvent` orqali haqiqiy sichqoncha
   drag simulyatsiya qilindi — chizilgan chiziq ekranda to'g'ri joyda ko'rinishi VA
   backend'da (`GET /api/pending` javobida) to'g'ri saqlangani tasdiqlandi (draw+reload
@@ -554,3 +570,27 @@ qiladi, shuning uchun tasodifiy/tekshirilmagan holda qilish xavfli):
   ro'yxatda yig'iladi va 20-banddagi "Taqqoslash" (sinxron zoom/pan + Flicker) rejimi
   aynan shu ro'yxatdan istalgan 2 tasini solishtirish imkonini beradi — asosiy ehtiyoj
   qo'shimcha qurilishsiz qondirilgan.
+
+## 24. ReviewDetail sahifasida rasm o'lchami/joylashuvi + Bemor Tarixida "yana 10 ta" (2026-07-29)
+
+### 24.1. Sticky footer'ni sudrab kattalashtirish/kichraytirish + rasmlarni maksimal kattalashtirish
+
+- Foydalanuvchi so'radi: pastki sticky footer'ning tepa chegarasida sudrab (tepaga/pastga) kichraytirib-kattalashtirish mumkin bo'lsin, va 4 ta rasm ham maksimal katta ko'rinsin.
+- `ReviewDetail.jsx` — footer balandligi endi `footerHeight` state'da saqlanadi (boshlang'ich 320px, `localStorage` kaliti `reviewFooterHeight` orqali eslab qolinadi). Footer'ning tepasida `GripHorizontal` ikonkali tutqich qo'shildi — sichqoncha/barmoq bilan bosib tepaga-pastga sudralganda `mousemove`/`touchmove` orqali balandlik real vaqtda o'zgaradi (min 110px, maks ekran balandligining 85%).
+- Statik `pb-64 lg:pb-56` va `max-h-[45vh]` klasslari olib tashlanib, o'rniga `footerHeight`ga bog'liq inline `style` qo'yildi — shuning uchun rasm kartochkasining pastki bo'shlig'i va footer balandligi doim bir-biriga mos keladi.
+- Rasm elementlarining qattiq `max-h-[520px]` chegarasi olib tashlanib, `maxHeight: max(320px, calc(100vh - footerHeight - 200px))` bilan almashtirildi — footer kichraytirilganda rasmlar ekranning qolgan bo'sh joyini avtomatik to'ldirib, maksimal katta bo'lib ko'rinadi.
+- Test: `npx vite build` orqali kompilyatsiya xatosiz o'tishi tekshirildi. Brauzerda haqiqiy sichqoncha bilan sudrash vizual tasdiqlanmadi — muhitda headless brauzer vositasi (`chromium-cli`/Playwright) mavjud emas edi.
+
+### 24.2. Rasmlar hali ham kichkina va o'rtada qolib ketayotgan edi — to'liq kenglikka yoyildi
+
+- Foydalanuvchi: 4 ta rasm hamon kichkina, `max-w-7xl` markazlashtirilgan sahifa tufayli o'rtada siqilib qolgan edi; chap navbar va o'ng ekran chetidan atigi ~10px oraliq qolib, qolgan hammasi rasmlarga tegishli bo'lishi kerak edi.
+- Sabab: rasm grid konteyneri `w-fit` (kontentga moslashuvchi, cho'zilmaydigan) edi va sahifaning o'zi `max-w-7xl mx-auto` bilan 1280px'ga cheklangan, kattaroq monitorlarda ikkala tomonda katta bo'sh joy qolardi. Rasmlar balandlik bo'yicha cheklangani (`maxHeight`) uchun eni ham tabiiy nisbatga ko'ra kichik chiqardi.
+- Yechim: `ReviewDetail.jsx` — sahifaning tashqi `max-w-7xl` cheklovi rasm bo'limidan olib tashlandi (orqaga qaytish tugmasi va pastki panel ichki kontenti hali ham o'zining `max-w-7xl`sida qoladi). Rasm kartochkasiga `-mx-6 px-[10px]` qo'yildi — bu asosiy `<main>`ning `p-6` to'ldirishini bekor qilib, o'rniga atigi 10px chekka oraliq qoldiradi. Grid endi `w-full` (cho'zilib to'liq kenglikni egallaydi), rasmlar esa `w-full h-auto object-contain` bilan — balandlik emas, ENI ustuvor hisoblanadi, shuning uchun rasm ustunning butun kengligini to'ldiradi (balandlik tabiiy nisbatga ko'ra o'sadi, sahifa kerak bo'lsa pastga scroll qiladi).
+- Test: `npx vite build` xatosiz o'tdi. Vizual (brauzer) tasdiqlash muhitda headless brauzer vositasi yo'qligi sababli amalga oshirilmadi.
+
+### 24.3. Bemor Tarixi sahifasida "Yana 10 ta ko'rsatish" (pagination)
+
+- Foydalanuvchi: bemorlar ro'yxati ("Bemor Tarixi") hammasi birdaniga yuklanib ko'rsatilib turgan edi (backend `/api/patients` cheklovsiz), ko'payib borgan sari sahifa og'irlashadi — "yana 10 ta qo'shish uchun funksiya" so'radi.
+- `PatientHistory.jsx` — yangi `visibleCount` state (boshlang'ich 10), ro'yxat `patients.slice(0, visibleCount)` bilan chiziladi. Har safar qidiruv/filtr o'zgarib `loadPatients()` qayta chaqirilganda `visibleCount` 10ga qaytariladi. Ro'yxat tagida, ko'rsatilmagan bemor qolsa, "Yana 10 ta ko'rsatish (N ta qoldi)" tugmasi chiqadi — bosilganda `visibleCount` 10taga oshadi.
+- Bu — backend so'rovini o'zgartirmagan, faqat frontendda ko'rsatishni bosqichma-bosqich qiladigan yengil yechim (backend hamon filtrlangan TO'LIQ ro'yxatni bir marta qaytaradi, keyin frontend uni bo'lib-bo'lib ko'rsatadi).
+- Test: `npx vite build` xatosiz o'tdi. Vizual tasdiqlash muhitda headless brauzer vositasi yo'qligi sababli amalga oshirilmadi.

@@ -33,6 +33,7 @@ export default function PatientHistory() {
   const [search, setSearch]       = useState('')
   const [activeLabel, setActiveLabel] = useState(searchParams.get('label') || '')
   const [patients, setPatients]   = useState([])
+  const [visibleCount, setVisibleCount] = useState(10)
   const [expanded, setExpanded]   = useState(null)
   const [images, setImages]       = useState({})
   const [loading, setLoading]     = useState(false)
@@ -81,11 +82,17 @@ export default function PatientHistory() {
       if (lbl) params.set('label', lbl)
       const { data } = await api.get(`/patients?${params}`)
       setPatients(data)
+      setVisibleCount(10)
     } catch {
       setPatients([])
+      setVisibleCount(10)
     } finally {
       setLoading(false)
     }
+  }
+
+  function showMore() {
+    setVisibleCount(c => c + 10)
   }
 
   // URL param o'zgarganda
@@ -230,11 +237,11 @@ export default function PatientHistory() {
       ) : (
         <div className="space-y-2">
           <p className="text-xs text-gray-400 dark:text-slate-500 px-1">
-            {patients.length} ta bemor topildi
+            {Math.min(visibleCount, patients.length)} / {patients.length} ta bemor ko'rsatilmoqda
             {activeLabel && ` — ${activeLabel} filtri`}
           </p>
 
-          {patients.map(p => (
+          {patients.slice(0, visibleCount).map(p => (
             <div key={p.id}
               className="card p-0 overflow-hidden hover:shadow-md dark:hover:shadow-slate-900/50 transition-all duration-200">
 
@@ -330,6 +337,14 @@ export default function PatientHistory() {
               )}
             </div>
           ))}
+
+          {visibleCount < patients.length && (
+            <div className="flex justify-center pt-2">
+              <button onClick={showMore} className="btn-secondary text-sm">
+                Yana 10 ta ko'rsatish ({patients.length - visibleCount} ta qoldi)
+              </button>
+            </div>
+          )}
         </div>
       )}
 
