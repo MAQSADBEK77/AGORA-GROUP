@@ -5,23 +5,43 @@ Hamshira rasm yuklaydi → radiolog tekshiradi → AI o'z-o'zini o'qitib boradi.
 
 ---
 
-## Ishga tushirish
+## Ishga tushirish (Windows)
 
-> **Talab:** Python 3.10+, Node.js 18+
-
-**1. Backend** — yangi terminal oching:
-
-```
-start_backend.bat
-```
-
-**2. Frontend** — boshqa terminal oching:
+GitHub'dan repo'ni yuklab oling (yashil **Code → Download ZIP** yoki `git clone`),
+so'ng papka ichidagi:
 
 ```
-start_frontend.bat
+ISHGA_TUSHIRISH.bat
 ```
 
-**3. Brauzerda oching:** [http://localhost:3000](http://localhost:3000)
+faylini ikki marta bosing. Shu bitta fayl avtomatik ravishda:
+
+- Python va Node.js borligini tekshiradi (yo'q bo'lsa `winget` orqali o'zi o'rnatadi)
+- Backend va frontend uchun kerakli kutubxonalarni o'rnatadi
+- Ikkala serverni ishga tushiradi
+- Brauzerni [http://localhost:3000](http://localhost:3000) manzilida ochadi
+
+> Agar Python/Node birinchi marta shu skript orqali o'rnatilsa, oyna sizdan
+> uni yopib qayta ochishni so'rashi mumkin (Windows PATH yangilanishi uchun) —
+> bu faqat birinchi ishga tushirishda, bir marta bo'ladi.
+
+Keyingi safar dasturni ochish uchun ham xuddi shu faylni bosishning o'zi
+yetarli — kutubxonalar allaqachon o'rnatilgani uchun bir necha soniyada
+ishga tushadi.
+
+<details>
+<summary>Alohida ishga tushirish (ilg'or foydalanuvchilar uchun)</summary>
+
+**Talab:** Python 3.10+, Node.js 18+
+
+1. `install_windows.bat` — Python/Node tekshiradi va o'rnatadi
+2. `start_backend_windows.bat` — backend (alohida terminal)
+3. `start_frontend_windows.bat` — frontend (alohida terminal)
+4. Brauzerda oching: [http://localhost:3000](http://localhost:3000)
+
+</details>
+
+**macOS:** `Backend_Mac.command` va `Frontend_Mac.command` fayllarini oching.
 
 ---
 
