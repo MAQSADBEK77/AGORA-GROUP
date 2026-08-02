@@ -754,3 +754,48 @@ masofada joylashgan ekan (mening 8% chegaramdan tashqarida qolgan).
   ko'krak mushagi rasm chetiga tabiiy tarzda yetib borishi mumkin, bu
   screenshot orqali tasdiqlandi (yorliqning o'zi bu safar to'g'ri
   chetlab o'tilgan edi).
+
+### 26.2. Uchinchi tuzatish — ko'krak mushagi muammosi: "core-zone" yondashuvi
+
+Foydalanuvchi yangi screenshot yubordi: "endi esa shu muammo" — ramka yana
+rasm burchagiga yaqin chiqib turardi. Bu safar "Yana tuzatishga harakat qil"
+deb aniq buyuriladi (funksiyani olib tashlash taklif qilingan edi, lekin
+foydalanuvchi rad etib, tuzatishni davom ettirishni tanladi).
+
+- Ildiz sabab: MLO ko'rinishida ko'krak mushagi (pectoral muscle) rentgenda
+  tabiiy ravishda ENG yorug'/zich to'qima bo'ladi va ko'pincha rasmning
+  yuqori burchagiga tegib turadi — bu haqiqiy topilma emas, lekin oldingi
+  algoritm buni "eng zich mintaqa" deb noto'g'ri tanlardi.
+- Birinchi urinish — piksel darajasida `cv2.erode` bilan chekka-yaqin
+  hududlarni "yeyish": OpenCV'ning gotcha'siga duch kelindi — `cv2.erode`
+  standart holatda rasm chegarasidan tashqarini "old plan" (foreground) deb
+  hisoblaydi, shu sabab haqiqiy rasm chetlarida kutilgan qisqarish
+  bo'lmaydi; `borderValue=0` aniq ko'rsatilishi kerak edi. Bu qisman
+  yordam berdi, lekin (a) avval to'g'ri ishlagan bir holatni buzib qo'ydi
+  (natija None qaytardi) va (b) to'liq o'lchamli rasmlarda (4728x5928px)
+  juda sekin ishladi (2+ daqiqa, timeout).
+- **Yakuniy yechim** (`backend/app/ai/lesion.py`, hozirgi holat):
+  1. **Tezlik**: tahlil rasmni 900px maksimal o'lchamgacha kichraytirilgan
+     nusxada bajaradi (`ANALYSIS_MAX_DIM`), natija oxirida asl o'lchamga
+     qayta hisoblanadi — bu 2+ daqiqalik ishlash vaqtini ~0.3-0.7 soniyagacha
+     tushirdi.
+  2. **"Core-zone" chegaralash**: piksel darajasidagi erode o'rniga, qidiruv
+     to'g'ridan-to'g'ri ko'krak to'qimasining O'Z chegara-qutisi (bounding
+     box) ichidagi markaziy 64% hudud bilan cheklanadi (`CORE_MARGIN_RATIO
+     = 0.18`, ya'ni har tomondan 18% chetga chiqarib tashlanadi) — bu
+     ko'krak mushagi/teri chegarasi kabi tashqi hududlarni avtomatik
+     chetlab o'tadi, chunki haqiqiy topilmalar odatda har tomondan to'qima
+     bilan o'ralgan bo'ladi.
+  3. Avvalgi bog'langan-blok (`_largest_component_mask`) usuli — apparat
+     yorliqlarini chetlab o'tish uchun — saqlab qolindi va o'zgarishsiz
+     ishlayapti.
+- Test: ikkala oldin muammoli bo'lgan haqiqiy fayl bilan qayta tekshirildi
+  (to'g'ridan-to'g'ri Python orqali, so'ng haqiqiy sahifada screenshot
+  orqali): MLO holatida natija endi ko'krak mushagi va "L MLO" yorlig'i
+  ikkalasidan ham aniq uzoqlashgan, ichki to'qima ustida (kanalga o'xshash
+  yorqin struktura ustida) joylashgani vizual tasdiqlandi; CC holatida
+  natija dastlabki (birinchi tuzatishdan keyingi, to'g'ri) natijaga deyarli
+  bir xil chiqdi.
+- Bazadagi barcha 7 ta haqiqiy `ai_predictions` qatori (id 1-7,
+  image_id 25/29/9/17/37/41/45) yangi algoritm bilan qayta hisoblanib
+  yangilandi.
