@@ -198,6 +198,11 @@ export default function ReviewDetail() {
       const { data } = await api.get(`/ai-predict/${id}`)
       setAiPred(data)
       if (!form.label && data.label) setForm(f => ({ ...f, label: data.label }))
+      // Natijani asosiy rasm(lar)ning o'zi ustida ham ko'rsatish uchun —
+      // panel render'i `p.ai_prediction`ga qarab ramka/yorliq chizadi.
+      const patch = img => img.id === Number(id) ? { ...img, ai_prediction: data } : img
+      setImage(img => img && patch(img))
+      setSiblings(prev => prev.map(patch))
       toast.success('AI tahlil tayyor')
     } catch (err) {
       const msg = err.response?.data?.detail || 'AI tahlil xatosi'
@@ -488,16 +493,25 @@ export default function ReviewDetail() {
                     width: p.ai_prediction.lesion_width, height: p.ai_prediction.lesion_height }
                 : null
               const pColor = (LABEL_STYLE[p.ai_prediction?.label] || LABEL_STYLE['Normal']).hex
+              const pFlagged = p.ai_prediction && p.ai_prediction.label !== 'Normal'
 
               const isSelected = compareSelected.some(x => x.id === p.id)
 
               return (
                 <div key={p.id}
                   className={`relative group bg-black flex items-center justify-center ${compareMode ? 'cursor-pointer' : 'cursor-zoom-in'} ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}
+                  style={pFlagged ? { boxShadow: `inset 0 0 0 3px ${pColor}` } : undefined}
                   onClick={e => compareMode ? togglePanelSelected(p, e) : setZoomImage(p)}>
-                  <span className="absolute top-1.5 left-1.5 z-10 text-[10px] font-bold bg-black/70 text-white px-1.5 py-0.5 rounded">
-                    {panelLabel(p)}
-                  </span>
+                  {pFlagged ? (
+                    <span className="absolute top-0 left-0 right-0 z-10 text-center text-white text-xs font-bold py-1"
+                      style={{ backgroundColor: pColor }}>
+                      {panelLabel(p)} • AI: {p.ai_prediction.label}
+                    </span>
+                  ) : (
+                    <span className="absolute top-1.5 left-1.5 z-10 text-[10px] font-bold bg-black/70 text-white px-1.5 py-0.5 rounded">
+                      {panelLabel(p)}
+                    </span>
+                  )}
                   {p.status === 'reviewed' && !compareMode && (
                     <CheckCircle size={14} className="absolute top-1.5 right-1.5 z-10 text-green-400" />
                   )}
@@ -610,34 +624,9 @@ export default function ReviewDetail() {
                 </p>
 
                 {similarCases.length > 0 ? (
-                  <div>
-                    <p className="text-xs text-gray-500 font-medium mb-2">
-                      Eng o'xshash {similarCases.length} ta holat:
-                    </p>
-                    <div className="grid grid-cols-4 gap-2">
-                      {similarCases.slice(0, 4).map((c, i) => {
-                        const s = LABEL_STYLE[c.label] || LABEL_STYLE['Normal']
-                        return (
-                          <button key={i} type="button"
-                            onClick={() => navigate(`/review/${c.image_id}`)}
-                            title={`Rasm #${c.image_id} — ${c.label}`}
-                            className="relative aspect-square rounded-lg overflow-hidden bg-black border-2 hover:opacity-90 transition-opacity"
-                            style={{ borderColor: s.hex }}>
-                            <img src={`${API_BASE_URL}/img/${c.image_id}`} alt={c.label}
-                              className="w-full h-full object-cover"
-                              onError={e => { e.target.style.opacity = 0.15 }} />
-                            <span className="absolute top-0 left-0 right-0 text-center text-white text-[9px] font-bold py-0.5 truncate px-1"
-                              style={{ backgroundColor: s.hex }}>
-                              {c.label}
-                            </span>
-                            <span className="absolute bottom-0.5 right-0.5 text-[9px] font-semibold text-white bg-black/70 px-1 rounded">
-                              {Math.round((c.similarity || 0) * 100)}%
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
+                  <p className="text-xs text-gray-500">
+                    Eng o'xshash {similarCases.length} ta holat asosida — natija yuqoridagi asosiy rasmda belgilangan.
+                  </p>
                 ) : (
                   <p className="text-xs text-orange-600 bg-orange-50 rounded p-2">
                     Labeled rasm topilmadi. Birinchi diagnoz qo'ying — AI o'rganib boradi.
