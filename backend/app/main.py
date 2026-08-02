@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from .database import engine, Base
 from .routers import auth, upload, review
 from . import models
@@ -51,11 +52,30 @@ def create_default_admin():
 create_default_admin()
 
 
-@app.get("/")
-def root():
-    return {"message": "MammoAI v2 — self-learning tizim", "docs": "/docs"}
-
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# Bitta-port production rejimi: agar frontend build qilingan bo'lsa
+# (frontend/dist mavjud bo'lsa — masalan server skripti orqali `npm run
+# build` ishlatilgandan keyin), backend uni ham xizmat qiladi. Shunda
+# Tailscale Funnel kabi tunnel xizmatlari uchun faqat BITTA portni (backend)
+# tashqariga chiqarish kifoya — frontend alohida server/port talab qilmaydi.
+FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")
+
+if os.path.isdir(FRONTEND_DIST):
+    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="frontend-assets")
+
+    @app.get("/{full_path:path}")
+    def serve_frontend(full_path: str):
+        candidate = os.path.join(FRONTEND_DIST, full_path)
+        if full_path and os.path.isfile(candidate):
+            return FileResponse(candidate)
+        # React Router client-side yo'llari (masalan /review/12) uchun
+        # ham har doim index.html qaytariladi — routing brauzerda hal bo'ladi.
+        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+else:
+    @app.get("/")
+    def root():
+        return {"message": "MammoAI v2 — self-learning tizim", "docs": "/docs"}

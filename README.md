@@ -29,6 +29,50 @@ Keyingi safar dasturni ochish uchun ham xuddi shu faylni bosishning o'zi
 yetarli — kutubxonalar allaqachon o'rnatilgani uchun bir necha soniyada
 ishga tushadi.
 
+---
+
+## Doimiy SERVER sifatida ishga tushirish (radiologlar boshqa joydan kirishi uchun)
+
+Bitta Windows kompyuterni doimiy yoqiladigan server qilib, boshqa
+shaharda/joyda o'tirgan radiolog unga internet orqali kirishi mumkin.
+Tarmoq uchun [Tailscale Funnel](https://tailscale.com/) ishlatiladi —
+bepul, router sozlash shart emas, HTTPS o'zi ishlaydi, va eng muhimi:
+kompyuterning 8000-porti internetga TO'G'RIDAN-TO'G'RI ochilmaydi —
+faqat Tailscale'ning shifrlangan tunneli orqali kiriladi (bemor
+ma'lumotlari uchun bu muhim xavfsizlik farqi).
+
+**Bir martalik o'rnatish** (bu fayl ustida o'ng tugma → **Run as administrator**):
+
+```
+SERVER_ORNATISH.bat
+```
+
+Bu skript: Python/Node.js/Tailscale'ni tekshiradi va o'rnatadi, backend
+kutubxonalarini o'rnatadi, frontend'ni **production build** qiladi
+(frontend endi backend bilan bitta portdan — 8000 — xizmat qiladi),
+kompyuterning uxlab qolishini o'chiradi, va serverni Windows qayta
+yoqilganda ham avtomatik ishga tushishini sozlaydi (Task Scheduler).
+Jarayon davomida bitta bor Tailscale akkauntga (Google/Microsoft/GitHub/
+email — bepul) brauzer orqali kirish so'raladi.
+
+O'rnatishdan keyin, radiolog kirishi kerak bo'lgan **tashqi manzil**
+ekranda `https://<kompyuter-nomi>.<tailnet-nomi>.ts.net` ko'rinishida
+chiqadi — shu havolani radiologga yuboring, u istalgan joydan (o'z
+kompyuteri yoki telefonidan, hech qanday dastur o'rnatmasdan) brauzer
+orqali kiraveradi.
+
+Keyingi safar qo'lda ishga tushirish kerak bo'lsa (masalan avtomatik
+ishga tushish ishlamay qolsa):
+
+```
+SERVER_ISHGA_TUSHIRISH.bat
+```
+
+> **Diqqat:** bu — production rejim, `ISHGA_TUSHIRISH.bat`dan farqli
+> o'laroq frontend har safar qayta build qilinmaydi va backend
+> `--reload`siz ishlaydi (kod o'zgartirsangiz, `SERVER_ORNATISH.bat`ni
+> qayta ishga tushiring — u qayta build qiladi).
+
 <details>
 <summary>Alohida ishga tushirish, AI trenirovka, demo data (ilg'or foydalanuvchilar uchun)</summary>
 

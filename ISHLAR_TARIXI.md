@@ -799,3 +799,64 @@ foydalanuvchi rad etib, tuzatishni davom ettirishni tanladi).
 - Bazadagi barcha 7 ta haqiqiy `ai_predictions` qatori (id 1-7,
   image_id 25/29/9/17/37/41/45) yangi algoritm bilan qayta hisoblanib
   yangilandi.
+
+## 27. Windows kompyuterni doimiy SERVER qilish — Tailscale Funnel orqali
+
+Foydalanuvchi: bitta Windows kompyuterni boshqa joyga qo'yib, uni
+o'chirmasdan doimiy SERVER sifatida ishlatmoqchi bo'ldi, radiologlar esa
+BOSHQA kompyuterlardan (o'sha Windows kompyuterda emas) unga kirishi kerak.
+Avvalgi tunnel usullari (ngrok — hisob to'xtatilgan, localtunnel — o'ta
+beqaror) bunga yaramaydi, chunki ular vaqtinchalik va manzil doim
+o'zgarib turadi.
+
+- **Tanlangan yechim**: Tailscale Funnel — bepul, router/port-forward
+  sozlash shart emas, HTTPS avtomatik ishlaydi, va portlar internetga
+  TO'G'RIDAN-TO'G'RI ochilmaydi (faqat Tailscale'ning shifrlangan tarmog'i
+  orqali) — bemor ma'lumotlari uchun bu port-forwarding'dan xavfsizroq.
+  Foydalanuvchiga 3 variant taqdim etildi (Tailscale Funnel / Cloudflare
+  Tunnel + domen / router port-forwarding + DDNS), Tailscale Funnel
+  tanlandi.
+
+- **Bitta-port production arxitekturasi qo'shildi** (`backend/app/main.py`):
+  avval frontend (Vite dev server, 3000-port) va backend (8000-port)
+  alohida serverlar edi — Tailscale Funnel bittasini oson, ikkitasini
+  qiyinroq ochadi. Endi agar `frontend/dist` build qilingan bo'lsa
+  (production), backend uni ham xizmat qiladi: `/assets` StaticFiles
+  orqali, va `@app.get("/{full_path:path}")` catch-all route orqali barcha
+  boshqa GET so'rovlar uchun `index.html` qaytariladi (React Router
+  client-side routing ishlashi uchun — masalan `/review/37` ham to'g'ri
+  ishlaydi). Frontend'ning `API_BASE_URL` standart qiymati (`/api`,
+  nisbiy yo'l) allaqachon shu arxitekturaga mos edi — hech qanday CORS
+  yoki alohida konfiguratsiya kerak bo'lmadi. `frontend/dist` mavjud
+  bo'lmasa (dev/API-only rejim, masalan Render backend service'ida),
+  eski JSON `/` javobi saqlanib qoladi — orqaga moslik buzilmadi.
+  **Test**: `npm run build` bilan haqiqiy build qilinib, backend mahalliy
+  portda ishga tushirilib tekshirildi — `/` (200, index.html), SPA yo'li
+  `/review/37` (200, index.html), JS/CSS assetlar (200), `/health`,
+  `/docs`, `/api/auth/login` — barchasi to'g'ri ishladi.
+
+- **`SERVER_ORNATISH.bat`** (tub papkada, Administrator sifatida bir marta
+  ishga tushiriladi): Python/Node.js/Tailscale'ni tekshiradi va o'rnatadi
+  (winget), backend venv+kutubxonalarini o'rnatadi, frontend'ni production
+  build qiladi, kompyuterning uxlab qolishi/monitor o'chishini
+  o'chiradi (`powercfg`), `tailscale up` orqali bir martalik akkaunt
+  kirishini so'raydi, va Windows Task Scheduler orqali serverni
+  kompyuter qayta yoqilganda ham avtomatik ishga tushirishni sozlaydi
+  (`schtasks /sc onstart /ru SYSTEM`).
+
+- **`SERVER_ISHGA_TUSHIRISH.bat`**: haqiqiy ishga tushirish skripti (ham
+  qo'lda, ham Task Scheduler orqali chaqiriladi). `tailscale funnel 8000`
+  ni alohida oynada ishga tushiradi (backend portini HTTPS orqali
+  tashqariga ochadi), `tailscale funnel status` bilan tashqi manzilni
+  ko'rsatadi, so'ng `uvicorn`ni **production rejimda** (`--reload`siz,
+  `0.0.0.0:8000`) ishga tushiradi — agar u kutilmaganda to'xtab qolsa,
+  5 soniyadan keyin avtomatik qayta ishga tushiriladigan loop bilan.
+
+- Render'dagi asosiy muammo — ephemeral disk har safar bazani tozalab
+  yuborishi — bu yondashuvda umuman yo'q, chunki bu foydalanuvchining
+  o'z jismoniy kompyuteri, disk hech qachon avtomatik tozalanmaydi.
+
+- README.md'ga to'liq bosqichma-bosqich yo'riqnoma qo'shildi (jumladan
+  Tailscale admin panelida bir martalik "Enable HTTPS" bosish kerakligi
+  haqida eslatma — bu veb-brauzer orqali qilinadigan qadam, skript orqali
+  avtomatlashtirib bo'lmaydi).
