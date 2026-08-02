@@ -725,3 +725,32 @@ apparat yozgan **"L MLO" yorlig'i ustida** chiqib turgan edi.
   bir xil, burchakka mos koordinata) — ularning `lesion_x/y/width/height`
   maydonlari NULL qilindi (diagnoz/ishonch darajasi O'ZGARTIRILMADI, faqat
   noto'g'ri ramka ko'rsatilishi to'xtatildi).
+
+### 26.1. Birinchi tuzatish YETARLI EMAS EDI — chegara marjini o'rniga bog'langan-blok usuli
+
+Foydalanuvchi: "baribir yana shunaqa bo'lyapti" — birinchi tuzatish (8% chekka
+marjinini chiqarib tashlash) ishlamadi, chunki apparat yorlig'i chetdan 12%
+masofada joylashgan ekan (mening 8% chegaramdan tashqarida qolgan).
+
+- Haqiqiy fayl bilan tekshirilib, xato aniq tasdiqlandi: kesib olingan
+  mintaqa rasmda chindan ham burchakdagi oq "L CC" yorlig'ining o'zi ekani
+  vizual tasdiqlandi (screenshot orqali).
+- **To'g'ri yechim**: chegara masofasi bo'yicha taxmin qilish o'rniga,
+  `cv2.connectedComponentsWithStats` bilan fon-old plan maskasidagi barcha
+  BOG'LANGAN BLOKLAR topiladi, va ular orasidan FAQAT ENG KATTASI (haqiqiy
+  ko'krak to'qimasi) qoldiriladi — apparat yorliqlari to'qimadan qora fon
+  bilan ajralib turgani uchun (kichikroq, alohida blok), aniq QAYERDA
+  joylashganidan qat'i nazar avtomatik chetlab o'tiladi.
+- Test: haqiqiy fayl bilan qayta tekshirildi — yangi natija (x=0.11, y=0.47)
+  vizual tasdiqlandi (kesib olingan mintaqa haqiqatan ham ko'krak
+  to'qimasi ichida, zichroq ko'rinishga ega joyda ekani rasm orqali
+  ko'rsatildi), "L CC" yorlig'i esa butunlay boshqa, chetlab o'tilgan
+  hududda qolgani tasdiqlandi.
+- Bazadagi barcha mavjud (Normal bo'lmagan) `ai_predictions` qatorlari
+  yangi, to'g'ri algoritm bilan QAYTA HISOBLANDI va yangilandi (oldin
+  faqat NULL qilingan edi — endi haqiqiy to'g'ri ramka qiymati bilan
+  to'ldirildi). Bir nechta yozuvda natija rasm burchagiga yaqin chiqdi,
+  lekin bu safar sabab BOSHQA (haqiqiy) edi — MLO ko'rinishida ko'krak/
+  ko'krak mushagi rasm chetiga tabiiy tarzda yetib borishi mumkin, bu
+  screenshot orqali tasdiqlandi (yorliqning o'zi bu safar to'g'ri
+  chetlab o'tilgan edi).

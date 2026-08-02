@@ -12,8 +12,22 @@ import numpy as np
 
 MIN_AREA_RATIO = 0.001   # rasm yuzasining shu ulushidan kichik bloklar e'tiborga olinmaydi
 DENSE_PERCENTILE = 97     # to'qima ichida eng yorug' foizlik chegara
-EDGE_MARGIN_RATIO = 0.08  # rasm chetidan shu ulush — apparat yozgan "L/R", "MLO" kabi
-                           # yorliqlar deyarli doim shu yerda bo'ladi, to'qima emas
+
+
+def _largest_component_mask(mask: np.ndarray) -> np.ndarray:
+    """Faqat ENG KATTA bog'langan blokni qoldiradi — apparat yozgan L/R,
+    CC/MLO kabi yorliqlar ko'krak to'qimasidan HAR DOIM ajralib turadi
+    (orasida qora fon bor), shuning uchun alohida, kichikroq blok bo'lib
+    chiqadi va shu yo'l bilan aniq chetlab o'tiladi — ularning rasmdagi
+    ANIQ joylashuvidan qat'i nazar (faqat chetda emas, markazga yaqin ham
+    bo'lishi mumkin)."""
+    n_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+    if n_labels <= 1:
+        return mask
+    # label 0 — fon; qolganlar orasidan eng katta yuzali blokni tanlaymiz
+    areas = stats[1:, cv2.CC_STAT_AREA]
+    largest_label = 1 + int(np.argmax(areas))
+    return np.where(labels == largest_label, 255, 0).astype(np.uint8)
 
 
 def detect_lesion_region(image_path: str) -> dict | None:
@@ -25,16 +39,11 @@ def detect_lesion_region(image_path: str) -> dict | None:
     h, w = img.shape
     blurred = cv2.GaussianBlur(img, (9, 9), 0)
 
-    # Fondan ko'krak to'qimasini ajratish
+    # Fondan ko'krak to'qimasini ajratish, so'ng FAQAT eng katta blok
+    # (haqiqiy ko'krak) qoldiriladi — apparat yorliqlari qora fon bilan
+    # ajralgan alohida (kichikroq) bloklar bo'lgani uchun bekor qilinadi.
     _, breast_mask = cv2.threshold(blurred, 15, 255, cv2.THRESH_BINARY)
-
-    # Rasm chetlarini (apparat yozgan L/R, MLO/CC kabi yorug' matn yorliqlari
-    # ko'pincha shu yerda bo'ladi) tekshiruvdan chiqarib tashlaymiz — aks holda
-    # ular "eng yorug' mintaqa" sifatida noto'g'ri tanlanib qolishi mumkin edi.
-    mx, my = int(w * EDGE_MARGIN_RATIO), int(h * EDGE_MARGIN_RATIO)
-    edge_mask = np.zeros_like(breast_mask)
-    edge_mask[my:h - my, mx:w - mx] = 255
-    breast_mask = cv2.bitwise_and(breast_mask, edge_mask)
+    breast_mask = _largest_component_mask(breast_mask)
 
     tissue_vals = blurred[breast_mask > 0]
     if tissue_vals.size < 100:
