@@ -59,23 +59,6 @@ def get_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
-# VAQTINCHALIK: admin parolini tiklash uchun favqulodda endpoint — faqat maxfiy
-# kalit to'g'ri kiritilsa ishlaydi. Ishlatilgandan so'ng KOD'DAN OLIB TASHLANADI.
-_BOOTSTRAP_SECRET = "9Tp9CsGFqY6R17H1dvbI6i_oPWhfHyMov4EVTgBLlUc"
-
-@router.post("/bootstrap-reset-admin")
-def bootstrap_reset_admin(secret: str, new_password: str, db: Session = Depends(get_db)):
-    if secret != _BOOTSTRAP_SECRET:
-        raise HTTPException(status_code=403, detail="Noto'g'ri kalit")
-    admin = db.query(models.User).filter(models.User.role == models.UserRole.admin).first()
-    if not admin:
-        raise HTTPException(status_code=404, detail="Admin topilmadi")
-    admin.hashed_password = hash_password(new_password)
-    db.commit()
-    _failed_attempts.clear()
-    return {"success": True, "email": admin.email}
-
-
 @router.get("/signature/{user_id}")
 def serve_signature(user_id: int, db: Session = Depends(get_db)):
     """Foydalanuvchi imzo rasmini qaytaradi — <img> tag uchun auth kerak emas."""
