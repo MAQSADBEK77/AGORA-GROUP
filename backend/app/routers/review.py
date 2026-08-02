@@ -9,6 +9,7 @@ from ..database import get_db
 from ..auth import get_current_user
 from ..ai.predictor import predict_from_labeled, index_labeled_image
 from ..ai.lesion import detect_lesion_region
+from ..ai.inference.deep_predictor import predict_image as deep_predict_image, model_status as deep_model_status
 from ..reports import generate_diagnosis_pdf
 
 router = APIRouter(prefix="/api", tags=["Review"])
@@ -172,13 +173,24 @@ def get_notifications(limit: int = 20,
 
 # ─── AI taxmin (labeled rasmlar bilan solishtirish) ───
 
+# Ehtimollikni 4 bosqichli label'ga aylantirish uchun oddiy, hujjatlashtirilgan
+# chegaralar — bu klinik jihatdan tasdiqlangan chegara EMAS, faqat uzluksiz
+# ehtimollikni mavjud Normal/Benign/Malignant/Very Malignant tizimiga moslashtiruvchi
+# amaliy xarita (radiolog yakuniy tashxisni doim o'zi tasdiqlaydi).
+def _probability_to_label(prob: float) -> models.ReviewLabel:
+    if prob < 0.3:
+        return models.ReviewLabel.normal
+    if prob < 0.5:
+        return models.ReviewLabel.benign
+    if prob < 0.85:
+        return models.ReviewLabel.malignant
+    return models.ReviewLabel.very_malignant
+
+
 @router.get("/ai-predict/{image_id}", response_model=schemas.AIPredictionOut)
 def ai_predict(image_id: int, db: Session = Depends(get_db),
                current_user: models.User = Depends(get_current_user)):
     _require_radiolog(current_user)
-
-    # AI tahlil hozircha o'chirilgan — dastur DICOM formatiga moslashtirilmoqda.
-    raise HTTPException(status_code=503, detail="AI tahlil hozircha o'chirilgan")
 
     image = db.query(models.MammographyImage).filter(
         models.MammographyImage.id == image_id).first()
@@ -188,8 +200,42 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
     if image.ai_prediction:
         return image.ai_prediction
 
-    # Labeled rasmlarni bitta query bilan olish (N+1 dan qochish)
-    from sqlalchemy import text
+    image_path = _resolve_image_path(image)
+
+    # 1) Avval chuqur o'rganish modelini (ConvNeXt) sinab ko'ramiz — og'irlik
+    #    topilmasa (hali o'qitilmagan bo'lsa), pastdagi KNN tizimiga o'tamiz.
+    deep_result = deep_predict_image(image_path)
+
+    if deep_result.get("status") == "completed":
+        probability = deep_result["probability"]
+        label_enum = _probability_to_label(probability)
+        model_version = deep_result.get("model_version", "unknown")
+
+        lesion_box = None
+        if label_enum != models.ReviewLabel.normal:
+            try:
+                lesion_box = detect_lesion_region(image_path)
+            except Exception:
+                lesion_box = None
+
+        pred = models.AIPrediction(
+            image_id=image_id,
+            label=label_enum,
+            confidence=probability if label_enum != models.ReviewLabel.normal else round(1 - probability, 4),
+            similar_cases=json.dumps([], ensure_ascii=False),
+            lesion_x=lesion_box["x"] if lesion_box else None,
+            lesion_y=lesion_box["y"] if lesion_box else None,
+            lesion_width=lesion_box["width"] if lesion_box else None,
+            lesion_height=lesion_box["height"] if lesion_box else None,
+            model_version=model_version,
+        )
+        db.add(pred)
+        db.commit()
+        db.refresh(pred)
+        return pred
+
+    # 2) Chuqur model mavjud emas (MODEL_WEIGHTS_NOT_FOUND / o'chirilgan / xato) —
+    #    KNN (shifokor belgilagan rasmlar bilan solishtirish) tizimiga qaytamiz.
     upload_dir = os.getenv("UPLOAD_DIR", "./uploads")
 
     rows = db.execute(text("""
@@ -214,7 +260,7 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
         })
 
     try:
-        result = predict_from_labeled(image.file_path, labeled_cases)
+        result = predict_from_labeled(image_path, labeled_cases)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI xatosi: {str(e)}")
 
@@ -227,7 +273,7 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
     lesion_box = None
     if label_enum != models.ReviewLabel.normal:
         try:
-            lesion_box = detect_lesion_region(image.file_path)
+            lesion_box = detect_lesion_region(image_path)
         except Exception:
             lesion_box = None
 
@@ -240,11 +286,19 @@ def ai_predict(image_id: int, db: Session = Depends(get_db),
         lesion_y=lesion_box["y"] if lesion_box else None,
         lesion_width=lesion_box["width"] if lesion_box else None,
         lesion_height=lesion_box["height"] if lesion_box else None,
+        model_version="knn-resnet18",
     )
     db.add(pred)
     db.commit()
     db.refresh(pred)
     return pred
+
+
+@router.get("/ai-status")
+def ai_status(current_user: models.User = Depends(get_current_user)):
+    """Chuqur o'rganish modeli holatini ko'rsatadi (og'irlik yuklanganmi va h.k.) —
+    frontend'da radiologga qaysi AI ishlatilishini ko'rsatish uchun."""
+    return deep_model_status()
 
 
 # ─── Radiolog labeling (asosiy endpoint) ───

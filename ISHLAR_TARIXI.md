@@ -594,3 +594,99 @@ qiladi, shuning uchun tasodifiy/tekshirilmagan holda qilish xavfli):
 - `PatientHistory.jsx` — yangi `visibleCount` state (boshlang'ich 10), ro'yxat `patients.slice(0, visibleCount)` bilan chiziladi. Har safar qidiruv/filtr o'zgarib `loadPatients()` qayta chaqirilganda `visibleCount` 10ga qaytariladi. Ro'yxat tagida, ko'rsatilmagan bemor qolsa, "Yana 10 ta ko'rsatish (N ta qoldi)" tugmasi chiqadi — bosilganda `visibleCount` 10taga oshadi.
 - Bu — backend so'rovini o'zgartirmagan, faqat frontendda ko'rsatishni bosqichma-bosqich qiladigan yengil yechim (backend hamon filtrlangan TO'LIQ ro'yxatni bir marta qaytaradi, keyin frontend uni bo'lib-bo'lib ko'rsatadi).
 - Test: `npx vite build` xatosiz o'tdi. Vizual tasdiqlash muhitda headless brauzer vositasi yo'qligi sababli amalga oshirilmadi.
+
+## 25. ConvNeXt chuqur o'rganish moduli qurildi — HALOL XULOSA: model hali ishlatishga tayyor emas (2026-08-02)
+
+Foydalanuvchi RSNA Breast Cancer Detection musobaqasining 1-o'rin yechimi ("mr.robot",
+https://github.com/dangnh0611/kaggle_rsna_breast_cancer) g'oyalaridan ilhomlangan
+chuqur o'rganish (deep learning) modulini, "tez MVP (2-3 soat) hozir, kuchli
+production kelajakda" tamoyili bilan qurishni so'radi. To'liq, ishlaydigan
+infratuzilma qurildi VA sinovdan o'tkazildi — lekin modelning o'zi kutilgan
+aniqlikka yetmadi, shuning uchun foydalanuvchi bilan kelishilgan holda ISHGA
+TUSHIRILMADI (tizim xavfsiz ravishda eski KNN'ga qaytadi).
+
+**Qurilgan infratuzilma** (`backend/app/ai/` ostida, to'liq ishlaydi):
+- `config.py` — markazlashtirilgan konfiguratsiya, FAST/PRODUCTION profillar,
+  barcha qiymatlar `AI_*` muhit o'zgaruvchilari orqali (kodga qattiq yozilmagan).
+- `preprocessing/breast_crop.py` — ko'krak mintaqasini fondan ajratish (threshold-
+  asosli, `BreastRegionDetector` interfeysi — kelajakda YOLOX bilan almashtirish
+  uchun joy qoldirilgan), `transforms.py` — o'qitish/xulosa uchun alohida
+  transformatsiyalar.
+- `models/convnext_model.py` — ConvNeXt (Tiny/Small/Base) wrapper, checkpoint
+  yuklash/saqlash, CUDA/MPS/CPU avtomatik aniqlash; `registry.py` — model
+  versiyalari tarixi (`model/registry.json`).
+- `training/dataset_prep.py` — **BEMOR DARAJASIDA** train/val bo'lish (`cbis_data/
+  mapping.json`dagi `patient_id` orqali — bitta bemorning bir nechta rasmi ham
+  train, ham val'da bo'lib qolib, natija soxta yuqori chiqishining oldi olindi;
+  bo'linishdan keyin avtomatik "leakage tekshiruvi" ham bor). `dataset.py` —
+  PyTorch Dataset; `train.py` — vaqt byudjeti bilan o'qitish tsikli (byudjet
+  tugashiga yaqinlashsa joriy epoch tugagach xavfsiz to'xtaydi), ROC-AUC/PR-AUC
+  baholash (sklearn), eng yaxshi checkpoint saqlash.
+- `inference/deep_predictor.py` — xulosa chiqarish, model FAQAT bir marta
+  yuklanadi (singleton). **torch/torchvision o'rnatilmagan muhitda ilova
+  QULAMAYDI** — `TORCH_AVAILABLE` bayrog'i orqali xavfsiz KNN'ga qaytadi
+  (mavjud `embeddings.py`dagi bir xil pattern). Checkpoint topilmasa
+  `MODEL_WEIGHTS_NOT_FOUND` — soxta bashorat qilinmaydi.
+- `aggregation/aggregation.py` — ko'p ko'rinishli (L-CC/L-MLO/R-CC/R-MLO)
+  natijalarni ko'krak/tekshiruv darajasiga yig'ish (max-pooling — mr.robot
+  yechimida ham shu yondashuv).
+- Backend: `ai_predictions` jadvaliga `model_version` ustuni qo'shildi (qaysi
+  model — ConvNeXt yoki KNN — natija berganini bildiradi). `/api/ai-predict/{id}`
+  ENDI avval ConvNeXt'ni sinaydi, checkpoint topilmasa AVTOMATIK KNN tizimiga
+  o'tadi (foydalanuvchi buni sezmaydi, ikkalasi ham bir xil `AIPredictionOut`
+  formatida qaytadi). Yangi `/api/ai-status` — model holatini tekshirish uchun.
+- Frontend: `ReviewDetail.jsx`da "AI dan so'rang" tugmasi TIKLANDI (avval matn
+  bor edi, lekin tugmaning o'zi yo'qolib qolgan edi — endi ishlaydi), natija
+  qaysi model tomonidan berilganini (`model_version`) va "bu yakuniy tashxis
+  emas, rasmni albatta o'zingiz ko'zdan kechiring" ogohlantirishini ko'rsatadi.
+- `requirements-ai.txt` — torch/torchvision/scikit-learn ATAYLAB asosiy
+  `requirements.txt`ga QO'SHILMADI (yuzlab MB, Render kabi yengil bepul
+  deploy'larni buzardi) — alohida ixtiyoriy fayl, faqat kerak bo'lganda
+  (`pip install -r requirements-ai.txt`) o'rnatiladi.
+- `AI_SETUP.md` — to'liq hujjat: arxitektura, FAST/PRODUCTION profil farqi,
+  "bu nega rasman mr.robot modeli emasligi" tushuntirilgan, muammolarni
+  bartaraf etish jadvali.
+
+**Dataset**: loyihada avvaldan bor edi — `cbis_data/` (CBIS-DDSM ochiq akademik
+mammografiya dataset namunasi, 500 rasm, `sample_500.json`da har biriga
+`patient_id` biriktirilgan). Bemor darajasida bo'lingandan keyin: **395 train
+/ 104 val** (Benign/Malignant nisbati muvozanatli).
+
+**Nega ishga tushirilmadi — 5 marta urinish, barchasi muvaffaqiyatsiz**:
+
+| # | Sozlama | Natija (ROC-AUC, 0.5=tasodifiy) |
+|---|---|---|
+| 1 | To'liq backbone fine-tune, 512px, 20 epoch | 0.518 |
+| 2 | Muzlatilgan backbone (faqat klassifikator boshi), 5 epoch | 0.429 |
+| 3 | AMP o'chirilgan (aralash aniqlik gradient muammosi ehtimoli tekshirildi) | 0.330 |
+| 4 | Yengil augmentatsiya (rotation/ColorJitter olib tashlandi — mayda kaltsifikatsiyalarga zarar berishi mumkin edi), 10 epoch | 0.475 |
+| 5 | Yuqori piksel (1024px, kamroq kichraytirish), 8 epoch | 0.478 |
+
+Har birida `train_loss` deyarli qimirlamadi (~0.79-0.80 atrofida qoldi — bu
+aynan modelning "har doim ehtimollik≈0.5" deb bashorat qilishiga mos keladigan
+qiymat, ya'ni model haqiqatda farqlashni o'rganmadi). Diagnostika uchun kichik
+(16 rasmli) to'plamni "yodlab olish" testi muvaffaqiyatli o'tdi (gradient oqimi,
+optimizer, loss — hammasi texnik jihatdan to'g'ri ishlaydi), lekin bu to'liq
+(395 xilma-xil rasmli) datasetdagi muvaffaqiyatsizlikni tushuntirmadi.
+
+**Eng ehtimolli sabab**: (a) 395 rasm 28 million parametrli ConvNeXt uchun juda
+kam (hatto muzlatilgan backbonda ham), (b) haqiqiy mr.robot yechimidagi YOLOX
+ROI-kesish bosqichisiz — bu yerda oddiy threshold-crop ishlatilgan, u mayda
+kaltsifikatsiyalarni saqlab qololmaydi (original rasmlar 512px'ga tushirilganda
+5-13x kichraytiriladi — tasdiqlangan), (c) "2-3 soat" vaqt cheklovi ichida
+yetarli epoch/qadam bo'lmagan bo'lishi mumkin — lekin bu kafolatlanmagan.
+
+**Foydalanuvchi bilan kelishilgan qaror**: eski (ishlamagan) checkpoint'lar
+(`model/convnext_best.pt` va h.k.) O'CHIRILDI — tizimda soxta/ishonchsiz
+natija bilan checkpoint QOLDIRILMADI. Kod GitHub'ga push qilinadi (kelajakda
+katta dataset va/yoki GPU server bilan qayta o'qitish uchun to'liq tayyor
+holda), lekin hozircha `/api/ai-predict` avtomatik ravishda eski, ishlaydigan
+KNN (shifokor belgilagan rasmlar bilan solishtirish) tizimidan foydalanadi —
+bu real muvaffaqiyatsiz model natijasidan xavfsizroq.
+
+**Test**: alohida test-bemor orqali (`upload/dicom-folder`) to'liq oqim
+tekshirildi — `model_status()` to'g'ri `weights_found: false` qaytardi,
+`/api/ai-predict/{id}` avtomatik KNN'ga o'tib, `model_version: "knn-resnet18"`
+bilan haqiqiy natija qaytardi (KNN natijasida ko'rsatilgan o'xshash rasmlar
+kechagi HAQIQIY shifokor tekshiruvlari ekani alohida tasdiqlandi — bugungi
+test qoldig'i emasligi tekshirildi). So'ng test yozuv/fayllar o'chirildi.

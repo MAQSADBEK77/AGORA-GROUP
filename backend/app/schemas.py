@@ -132,6 +132,7 @@ class AIPredictionOut(BaseModel):
     lesion_y: Optional[float] = None
     lesion_width: Optional[float] = None
     lesion_height: Optional[float] = None
+    model_version: Optional[str] = None
     created_at: datetime
 
     class Config:

@@ -575,8 +575,13 @@ export default function ReviewDetail() {
               <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm">
                 <Brain size={16} className="text-purple-500" /> AI Tahlil
               </h3>
-              {!aiPred && (
-                <span className="text-xs text-gray-400 italic">AI tahlil hozircha o'chirilgan</span>
+              {!aiPred && canReview && (
+                <button onClick={loadAiPrediction} disabled={aiLoading}
+                  className="btn-secondary text-xs py-1 px-3 flex items-center gap-1.5 disabled:opacity-50">
+                  {aiLoading
+                    ? <><div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" /> Tahlil qilinmoqda...</>
+                    : <><Brain size={12} /> AI dan so'rang</>}
+                </button>
               )}
             </div>
 
@@ -592,11 +597,17 @@ export default function ReviewDetail() {
                         <p className={`font-bold ${s.color}`}>{aiPred.label}</p>
                         <p className="text-xs text-gray-500">
                           Ishonch: {Math.round((aiPred.confidence || 0) * 100)}%
+                          {aiPred.model_version && (
+                            <span className="ml-2 text-gray-400">• {aiPred.model_version}</span>
+                          )}
                         </p>
                       </div>
                     </div>
                   )
                 })()}
+                <p className="text-[11px] text-gray-400 italic">
+                  AI-baholangan ehtimollik — yakuniy tashxis emas. Rasmni albatta o'zingiz ko'zdan kechiring.
+                </p>
 
                 {similarCases.length > 0 ? (
                   <div>

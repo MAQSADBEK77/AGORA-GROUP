@@ -1,0 +1,54 @@
+[
+  {
+    "model_name": "convnext_tiny",
+    "model_version": "mrrobot-inspired-0.1.0",
+    "profile": "fast",
+    "checkpoint_path": "./model/convnext_best.pt",
+    "image_size": 512,
+    "roc_auc": 0.42935606060606063,
+    "train_size": 395,
+    "val_size": 104,
+    "epochs_run": 5,
+    "dataset_version": "cbis-ddsm-sample-500",
+    "recorded_at": "2026-08-02T05:26:09.879069+00:00"
+  },
+  {
+    "model_name": "convnext_tiny",
+    "model_version": "mrrobot-inspired-0.1.0",
+    "profile": "fast",
+    "checkpoint_path": "./model/convnext_best.pt",
+    "image_size": 512,
+    "roc_auc": 0.32992424242424245,
+    "train_size": 395,
+    "val_size": 104,
+    "epochs_run": 5,
+    "dataset_version": "cbis-ddsm-sample-500",
+    "recorded_at": "2026-08-02T05:32:36.668844+00:00"
+  },
+  {
+    "model_name": "convnext_tiny",
+    "model_version": "mrrobot-inspired-0.1.0",
+    "profile": "fast",
+    "checkpoint_path": "./model/convnext_best.pt",
+    "image_size": 512,
+    "roc_auc": 0.475,
+    "train_size": 395,
+    "val_size": 104,
+    "epochs_run": 10,
+    "dataset_version": "cbis-ddsm-sample-500",
+    "recorded_at": "2026-08-02T05:46:30.466493+00:00"
+  },
+  {
+    "model_name": "convnext_tiny",
+    "model_version": "mrrobot-inspired-0.1.0",
+    "profile": "fast",
+    "checkpoint_path": "./model/convnext_best.pt",
+    "image_size": 1024,
+    "roc_auc": 0.478030303030303,
+    "train_size": 395,
+    "val_size": 104,
+    "epochs_run": 8,
+    "dataset_version": "cbis-ddsm-sample-500",
+    "recorded_at": "2026-08-02T06:11:12.673375+00:00"
+  }
+]

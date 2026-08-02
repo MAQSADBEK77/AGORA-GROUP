@@ -137,6 +137,7 @@ class AIPrediction(Base):
     lesion_y      = Column(Float, nullable=True)
     lesion_width  = Column(Float, nullable=True)
     lesion_height = Column(Float, nullable=True)
+    model_version = Column(String(64), nullable=True)  # masalan "mrrobot-inspired-0.1.0" yoki "knn-resnet18" — qaysi model ishlab chiqarganini bildiradi
     created_at    = Column(DateTime(timezone=True), server_default=func.now())
 
     image = relationship("MammographyImage", back_populates="ai_prediction")

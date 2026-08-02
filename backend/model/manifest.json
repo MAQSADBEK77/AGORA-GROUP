@@ -1,0 +1,3495 @@
+[
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0000_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01369",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0001_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01417",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0002_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01574",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0003_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01739",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0004_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00157",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0005_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02195",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0006_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00833",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0007_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00687",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0008_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01274",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0009_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00017",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0010_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00534",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0011_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01220",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0012_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01166",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0013_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01099",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0014_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01254",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0015_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01725",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0016_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00963",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0017_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01516",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0018_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00207",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0019_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00276",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0020_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01655",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0021_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01299",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0022_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01830",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0023_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01066",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0024_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00846",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0025_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01090",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0026_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02368",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0027_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00922",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0028_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00601",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0029_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00600",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0030_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01824",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0031_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00814",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0032_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01257",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0033_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00692",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0034_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00330",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0035_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00340",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0036_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00693",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0037_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00775",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0038_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01654",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0039_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01841",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0040_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00242",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0041_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00952",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0042_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01825",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0043_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00303",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0044_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01123",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0045_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00642",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0046_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00611",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0047_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00685",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0048_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00781",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0049_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00181",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0050_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01838",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0051_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00630",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0052_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01189",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0053_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01486",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0054_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00370",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0055_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01636",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0056_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00209",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0057_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00977",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0058_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00106",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0059_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00877",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0060_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01119",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0061_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01641",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0062_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01614",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0063_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00737",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0064_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00569",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0065_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00754",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0066_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00133",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0067_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01190",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0068_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00418",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0069_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00559",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0070_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01313",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0071_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01293",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0072_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00400",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0073_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01375",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0074_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01186",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0075_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00119",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0076_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01365",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0077_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_02115",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0078_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01628",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0079_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00391",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0081_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01832",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0082_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01383",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0083_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01685",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0084_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01423",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0085_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_02409",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0086_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00369",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0087_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00018",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0088_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01717",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0089_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01149",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0090_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01486",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0091_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00858",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0092_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00631",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0093_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01576",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0094_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01284",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0095_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01387",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0096_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01378",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0097_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01249",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0098_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01008",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0099_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01858",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0100_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00662",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0101_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01635",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0102_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00871",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0103_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01643",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0104_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00634",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0105_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00900",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0106_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01767",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0107_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01297",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0108_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01326",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0109_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01673",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0110_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01548",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0111_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01029",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0112_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00380",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0113_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01239",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0114_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00528",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0115_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01799",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0116_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01729",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0117_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01642",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0118_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00232",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0119_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00700",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0120_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00980",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0121_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01783",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0122_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00224",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0123_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01215",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0124_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00239",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0125_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00605",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0126_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00369",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0127_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00935",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0128_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00781",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0129_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00229",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0130_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01063",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0131_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00291",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0132_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01250",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0133_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00395",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0134_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00034",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0135_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00303",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0136_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00734",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0137_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00043",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0138_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01181",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0139_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01703",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0140_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00385",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0141_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01046",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0142_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01254",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0143_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00901",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0144_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01293",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0145_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00829",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0146_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00057",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0147_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01786",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0148_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01595",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0149_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00613",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0150_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00453",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0151_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01621",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0152_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00673",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0153_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01134",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0154_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00498",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0155_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01617",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0156_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01759",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0157_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01356",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0158_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00486",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0159_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01381",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0160_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00473",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0161_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00680",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0162_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01217",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0163_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01056",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0164_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01865",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0165_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00909",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0166_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01275",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0167_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00893",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0168_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00808",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0169_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00711",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0170_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00759",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0171_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01815",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0172_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_02563",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0173_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00548",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0174_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00197",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0175_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01437",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0176_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00356",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0177_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00395",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0178_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00238",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0179_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01406",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0180_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01321",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0181_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01395",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0182_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00432",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0183_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02424",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0184_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00899",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0185_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00986",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0186_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01301",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0187_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00381",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0188_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00189",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0189_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00396",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0190_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00685",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0191_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00682",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0192_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01740",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0193_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00414",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0194_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00505",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0195_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00682",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0196_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00047",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0197_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01137",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0198_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00577",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0199_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01912",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0200_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01770",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0201_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01623",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0202_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00085",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0203_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01531",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0204_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01123",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0205_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01420",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0206_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_02313",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0207_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00784",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0208_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00366",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0209_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00701",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0210_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01043",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0211_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01709",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0212_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01456",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0213_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01304",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0214_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01321",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0215_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00944",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0216_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00146",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0217_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00528",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0218_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00562",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0219_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00504",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0220_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00750",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0221_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01276",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0222_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01362",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0223_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00055",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0224_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00667",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0225_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00928",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0226_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00773",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0227_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00583",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0228_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01248",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0229_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00158",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0230_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01259",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0231_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01875",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0232_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00177",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0233_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00960",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0234_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01493",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0235_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01447",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0236_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01908",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0237_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01630",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0238_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00021",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0239_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01577",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0240_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00566",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0241_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01754",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0242_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02437",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0243_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00001",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0244_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00342",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0245_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00092",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0246_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00358",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0247_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01518",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0248_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00953",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0249_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00409",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0250_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01569",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0251_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00011",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0252_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01454",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0253_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01183",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0254_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01409",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0255_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00493",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0256_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02154",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0257_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00889",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0258_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00788",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0259_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02380",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0260_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00456",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0261_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01617",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0262_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00859",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0263_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01481",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0264_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01349",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0265_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01286",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0266_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00557",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0267_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00392",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0268_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00841",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0269_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00738",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0270_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00467",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0271_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01327",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0272_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01565",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0273_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00951",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0274_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00836",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0275_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00799",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0276_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00275",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0277_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01646",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0278_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00829",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0279_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01611",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0280_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00863",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0281_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00878",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0282_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00925",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0283_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00534",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0284_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01156",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0285_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00471",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0286_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01545",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0287_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01374",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0288_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00929",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0289_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01248",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0290_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00912",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0291_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00543",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0292_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01073",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0293_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01546",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0294_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00313",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0295_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01316",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0296_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00377",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0297_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00761",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0298_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01331",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0299_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00731",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0300_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01145",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0301_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01077",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0302_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02518",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0303_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01626",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0304_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01232",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0305_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00495",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0306_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01735",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0307_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01155",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0308_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00819",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0309_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01273",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0310_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01095",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0311_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01866",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0312_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01120",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0313_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01473",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0314_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00384",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0315_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01225",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0316_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00328",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0317_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00751",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0318_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00004",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0319_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01326",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0320_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02459",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0321_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01582",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0322_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00096",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0323_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01156",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0324_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00522",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0325_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00024",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0326_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01663",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0327_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01524",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0328_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01099",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0329_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00112",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0330_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00014",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0331_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00179",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0332_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00728",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0333_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00639",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0334_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01070",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0335_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00129",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0336_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00931",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0337_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01616",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0338_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00015",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0339_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00568",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0340_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00675",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0341_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01785",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0342_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00837",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0343_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00452",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0344_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01435",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0345_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00767",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0346_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01031",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0347_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00660",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0348_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01575",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0349_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00955",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0350_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01270",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0351_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00414",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0352_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00471",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0353_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00476",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0354_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00757",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0355_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02419",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0356_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00710",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0357_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01069",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0358_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00883",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0359_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01107",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0360_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00307",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0361_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01400",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0362_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00004",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0363_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02400",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0364_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00694",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0365_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01126",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0366_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01049",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0367_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01508",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0368_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00027",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0369_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00133",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0370_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01003",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0371_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01203",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0372_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00863",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0373_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01647",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0374_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01010",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0375_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01056",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0376_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01192",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0377_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00912",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0378_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00037",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0379_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00480",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0380_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02400",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0381_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00951",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0382_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00302",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0383_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01645",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0384_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01882",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0385_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00519",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0386_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00828",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0387_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01591",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0388_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00522",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0389_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01697",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0390_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01686",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0391_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01097",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0392_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00551",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0393_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02442",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0394_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00251",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0395_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01619",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0396_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00474",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0397_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00569",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0398_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00281",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0399_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01788",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0400_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00920",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0401_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01165",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0402_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00199",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0403_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01800",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0404_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00162",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0405_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01736",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0406_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00534",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0407_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00041",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0408_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01175",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0409_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01108",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0410_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01350",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0411_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00809",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0412_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00010",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0413_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00080",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0414_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00765",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0415_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01844",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0416_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01187",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0417_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02226",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0418_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01702",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0419_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00432",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0420_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01370",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0421_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00296",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0422_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01885",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0423_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01365",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0424_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01097",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0425_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01243",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0426_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00376",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0427_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02559",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0428_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00061",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0429_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01848",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0430_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01130",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0431_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00034",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0432_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00239",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0433_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00293",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0434_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01856",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0435_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00729",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0436_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00159",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0437_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01151",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0438_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02559",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0439_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01397",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0440_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01563",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0441_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01149",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0442_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01810",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0443_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00409",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0444_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02195",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0445_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02402",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0446_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01306",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0447_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01306",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0448_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00894",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0449_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00546",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0450_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01875",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0451_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00012",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0452_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00882",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0453_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01203",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0454_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00157",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0455_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01313",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0456_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00131",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0457_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01054",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0458_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00622",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0459_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01885",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0460_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00432",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0461_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00848",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0462_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01172",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0463_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00171",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0464_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01801",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0465_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00148",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0466_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00982",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0467_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00699",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0468_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00224",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0469_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01283",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0470_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00339",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0471_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00582",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0472_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01093",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0473_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01720",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0474_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01777",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0475_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00514",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0476_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01453",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0477_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01286",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0478_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00145",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0479_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01076",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0480_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00431",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0481_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00923",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0482_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00099",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0483_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00778",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0484_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00652",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0485_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_02105",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0486_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01213",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0487_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01581",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0488_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01292",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0489_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01262",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0490_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00444",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0491_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01481",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0492_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00423",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0493_Malignant.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_00862",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0494_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01816",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0495_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01595",
+    "split": "val"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0496_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_01539",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0497_Malignant.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00490",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0498_Benign.jpg",
+    "label": 1,
+    "label_name": "Malignant",
+    "patient_id": "P_01360",
+    "split": "train"
+  },
+  {
+    "path": "/Users/maqsadbekusmonov/Documents/AGORA-GROUP-main/backend/cbis_data/jpeg_sample/0499_Benign.jpg",
+    "label": 0,
+    "label_name": "Benign",
+    "patient_id": "P_00708",
+    "split": "val"
+  }
+]

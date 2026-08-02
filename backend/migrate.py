@@ -30,6 +30,7 @@ def migrate():
         ("ai_predictions", "lesion_y",      "ALTER TABLE ai_predictions ADD COLUMN lesion_y REAL"),
         ("ai_predictions", "lesion_width",  "ALTER TABLE ai_predictions ADD COLUMN lesion_width REAL"),
         ("ai_predictions", "lesion_height", "ALTER TABLE ai_predictions ADD COLUMN lesion_height REAL"),
+        ("ai_predictions", "model_version", "ALTER TABLE ai_predictions ADD COLUMN model_version TEXT"),
         ("patients", "dicom_patient_id", "ALTER TABLE patients ADD COLUMN dicom_patient_id TEXT"),
         ("mammography_images", "cad_summary", "ALTER TABLE mammography_images ADD COLUMN cad_summary TEXT"),
         ("mammography_images", "patient_orientation", "ALTER TABLE mammography_images ADD COLUMN patient_orientation TEXT"),
