@@ -690,3 +690,38 @@ tekshirildi — `model_status()` to'g'ri `weights_found: false` qaytardi,
 bilan haqiqiy natija qaytardi (KNN natijasida ko'rsatilgan o'xshash rasmlar
 kechagi HAQIQIY shifokor tekshiruvlari ekani alohida tasdiqlandi — bugungi
 test qoldig'i emasligi tekshirildi). So'ng test yozuv/fayllar o'chirildi.
+
+## 26. AI natija asosiy rasmda ko'rsatildi + "Shubhali mintaqa" xatosi tuzatildi (2026-08-02)
+
+Foydalanuvchi skrinshot yuborib ko'rsatdi: "AI dan so'rang" natijasi tepadagi
+asosiy rasmda emas, faqat pastki panelda ko'rinardi — bu noqulay edi.
+
+- `ReviewDetail.jsx` — `loadAiPrediction()` endi natijani `image`/`siblings`
+  state'ga ham yozadi (`p.ai_prediction`), shunda asosiy rasm panel'i buni
+  ko'rib, agar diagnoz Normal bo'lmasa: rasm atrofida rangli ramka (masalan
+  qizil, Malignant uchun) va rasm tepasida to'liq kenglikdagi rangli banner
+  ("L MLO • AI: Malignant") ko'rsatadi. Pastdagi "Eng o'xshash holatlar"
+  bo'limi — foydalanuvchi qo'shimcha rasmlar chiqishini "noqulay" dedi —
+  qisqa matn qatoriga soddalashtirildi (avvalgi turdagi kichik rasm-kartalar
+  olib tashlandi).
+
+**Ikkinchi, jiddiyroq xato shu skrinshotdan aniqlandi**: "Shubhali mintaqa"
+(lesion) ramkasi haqiqiy to'qima ustida emas, balki rasm burchagidagi
+apparat yozgan **"L MLO" yorlig'i ustida** chiqib turgan edi.
+
+- Sabab: `backend/app/ai/lesion.py`dagi `detect_lesion_region()` "eng
+  yorug'/zich mintaqa"ni butun rasm bo'ylab qidirar edi — apparat tomonidan
+  rasm burchagiga yozilgan oq matn (L/R, CC/MLO belgilari) haqiqiy
+  to'qimadan ham yorqinroq bo'lgani uchun noto'g'ri "eng zich mintaqa"
+  sifatida tanlanib qolar edi.
+- Tuzatish: qidiruv rasmning tashqi chetidan 8% marjinni (`EDGE_MARGIN_RATIO`)
+  butunlay chiqarib tashlaydi — apparat yorliqlari deyarli doim shu hududda
+  bo'ladi, haqiqiy ko'krak to'qimasi esa markazda qoladi.
+- Test: sun'iy rasm (markazda haqiqiy "zich mintaqa" + burchakda yorqin "L
+  MLO" matn) bilan tekshirildi — tuzatishdan keyin natija to'g'ri markaziy
+  mintaqani topdi, burchakdagi matnni EMAS.
+- **Bazadagi eski (xato) yozuvlar ham tozalandi**: shu xato bilan
+  saqlangan 5 ta haqiqiy `ai_predictions` qatori topildi (barchasida deyarli
+  bir xil, burchakka mos koordinata) — ularning `lesion_x/y/width/height`
+  maydonlari NULL qilindi (diagnoz/ishonch darajasi O'ZGARTIRILMADI, faqat
+  noto'g'ri ramka ko'rsatilishi to'xtatildi).

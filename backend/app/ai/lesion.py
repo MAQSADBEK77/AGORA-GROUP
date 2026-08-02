@@ -12,6 +12,8 @@ import numpy as np
 
 MIN_AREA_RATIO = 0.001   # rasm yuzasining shu ulushidan kichik bloklar e'tiborga olinmaydi
 DENSE_PERCENTILE = 97     # to'qima ichida eng yorug' foizlik chegara
+EDGE_MARGIN_RATIO = 0.08  # rasm chetidan shu ulush — apparat yozgan "L/R", "MLO" kabi
+                           # yorliqlar deyarli doim shu yerda bo'ladi, to'qima emas
 
 
 def detect_lesion_region(image_path: str) -> dict | None:
@@ -25,6 +27,15 @@ def detect_lesion_region(image_path: str) -> dict | None:
 
     # Fondan ko'krak to'qimasini ajratish
     _, breast_mask = cv2.threshold(blurred, 15, 255, cv2.THRESH_BINARY)
+
+    # Rasm chetlarini (apparat yozgan L/R, MLO/CC kabi yorug' matn yorliqlari
+    # ko'pincha shu yerda bo'ladi) tekshiruvdan chiqarib tashlaymiz — aks holda
+    # ular "eng yorug' mintaqa" sifatida noto'g'ri tanlanib qolishi mumkin edi.
+    mx, my = int(w * EDGE_MARGIN_RATIO), int(h * EDGE_MARGIN_RATIO)
+    edge_mask = np.zeros_like(breast_mask)
+    edge_mask[my:h - my, mx:w - mx] = 255
+    breast_mask = cv2.bitwise_and(breast_mask, edge_mask)
+
     tissue_vals = blurred[breast_mask > 0]
     if tissue_vals.size < 100:
         return None
