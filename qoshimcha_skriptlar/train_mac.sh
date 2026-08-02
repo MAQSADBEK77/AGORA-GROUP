@@ -4,7 +4,7 @@ echo "  MammoAI - ResNet18 Trenirovkasi (CBIS-DDSM)"
 echo "================================================"
 echo ""
 
-cd "$(dirname "$0")/backend"
+cd "$(dirname "$0")/../backend"
 source venv/bin/activate
 
 pip install pandas -q
@@ -36,5 +36,5 @@ python train.py --data_dir "./data" --output_dir "./model" --epochs 25 --batch_s
 echo ""
 echo "================================================"
 echo "  Model saqlandi: backend/model/model_breast.pth"
-echo "  Serverni qayta ishga tushiring: ./start_backend.sh"
+echo "  Serverni qayta ishga tushiring: ./start_backend_mac.sh"
 echo "================================================"

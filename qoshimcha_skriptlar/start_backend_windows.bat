@@ -6,7 +6,7 @@ echo ================================================
 echo   MammoAI Backend ishga tushmoqda...
 echo ================================================
 
-cd /d "%~dp0backend"
+cd /d "%~dp0..\backend"
 
 :: Virtual environment yo'q bo'lsa yaratish
 if not exist "venv\Scripts\activate.bat" (

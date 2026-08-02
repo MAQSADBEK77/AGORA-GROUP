@@ -30,14 +30,22 @@ yetarli — kutubxonalar allaqachon o'rnatilgani uchun bir necha soniyada
 ishga tushadi.
 
 <details>
-<summary>Alohida ishga tushirish (ilg'or foydalanuvchilar uchun)</summary>
+<summary>Alohida ishga tushirish, AI trenirovka, demo data (ilg'or foydalanuvchilar uchun)</summary>
 
 **Talab:** Python 3.10+, Node.js 18+
 
-1. `install_windows.bat` — Python/Node tekshiradi va o'rnatadi
-2. `start_backend_windows.bat` — backend (alohida terminal)
-3. `start_frontend_windows.bat` — frontend (alohida terminal)
-4. Brauzerda oching: [http://localhost:3000](http://localhost:3000)
+Quyidagi fayllar `qoshimcha_skriptlar/` papkasida joylashgan (kunlik
+ishlatishda kerak emas, shuning uchun asosiy papkadan olib qo'yilgan):
+
+1. `install_windows.bat` / `install_mac.sh` — Python/Node tekshiradi va o'rnatadi
+2. `start_backend_windows.bat` / `start_backend_mac.sh` — backend (alohida terminal)
+3. `start_frontend_windows.bat` / `start_frontend_mac.sh` — frontend (alohida terminal)
+4. `install_ai_windows.bat` / `install_ai_mac.sh` — PyTorch/AI kutubxonalarni o'rnatish (~500MB)
+5. `train_windows.bat` / `train_mac.sh` — CBIS-DDSM asosida model trenirovkasi
+6. `setup_demo_windows.bat` / `setup_demo_mac.sh` — Kaggle'dan MIAS demo dataset yuklash
+7. `colab_train.ipynb` — Google Colab'da GPU bilan trenirovka qilish uchun notebook
+
+Brauzerda oching: [http://localhost:3000](http://localhost:3000)
 
 </details>
 

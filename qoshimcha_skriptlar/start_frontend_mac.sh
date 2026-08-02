@@ -3,7 +3,7 @@ echo "================================================"
 echo "  MammoAI Frontend ishga tushmoqda..."
 echo "================================================"
 
-cd "$(dirname "$0")/frontend"
+cd "$(dirname "$0")/../frontend"
 
 NPM=~/miniconda3/bin/npm
 

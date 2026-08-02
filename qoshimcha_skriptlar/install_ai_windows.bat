@@ -8,7 +8,7 @@ echo   ~500MB yuklanadi, internet kerak
 echo ================================================
 echo.
 
-cd /d "%~dp0backend"
+cd /d "%~dp0..\backend"
 call venv\Scripts\activate.bat
 
 echo [1/2] PyTorch CPU o'rnatilmoqda...

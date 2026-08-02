@@ -6,7 +6,7 @@ echo ================================================
 echo   MammoAI Frontend ishga tushmoqda...
 echo ================================================
 
-cd /d "%~dp0frontend"
+cd /d "%~dp0..\frontend"
 
 :: node_modules yo'q bo'lsa o'rnatish
 if not exist "node_modules" (

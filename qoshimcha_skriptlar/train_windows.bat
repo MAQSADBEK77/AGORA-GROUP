@@ -7,7 +7,7 @@ echo   MammoAI - ResNet18 Trenirovkasi (CBIS-DDSM)
 echo ================================================
 echo.
 
-cd /d "%~dp0backend"
+cd /d "%~dp0..\backend"
 call venv\Scripts\activate.bat
 
 :: Pandas kerak (dataset tayyorlash uchun)
@@ -46,6 +46,6 @@ python train.py --data_dir "./data" --output_dir "./model" --epochs 25 --batch_s
 echo.
 echo ================================================
 echo   Model saqlandi: backend\model\model_breast.pth
-echo   Serverni qayta ishga tushiring: start_backend.bat
+echo   Serverni qayta ishga tushiring: start_backend_windows.bat
 echo ================================================
 pause

@@ -8,7 +8,7 @@ echo   (50MB Kaggle dan yuklanadi)
 echo ================================================
 echo.
 
-cd /d "%~dp0backend"
+cd /d "%~dp0..\backend"
 call venv\Scripts\activate.bat
 
 pip install requests pillow numpy -q

@@ -5,7 +5,7 @@ echo "  ~500MB yuklanadi, internet kerak"
 echo "================================================"
 echo ""
 
-cd "$(dirname "$0")/backend"
+cd "$(dirname "$0")/../backend"
 source venv/bin/activate
 
 echo "[1/2] PyTorch CPU o'rnatilmoqda..."

@@ -3,7 +3,7 @@ echo "================================================"
 echo "  MammoAI Backend ishga tushmoqda..."
 echo "================================================"
 
-cd "$(dirname "$0")/backend"
+cd "$(dirname "$0")/../backend"
 
 PYTHON=~/miniconda3/envs/mammoai/bin/python
 PIP=~/miniconda3/envs/mammoai/bin/pip

@@ -34,7 +34,9 @@ if %errorlevel% neq 0 (
 echo.
 echo ================================================
 echo   Hammasi tayyor! Endi ishga tushirish uchun:
-echo   1. start_backend.bat  (backend)
-echo   2. start_frontend.bat (frontend)
+echo   1. start_backend_windows.bat  (backend)
+echo   2. start_frontend_windows.bat (frontend)
+echo   (yoki repo tub papkasidagi ISHGA_TUSHIRISH.bat
+echo    bilan hammasini bitta bosishda qiling)
 echo ================================================
 pause

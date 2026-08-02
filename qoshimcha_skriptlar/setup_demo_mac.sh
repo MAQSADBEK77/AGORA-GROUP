@@ -5,7 +5,7 @@ echo "  (50MB Kaggle dan yuklanadi)"
 echo "================================================"
 echo ""
 
-cd "$(dirname "$0")/backend"
+cd "$(dirname "$0")/../backend"
 source venv/bin/activate
 
 pip install requests pillow numpy -q

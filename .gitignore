@@ -32,8 +32,14 @@ backend/cbis_data/
 dcm/
 *.dcm
 
+# Kaggle API kaliti (maxfiy - hech qachon commit qilinmasin)
+kaggle.json
+
 # Docker
 *.log
 
 # Claude
 .claude/
+
+# macOS
+.DS_Store
