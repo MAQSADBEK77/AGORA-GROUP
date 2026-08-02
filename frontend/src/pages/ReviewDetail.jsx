@@ -614,21 +614,28 @@ export default function ReviewDetail() {
                     <p className="text-xs text-gray-500 font-medium mb-2">
                       Eng o'xshash {similarCases.length} ta holat:
                     </p>
-                    <div className="space-y-1">
-                      {similarCases.slice(0, 4).map((c, i) => (
-                        <div key={i}
-                          className="flex items-center justify-between text-xs bg-gray-50 rounded px-3 py-2">
-                          <span className="text-gray-600">Rasm #{c.image_id}</span>
-                          <div className="flex items-center gap-2">
-                            <span className={`font-medium ${(LABEL_STYLE[c.label] || {}).color || 'text-gray-700'}`}>
+                    <div className="grid grid-cols-4 gap-2">
+                      {similarCases.slice(0, 4).map((c, i) => {
+                        const s = LABEL_STYLE[c.label] || LABEL_STYLE['Normal']
+                        return (
+                          <button key={i} type="button"
+                            onClick={() => navigate(`/review/${c.image_id}`)}
+                            title={`Rasm #${c.image_id} — ${c.label}`}
+                            className="relative aspect-square rounded-lg overflow-hidden bg-black border-2 hover:opacity-90 transition-opacity"
+                            style={{ borderColor: s.hex }}>
+                            <img src={`${API_BASE_URL}/img/${c.image_id}`} alt={c.label}
+                              className="w-full h-full object-cover"
+                              onError={e => { e.target.style.opacity = 0.15 }} />
+                            <span className="absolute top-0 left-0 right-0 text-center text-white text-[9px] font-bold py-0.5 truncate px-1"
+                              style={{ backgroundColor: s.hex }}>
                               {c.label}
                             </span>
-                            <span className="text-gray-400">
+                            <span className="absolute bottom-0.5 right-0.5 text-[9px] font-semibold text-white bg-black/70 px-1 rounded">
                               {Math.round((c.similarity || 0) * 100)}%
                             </span>
-                          </div>
-                        </div>
-                      ))}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 ) : (
